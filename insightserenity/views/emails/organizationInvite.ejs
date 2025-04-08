@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invitation to Join Organization</title>
+  <style>
+    /* Base styles */
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333333;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #ffffff;
+    }
+    .header {
+      text-align: center;
+      padding: 20px 0;
+      border-bottom: 1px solid #eeeeee;
+    }
+    .content {
+      padding: 30px 20px;
+    }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: #888888;
+      border-top: 1px solid #eeeeee;
+    }
+    h1 {
+      color: #333333;
+      margin-top: 0;
+    }
+    .button {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: #2196F3;
+      color: #ffffff !important;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+    .organization-info {
+      margin: 20px 0;
+      padding: 15px;
+      background-color: #f9f9f9;
+      border: 1px solid #eeeeee;
+      border-radius: 4px;
+    }
+    .inviter-info {
+      margin: 20px 0;
+    }
+    .inviter-name {
+      font-weight: bold;
+    }
+    .role-badge {
+      display: inline-block;
+      padding: 5px 10px;
+      background-color: #e3f2fd;
+      color: #1976d2;
+      border-radius: 15px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .note {
+      font-size: 12px;
+      color: #666666;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1><%= appName %></h1>
+    </div>
+    <div class="content">
+      <h2>You've Been Invited!</h2>
+      <p>Hello,</p>
+      <p>You've been invited to join <strong><%= organizationName %></strong> as a <span class="role-badge"><%= role %></span>.</p>
+      
+      <div class="inviter-info">
+        <p>Invited by: <span class="inviter-name"><%= inviterName %></span> (<a href="mailto:<%= inviterEmail %>"><%= inviterEmail %></a>)</p>
+      </div>
+      
+      <div style="text-align: center;">
+        <a href="<%= actionUrl %>" class="button">Accept Invitation</a>
+      </div>
+      
+      <div class="organization-info">
+        <h3><%= organizationName %></h3>
+        <p>By accepting this invitation, you'll be able to collaborate with other members of the organization based on your assigned role.</p>
+      </div>
+      
+      <p class="note">This invitation will expire in <%= expiresIn %>. If you did not expect this invitation, you can safely ignore this email.</p>
+    </div>
+    <div class="footer">
+      <p>© <%= new Date().getFullYear() %> <%= appName %>. All rights reserved.</p>
+      <p>This is an automated message, please do not reply to this email.</p>
+    </div>
+  </div>
+</body>
+</html>

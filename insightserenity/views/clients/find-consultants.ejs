@@ -1,0 +1,199 @@
+<% layout('layouts/dashboard') -%>
+<% block('title', 'Find Consultants - InsightSerenity') -%>
+
+<div class="mb-6">
+  <h1 class="text-2xl font-bold mb-2">Find the Right Consultant</h1>
+  <p class="text-gray-600">Browse our network of qualified consultants to find the perfect match for your project</p>
+</div>
+
+<!-- Search form -->
+<div class="card bg-white p-6 mb-6">
+  <form action="/api/clients/search-consultants" method="POST" id="search-form">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="md:col-span-2">
+        <label for="query" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i data-lucide="search" class="h-5 w-5 text-gray-400"></i>
+          </div>
+          <input type="text" id="query" name="query" class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary" 
+            placeholder="Search by name, skill, or expertise" value="<%= typeof query !== 'undefined' ? query : '' %>">
+        </div>
+      </div>
+      
+      <div>
+        <label for="specialty" class="block text-sm font-medium text-gray-700 mb-1">Specialty</label>
+        <select id="specialty" name="specialty" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary appearance-none">
+          <option value="">All Specialties</option>
+          <% specialties.forEach(specialty => { %>
+            <option value="<%= specialty.value %>" <%= specialty.value === (typeof specialty !== 'undefined' ? specialty : '') ? 'selected' : '' %>>
+              <%= specialty.label %>
+            </option>
+          <% }) %>
+        </select>
+      </div>
+      
+      <div>
+        <label for="maxRate" class="block text-sm font-medium text-gray-700 mb-1">Max Hourly Rate ($)</label>
+        <input type="number" id="maxRate" name="maxRate" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary" 
+          placeholder="Any" value="<%= typeof maxRate !== 'undefined' ? maxRate : '' %>" min="0" step="10">
+      </div>
+    </div>
+    
+    <div class="mt-4">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Skills (select up to 5)</label>
+      <div class="flex flex-wrap gap-2 mb-2">
+        <% skills.slice(0, 20).forEach(skill => { %>
+          <div class="skill-chip">
+            <input type="checkbox" id="skill-<%= skill.name %>" name="skill" value="<%= skill.name %>" class="hidden skill-checkbox"
+              <%= typeof skills !== 'undefined' && skills.includes(skill.name) ? 'checked' : '' %>>
+            <label for="skill-<%= skill.name %>" class="inline-block px-3 py-1 rounded-full border border-gray-300 text-sm cursor-pointer transition-colors">
+              <%= skill.name %> <span class="text-xs text-gray-500">(<%= skill.count %>)</span>
+            </label>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+    
+    <div class="mt-4 flex justify-end">
+      <button type="reset" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+        Reset
+      </button>
+      <button type="submit" class="ml-3 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+        Search
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Results or Recommendations -->
+<div class="card bg-white p-6">
+  <div class="mb-6">
+    <h2 class="text-xl font-semibold">
+      <% if (typeof recommendations !== 'undefined' && recommendations.length > 0) { %>
+        Recommended Consultants
+      <% } else if (typeof consultants !== 'undefined' && consultants.length > 0) { %>
+        Search Results
+      <% } else { %>
+        Top Consultants
+      <% } %>
+    </h2>
+  </div>
+  
+  <% if ((typeof consultants !== 'undefined' && consultants.length > 0) || (typeof recommendations !== 'undefined' && recommendations.length > 0)) { %>
+    <% const displayConsultants = consultants || recommendations; %>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% displayConsultants.forEach(consultant => { %>
+        <div class="border rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+          <div class="p-4">
+            <div class="flex items-start space-x-4">
+              <% if (consultant.avatarUrl) { %>
+                <img src="<%= consultant.avatarUrl %>" alt="<%= consultant.name %>" class="h-16 w-16 rounded-full object-cover">
+              <% } else { %>
+                <div class="h-16 w-16 rounded-full bg-primary flex items-center justify-center text-dark font-bold text-xl">
+                  <%= consultant.name.split(' ')[0].charAt(0) %><%= consultant.name.split(' ')[1].charAt(0) %>
+                </div>
+              <% } %>
+              <div>
+                <h3 class="text-lg font-medium mb-1"><%= consultant.name %></h3>
+                <p class="text-gray-600 text-sm mb-2"><%= consultant.title %></p>
+                <div class="flex items-center mb-2">
+                  <i data-lucide="star" class="h-4 w-4 text-yellow-400"></i>
+                  <span class="text-sm ml-1">
+                    <%= consultant.rating.toFixed(1) %> (<%= consultant.reviewCount %> reviews)
+                  </span>
+                </div>
+                <p class="text-sm font-medium">
+                  <%= consultant.currency === 'USD' ? '$' : consultant.currency %><%= consultant.hourlyRate %>/hr
+                </p>
+              </div>
+            </div>
+              
+            <div class="mt-3">
+              <div class="flex flex-wrap gap-1 mb-3">
+                <% consultant.skills.slice(0, 3).forEach(skill => { %>
+                  <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">
+                    <%= skill %>
+                  </span>
+                <% }) %>
+                <% if (consultant.skills.length > 3) { %>
+                  <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">
+                    +<%= consultant.skills.length - 3 %> more
+                  </span>
+                <% } %>
+              </div>
+                
+              <div class="flex justify-between">
+                <a href="/consultants/<%= consultant.id %>/profile" class="text-primary-dark hover:text-primary text-sm font-medium">
+                  View Profile
+                </a>
+                <form action="/api/clients/save-consultant/<%= consultant.id %>" method="POST" class="inline">
+                  <button type="submit" class="text-gray-500 hover:text-primary text-sm font-medium flex items-center">
+                    <i data-lucide="bookmark" class="h-4 w-4 mr-1"></i> Save
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  <% } else { %>
+    <div class="text-center py-8">
+      <div class="mb-4">
+        <i data-lucide="search" class="h-12 w-12 mx-auto text-gray-400"></i>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-1">No consultants found</h3>
+      <p class="text-gray-500 mb-4">Try adjusting your search criteria</p>
+      <button id="reset-search" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+        Reset Search
+      </button>
+    </div>
+  <% } %>
+</div>
+
+<% block('additionalJS', `
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Handle skill chip selection
+    const skillChips = document.querySelectorAll('.skill-chip');
+    const maxSkills = 5;
+    
+    skillChips.forEach(chip => {
+      const checkbox = chip.querySelector('.skill-checkbox');
+      const label = chip.querySelector('label');
+      
+      label.addEventListener('click', function(e) {
+        // If the checkbox is not checked and we've reached the max, prevent checking more
+        const selectedCount = document.querySelectorAll('.skill-checkbox:checked').length;
+        if (!checkbox.checked && selectedCount >= maxSkills) {
+          e.preventDefault();
+          alert('You can select up to 5 skills');
+          return false;
+        }
+        
+        // Toggle active class for styling
+        if (checkbox.checked) {
+          label.classList.remove('bg-primary', 'text-dark');
+          label.classList.add('bg-white', 'text-gray-700');
+        } else {
+          label.classList.add('bg-primary', 'text-dark');
+          label.classList.remove('bg-white', 'text-gray-700');
+        }
+      });
+      
+      // Apply initial styling based on checked state
+      if (checkbox.checked) {
+        label.classList.add('bg-primary', 'text-dark');
+        label.classList.remove('bg-white', 'text-gray-700');
+      }
+    });
+    
+    // Handle reset button
+    document.getElementById('reset-search').addEventListener('click', function() {
+      document.getElementById('search-form').reset();
+      document.getElementById('search-form').submit();
+    });
+  });
+</script>
+`) -%>

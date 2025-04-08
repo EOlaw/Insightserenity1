@@ -1,0 +1,1167 @@
+<!-- views/case-studies/editor.ejs -->
+<% layout('layouts/case-study') %>
+
+<div class="bg-white shadow-sm rounded-lg overflow-hidden">
+  <!-- Header -->
+  <div class="bg-gray-50 border-b border-gray-200 px-6 py-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h1 class="text-xl font-bold text-gray-800"><%= caseStudy ? 'Edit Case Study' : 'Create New Case Study' %></h1>
+        <p class="text-sm text-gray-600 mt-1">
+          <%= caseStudy ? 'Update details of an existing case study' : 'Showcase your consulting success with a new case study' %>
+        </p>
+      </div>
+      
+      <div class="mt-3 sm:mt-0">
+        <a href="<%= caseStudy ? '/api/case-studies/' + caseStudy.slug : '/api/case-studies' %>" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none">
+          <i data-lucide="x" class="h-4 w-4 mr-2"></i>
+          Cancel
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Form Content -->
+  <form id="case-study-form" method="POST" action="<%= caseStudy ? '/api/case-studies/' + caseStudy._id + '?_method=PUT' : '/api/case-studies' %>" enctype="multipart/form-data" class="px-6 py-6">
+    <!-- Status and Visibility -->
+    <div class="mb-6 flex items-center justify-between bg-gray-50 p-4 rounded-lg">
+      <% if (caseStudy) { %>
+        <div class="flex items-center">
+          <span class="mr-2 text-sm font-medium text-gray-700">Status:</span>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+            <% if (caseStudy.status === 'published') { %>
+              bg-green-100 text-green-800
+            <% } else if (caseStudy.status === 'draft') { %>
+              bg-gray-100 text-gray-800
+            <% } else if (caseStudy.status === 'archived') { %>
+              bg-red-100 text-red-800
+            <% } %>">
+            <i data-lucide="<%= caseStudy.status === 'published' ? 'check-circle' : (caseStudy.status === 'draft' ? 'clock' : 'archive') %>" class="h-3 w-3 mr-1"></i>
+            <%= caseStudy.status.charAt(0).toUpperCase() + caseStudy.status.slice(1) %>
+          </span>
+        </div>
+        
+        <div class="flex items-center">
+          <% if (caseStudy.status !== 'published') { %>
+            <button type="button" id="publish-btn" data-id="<%= caseStudy._id %>" class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none mr-2">
+              <i data-lucide="send" class="h-3 w-3 mr-1"></i>
+              Publish
+            </button>
+          <% } %>
+          
+          <% if (caseStudy.status !== 'draft') { %>
+            <button type="button" id="draft-btn" data-id="<%= caseStudy._id %>" class="inline-flex items-center px-3 py-1 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none mr-2">
+              <i data-lucide="edit-3" class="h-3 w-3 mr-1"></i>
+              Set as Draft
+            </button>
+          <% } %>
+          
+          <% if (caseStudy.status !== 'archived') { %>
+            <button type="button" id="archive-btn" data-id="<%= caseStudy._id %>" class="inline-flex items-center px-3 py-1 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none">
+              <i data-lucide="archive" class="h-3 w-3 mr-1"></i>
+              Archive
+            </button>
+          <% } %>
+        </div>
+      <% } else { %>
+        <div class="flex items-center">
+          <span class="mr-2 text-sm font-medium text-gray-700">Status:</span>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+            <i data-lucide="clock" class="h-3 w-3 mr-1"></i>
+            Draft
+          </span>
+        </div>
+        
+        <input type="hidden" name="status" value="draft">
+      <% } %>
+    </div>
+  
+    <!-- Form Tabs -->
+    <div class="mb-6 border-b border-gray-200">
+      <div class="flex space-x-6" id="form-tabs">
+        <button type="button" class="px-1 py-3 border-b-2 border-primary text-sm font-medium text-gray-900 focus:outline-none tab-btn active" data-tab="basic-info">
+          Basic Info
+        </button>
+        <button type="button" class="px-1 py-3 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none tab-btn" data-tab="content">
+          Content
+        </button>
+        <button type="button" class="px-1 py-3 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none tab-btn" data-tab="media">
+          Media
+        </button>
+        <button type="button" class="px-1 py-3 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none tab-btn" data-tab="related">
+          Related Items
+        </button>
+        <button type="button" class="px-1 py-3 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none tab-btn" data-tab="settings">
+          Settings
+        </button>
+      </div>
+    </div>
+    
+    <!-- Tab Content -->
+    <div id="form-tab-content">
+      <!-- Basic Info Tab -->
+      <div class="tab-panel active" id="basic-info-panel">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Title -->
+          <div class="col-span-full">
+            <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Title*</label>
+            <input type="text" id="title" name="title" value="<%= caseStudy ? caseStudy.title : '' %>" required class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm">
+            <p class="mt-1 text-xs text-gray-500">A clear, concise title for your case study (3-200 characters)</p>
+          </div>
+          
+          <!-- Slug -->
+          <div class="col-span-full">
+            <label for="slug" class="block text-sm font-medium text-gray-700 mb-1">URL Slug</label>
+            <div class="flex rounded-md shadow-sm">
+              <span class="inline-flex items-center px-3 py-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-xs">
+                /case-studies/
+              </span>
+              <input type="text" id="slug" name="slug" value="<%= caseStudy ? caseStudy.slug : '' %>" class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-primary focus:border-primary text-sm" placeholder="auto-generated-from-title">
+            </div>
+            <p class="mt-1 text-xs text-gray-500">Leave blank to auto-generate from title (lowercase letters, numbers, and hyphens only)</p>
+          </div>
+          
+          <!-- Client Information Section -->
+          <div class="col-span-full mt-3">
+            <h3 class="text-base font-medium text-gray-900 mb-2">Client Information</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-4 rounded-md">
+              <!-- Client Name -->
+              <div>
+                <label for="client-name" class="block text-sm font-medium text-gray-700 mb-1">Client Name*</label>
+                <input type="text" id="client-name" name="client.name" value="<%= caseStudy && caseStudy.client ? caseStudy.client.name : '' %>" required class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm">
+              </div>
+              
+              <!-- Client Industry -->
+              <div>
+                <label for="client-industry" class="block text-sm font-medium text-gray-700 mb-1">Industry*</label>
+                <select id="client-industry" name="client.industry" required class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm">
+                  <option value="" disabled <%= !caseStudy || !caseStudy.client || !caseStudy.client.industry ? 'selected' : '' %>>Select industry</option>
+                  <option value="technology" <%= caseStudy && caseStudy.client && caseStudy.client.industry === 'technology' ? 'selected' : '' %>>Technology</option>
+                  <option value="healthcare" <%= caseStudy && caseStudy.client && caseStudy.client.industry === 'healthcare' ? 'selected' : '' %>>Healthcare</option>
+                  <option value="finance" <%= caseStudy && caseStudy.client && caseStudy.client.industry === 'finance' ? 'selected' : '' %>>Finance</option>
+                  <option value="education" <%= caseStudy && caseStudy.client && caseStudy.client.industry === 'education' ? 'selected' : '' %>>Education</option>
+                  <option value="retail" <%= caseStudy && caseStudy.client && caseStudy.client.industry === 'retail' ? 'selected' : '' %>>Retail</option>
+                  <option value="manufacturing" <%= caseStudy && caseStudy.client && caseStudy.client.industry === 'manufacturing' ? 'selected' : '' %>>Manufacturing</option>
+                  <option value="media" <%= caseStudy && caseStudy.client && caseStudy.client.industry === 'media' ? 'selected' : '' %>>Media</option>
+                  <option value="legal" <%= caseStudy && caseStudy.client && caseStudy.client.industry === 'legal' ? 'selected' : '' %>>Legal</option>
+                  <option value="real_estate" <%= caseStudy && caseStudy.client && caseStudy.client.industry === 'real_estate' ? 'selected' : '' %>>Real Estate</option>
+                  <option value="energy" <%= caseStudy && caseStudy.client && caseStudy.client.industry === 'energy' ? 'selected' : '' %>>Energy</option>
+                  <option value="hospitality" <%= caseStudy && caseStudy.client && caseStudy.client.industry === 'hospitality' ? 'selected' : '' %>>Hospitality</option>
+                  <option value="nonprofit" <%= caseStudy && caseStudy.client && caseStudy.client.industry === 'nonprofit' ? 'selected' : '' %>>Nonprofit</option>
+                  <option value="government" <%= caseStudy && caseStudy.client && caseStudy.client.industry === 'government' ? 'selected' : '' %>>Government</option>
+                  <option value="transportation" <%= caseStudy && caseStudy.client && caseStudy.client.industry === 'transportation' ? 'selected' : '' %>>Transportation</option>
+                  <option value="other" <%= caseStudy && caseStudy.client && caseStudy.client.industry === 'other' ? 'selected' : '' %>>Other</option>
+                </select>
+              </div>
+              
+              <!-- Client Size -->
+              <div>
+                <label for="client-size" class="block text-sm font-medium text-gray-700 mb-1">Company Size</label>
+                <select id="client-size" name="client.size" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm">
+                  <option value="" <%= !caseStudy || !caseStudy.client || !caseStudy.client.size ? 'selected' : '' %>>Not specified</option>
+                  <option value="1-10" <%= caseStudy && caseStudy.client && caseStudy.client.size === '1-10' ? 'selected' : '' %>>1-10 employees</option>
+                  <option value="11-50" <%= caseStudy && caseStudy.client && caseStudy.client.size === '11-50' ? 'selected' : '' %>>11-50 employees</option>
+                  <option value="51-200" <%= caseStudy && caseStudy.client && caseStudy.client.size === '51-200' ? 'selected' : '' %>>51-200 employees</option>
+                  <option value="201-500" <%= caseStudy && caseStudy.client && caseStudy.client.size === '201-500' ? 'selected' : '' %>>201-500 employees</option>
+                  <option value="501-1000" <%= caseStudy && caseStudy.client && caseStudy.client.size === '501-1000' ? 'selected' : '' %>>501-1000 employees</option>
+                  <option value="1000+" <%= caseStudy && caseStudy.client && caseStudy.client.size === '1000+' ? 'selected' : '' %>>1000+ employees</option>
+                </select>
+              </div>
+              
+              <!-- Client Location -->
+              <div>
+                <label for="client-location" class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                <input type="text" id="client-location" name="client.location" value="<%= caseStudy && caseStudy.client ? caseStudy.client.location : '' %>" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm" placeholder="City, Country">
+              </div>
+              
+              <!-- Anonymous Option -->
+              <div class="col-span-full">
+                <div class="flex items-center">
+                  <input type="checkbox" id="client-anonymous" name="client.isAnonymous" <%= caseStudy && caseStudy.client && caseStudy.client.isAnonymous ? 'checked' : '' %> class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                  <label for="client-anonymous" class="ml-2 block text-sm text-gray-700">
+                    Make client identity confidential
+                  </label>
+                </div>
+                <p class="mt-1 text-xs text-gray-500">Check this if you need to keep the client's identity private for confidentiality reasons</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Project Duration Section -->
+          <div class="col-span-full mt-3">
+            <h3 class="text-base font-medium text-gray-900 mb-2">Project Duration</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 p-4 rounded-md">
+              <!-- Start Date -->
+              <div>
+                <label for="duration-start" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                <input type="date" id="duration-start" name="duration.startDate" value="<%= caseStudy && caseStudy.duration && caseStudy.duration.startDate ? new Date(caseStudy.duration.startDate).toISOString().split('T')[0] : '' %>" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm">
+              </div>
+              
+              <!-- End Date -->
+              <div>
+                <label for="duration-end" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                <input type="date" id="duration-end" name="duration.endDate" value="<%= caseStudy && caseStudy.duration && caseStudy.duration.endDate ? new Date(caseStudy.duration.endDate).toISOString().split('T')[0] : '' %>" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm">
+              </div>
+              
+              <!-- Timeframe Text -->
+              <div class="col-span-full">
+                <label for="duration-timeframe" class="block text-sm font-medium text-gray-700 mb-1">Timeframe Description (Optional)</label>
+                <input type="text" id="duration-timeframe" name="duration.timeframe" value="<%= caseStudy && caseStudy.duration ? caseStudy.duration.timeframe : '' %>" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm" placeholder="e.g., '3 months', 'Ongoing' or 'Q2 2023-Q1 2024'">
+                <p class="mt-1 text-xs text-gray-500">Custom timeframe description. If provided, this will be displayed instead of the calculated duration from start/end dates.</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Summary -->
+          <div class="col-span-full mt-3">
+            <label for="summary" class="block text-sm font-medium text-gray-700 mb-1">Executive Summary*</label>
+            <textarea id="summary" name="summary" rows="4" required maxlength="500" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm"><%= caseStudy ? caseStudy.summary : '' %></textarea>
+            <p class="mt-1 text-xs text-gray-500">A brief overview of the case study (max 500 characters). This will appear in listings and at the top of the case study.</p>
+            <div class="mt-1 text-xs text-gray-500 text-right"><span id="summary-chars">0</span>/500</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Content Tab -->
+      <div class="tab-panel" id="content-panel" style="display: none;">
+        <div class="space-y-6">
+          <!-- Challenge -->
+          <div>
+            <label for="challenge" class="block text-sm font-medium text-gray-700 mb-1">Challenge*</label>
+            <textarea id="challenge" name="challenge" rows="6" required maxlength="3000" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm"><%= caseStudy ? caseStudy.challenge : '' %></textarea>
+            <p class="mt-1 text-xs text-gray-500">Describe the problem or challenge the client was facing (max 3000 characters)</p>
+            <div class="mt-1 text-xs text-gray-500 text-right"><span id="challenge-chars">0</span>/3000</div>
+          </div>
+          
+          <!-- Approach -->
+          <div>
+            <label for="approach" class="block text-sm font-medium text-gray-700 mb-1">Approach*</label>
+            <textarea id="approach" name="approach" rows="6" required maxlength="3000" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm"><%= caseStudy ? caseStudy.approach : '' %></textarea>
+            <p class="mt-1 text-xs text-gray-500">Describe your approach to solving the problem (max 3000 characters)</p>
+            <div class="mt-1 text-xs text-gray-500 text-right"><span id="approach-chars">0</span>/3000</div>
+          </div>
+          
+          <!-- Solution -->
+          <div>
+            <label for="solution" class="block text-sm font-medium text-gray-700 mb-1">Solution*</label>
+            <textarea id="solution" name="solution" rows="6" required maxlength="3000" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm"><%= caseStudy ? caseStudy.solution : '' %></textarea>
+            <p class="mt-1 text-xs text-gray-500">Describe the solution that was implemented (max 3000 characters)</p>
+            <div class="mt-1 text-xs text-gray-500 text-right"><span id="solution-chars">0</span>/3000</div>
+          </div>
+          
+          <!-- Results -->
+          <div>
+            <label for="results-description" class="block text-sm font-medium text-gray-700 mb-1">Results*</label>
+            <textarea id="results-description" name="results.description" rows="6" required maxlength="3000" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm"><%= caseStudy && caseStudy.results ? caseStudy.results.description : '' %></textarea>
+            <p class="mt-1 text-xs text-gray-500">Describe the outcomes and results achieved (max 3000 characters)</p>
+            <div class="mt-1 text-xs text-gray-500 text-right"><span id="results-chars">0</span>/3000</div>
+          </div>
+          
+          <!-- Result Metrics -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-sm font-medium text-gray-700">Key Metrics (Optional)</label>
+              <button type="button" id="add-metric-btn" class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-primary hover:bg-primary-light focus:outline-none">
+                <i data-lucide="plus" class="h-3 w-3 mr-1"></i>
+                Add Metric
+              </button>
+            </div>
+            
+            <div id="metrics-container" class="space-y-3">
+              <% if(caseStudy && caseStudy.results && caseStudy.results.metrics && caseStudy.results.metrics.length > 0) { %>
+                <% caseStudy.results.metrics.forEach((metric, index) => { %>
+                  <div class="metric-item bg-gray-50 p-3 rounded-md border border-gray-200 relative">
+                    <button type="button" class="remove-metric-btn absolute top-2 right-2 text-gray-400 hover:text-gray-600">
+                      <i data-lucide="x" class="h-4 w-4"></i>
+                    </button>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Label</label>
+                        <input type="text" name="results.metrics[<%= index %>].label" value="<%= metric.label %>" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-xs" placeholder="e.g., 'Increase in Revenue'">
+                      </div>
+                      <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Value</label>
+                        <input type="text" name="results.metrics[<%= index %>].value" value="<%= metric.value %>" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-xs" placeholder="e.g., '32%' or '$1.2M'">
+                      </div>
+                      <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Icon (Optional)</label>
+                        <input type="text" name="results.metrics[<%= index %>].icon" value="<%= metric.icon %>" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-xs" placeholder="e.g., 'trending-up'">
+                      </div>
+                    </div>
+                  </div>
+                <% }) %>
+              <% } %>
+            </div>
+            
+            <p class="mt-2 text-xs text-gray-500">Add key metrics that highlight the impact of your work</p>
+          </div>
+          
+          <!-- Testimonial -->
+          <div>
+            <h3 class="text-base font-medium text-gray-900 mb-2">Testimonial (Optional)</h3>
+            <div class="bg-gray-50 p-4 rounded-md space-y-4">
+              <div>
+                <label for="testimonial-quote" class="block text-sm font-medium text-gray-700 mb-1">Quote</label>
+                <textarea id="testimonial-quote" name="testimonial.quote" rows="3" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm"><%= caseStudy && caseStudy.testimonial ? caseStudy.testimonial.quote : '' %></textarea>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label for="testimonial-author" class="block text-sm font-medium text-gray-700 mb-1">Author Name</label>
+                  <input type="text" id="testimonial-author" name="testimonial.author" value="<%= caseStudy && caseStudy.testimonial ? caseStudy.testimonial.author : '' %>" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm">
+                </div>
+                
+                <div>
+                  <label for="testimonial-position" class="block text-sm font-medium text-gray-700 mb-1">Position/Title</label>
+                  <input type="text" id="testimonial-position" name="testimonial.position" value="<%= caseStudy && caseStudy.testimonial ? caseStudy.testimonial.position : '' %>" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm">
+                </div>
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Avatar Image</label>
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-14 w-14 bg-gray-100 rounded-full overflow-hidden mr-3 flex items-center justify-center">
+                    <% if(caseStudy && caseStudy.testimonial && caseStudy.testimonial.avatar) { %>
+                      <img src="<%= caseStudy.testimonial.avatar %>" alt="Avatar" class="h-full w-full object-cover">
+                    <% } else { %>
+                      <i data-lucide="user" class="h-8 w-8 text-gray-400"></i>
+                    <% } %>
+                  </div>
+                  
+                  <div class="flex-grow">
+                    <p class="text-xs text-gray-500 mb-1">
+                      <% if(caseStudy && caseStudy.testimonial && caseStudy.testimonial.avatar) { %>
+                        Current: <%= caseStudy.testimonial.avatar.split('/').pop() %>
+                      <% } else { %>
+                        No avatar uploaded
+                      <% } %>
+                    </p>
+                    
+                    <div class="text-xs">
+                      <button type="button" id="upload-avatar-btn" class="inline-flex items-center px-2 py-1 text-primary hover:text-primary-dark focus:outline-none">
+                        <i data-lucide="upload" class="h-3 w-3 mr-1"></i>
+                        Upload new avatar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Media Tab -->
+      <div class="tab-panel" id="media-panel" style="display: none;">
+        <div class="space-y-6">
+          <!-- Featured Image -->
+          <div>
+            <h3 class="text-base font-medium text-gray-900 mb-2">Featured Image</h3>
+            <div class="bg-gray-50 p-4 rounded-md">
+              <div class="flex flex-col md:flex-row md:items-center">
+                <div class="flex-shrink-0 h-40 w-full md:w-64 bg-gray-200 rounded-md overflow-hidden mb-4 md:mb-0 md:mr-4">
+                  <% if(caseStudy && caseStudy.media && caseStudy.media.featuredImage) { %>
+                    <img src="<%= caseStudy.media.featuredImage %>" alt="Featured Image" class="h-full w-full object-cover">
+                  <% } else { %>
+                    <div class="h-full w-full flex items-center justify-center">
+                      <i data-lucide="image" class="h-16 w-16 text-gray-400"></i>
+                    </div>
+                  <% } %>
+                </div>
+                
+                <div class="flex-grow">
+                  <p class="text-sm text-gray-700 mb-3">This image will be shown at the top of the case study and in listing cards. For best results, use a high-quality image with a 16:9 aspect ratio.</p>
+                  
+                  <% if(caseStudy && caseStudy.media && caseStudy.media.featuredImage) { %>
+                    <p class="text-xs text-gray-500 mb-2">Current: <%= caseStudy.media.featuredImage.split('/').pop() %></p>
+                  <% } %>
+                  
+                  <div class="mt-1 flex items-center">
+                    <button type="button" id="upload-featured-btn" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none">
+                      <i data-lucide="upload" class="h-4 w-4 mr-2"></i>
+                      <%= caseStudy && caseStudy.media && caseStudy.media.featuredImage ? 'Replace Image' : 'Upload Image' %>
+                    </button>
+                    
+                    <% if(caseStudy && caseStudy.media && caseStudy.media.featuredImage) { %>
+                      <button type="button" id="remove-featured-btn" class="ml-3 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none">
+                        <i data-lucide="trash-2" class="h-4 w-4 mr-2"></i>
+                        Remove
+                      </button>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Image Gallery -->
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-base font-medium text-gray-900">Image Gallery</h3>
+              <button type="button" id="add-gallery-image-btn" class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-dark bg-primary hover:bg-primary-dark focus:outline-none">
+                <i data-lucide="plus" class="h-4 w-4 mr-1"></i>
+                Add Image
+              </button>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-md">
+              <div id="gallery-container" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <% if(caseStudy && caseStudy.media && caseStudy.media.gallery && caseStudy.media.gallery.length > 0) { %>
+                  <% caseStudy.media.gallery.forEach(image => { %>
+                    <div class="gallery-item relative bg-white border border-gray-200 rounded-md overflow-hidden shadow-sm">
+                      <img src="<%= image %>" alt="Gallery Image" class="w-full h-32 object-cover">
+                      <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center opacity-0 hover:opacity-100">
+                        <button type="button" class="remove-gallery-btn inline-flex items-center justify-center h-8 w-8 rounded-full bg-white text-red-600 hover:text-red-800" data-url="<%= image %>">
+                          <i data-lucide="trash-2" class="h-4 w-4"></i>
+                        </button>
+                      </div>
+                      <input type="hidden" name="media.gallery[]" value="<%= image %>">
+                    </div>
+                  <% }) %>
+                <% } else { %>
+                  <div class="col-span-full py-10 text-center">
+                    <i data-lucide="image" class="h-12 w-12 text-gray-400 mx-auto mb-2"></i>
+                    <p class="text-sm text-gray-500">No gallery images added yet</p>
+                    <p class="text-xs text-gray-500 mt-1">Add images to showcase your work</p>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Video URL -->
+          <div>
+            <h3 class="text-base font-medium text-gray-900 mb-2">Video URL (Optional)</h3>
+            <div class="bg-gray-50 p-4 rounded-md">
+              <div class="flex items-center">
+                <div class="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-md bg-gray-100 mr-3">
+                  <i data-lucide="video" class="h-4 w-4 text-gray-500"></i>
+                </div>
+                <div class="flex-grow">
+                  <input type="url" id="video-url" name="media.video" value="<%= caseStudy && caseStudy.media ? caseStudy.media.video : '' %>" placeholder="https://www.youtube.com/watch?v=..." class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm">
+                </div>
+              </div>
+              <p class="mt-2 text-xs text-gray-500">Add a YouTube or Vimeo URL to complement your case study</p>
+            </div>
+          </div>
+          
+          <!-- Client Logo -->
+          <div>
+            <h3 class="text-base font-medium text-gray-900 mb-2">Client Logo (Optional)</h3>
+            <div class="bg-gray-50 p-4 rounded-md">
+              <div class="flex items-center">
+                <div class="flex-shrink-0 h-20 w-20 bg-white border border-gray-200 rounded-md overflow-hidden flex items-center justify-center mr-4">
+                  <% if(caseStudy && caseStudy.client && caseStudy.client.logo) { %>
+                    <img src="<%= caseStudy.client.logo %>" alt="Client Logo" class="h-full w-full object-contain p-2">
+                  <% } else { %>
+                    <i data-lucide="building" class="h-10 w-10 text-gray-300"></i>
+                  <% } %>
+                </div>
+                
+                <div class="flex-grow">
+                  <p class="text-sm text-gray-700 mb-3">Upload the client's logo to display in the case study. Square or landscape format recommended.</p>
+                  
+                  <% if(caseStudy && caseStudy.client && caseStudy.client.logo) { %>
+                    <p class="text-xs text-gray-500 mb-2">Current: <%= caseStudy.client.logo.split('/').pop() %></p>
+                  <% } %>
+                  
+                  <div class="mt-1 flex items-center">
+                    <button type="button" id="upload-logo-btn" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none">
+                      <i data-lucide="upload" class="h-4 w-4 mr-2"></i>
+                      <%= caseStudy && caseStudy.client && caseStudy.client.logo ? 'Replace Logo' : 'Upload Logo' %>
+                    </button>
+                    
+                    <% if(caseStudy && caseStudy.client && caseStudy.client.logo) { %>
+                      <button type="button" id="remove-logo-btn" class="ml-3 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none">
+                        <i data-lucide="trash-2" class="h-4 w-4 mr-2"></i>
+                        Remove
+                      </button>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Downloadable Files -->
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-base font-medium text-gray-900">Downloadable Files</h3>
+              <button type="button" id="add-download-btn" class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-dark bg-primary hover:bg-primary-dark focus:outline-none">
+                <i data-lucide="plus" class="h-4 w-4 mr-1"></i>
+                Add File
+              </button>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-md">
+              <div id="downloads-container">
+                <% if(caseStudy && caseStudy.downloads && caseStudy.downloads.length > 0) { %>
+                  <div class="space-y-3">
+                    <% caseStudy.downloads.forEach((download, index) => { %>
+                      <div class="download-item bg-white p-3 rounded-md border border-gray-200 flex items-center relative">
+                        <button type="button" class="remove-download-btn absolute top-3 right-3 text-gray-400 hover:text-red-600">
+                          <i data-lucide="x" class="h-4 w-4"></i>
+                        </button>
+                        
+                        <% if(download.type === 'pdf') { %>
+                          <i data-lucide="file-text" class="h-8 w-8 text-red-500 mr-4"></i>
+                        <% } else if(download.type === 'pptx') { %>
+                          <i data-lucide="file-presentation" class="h-8 w-8 text-orange-500 mr-4"></i>
+                        <% } else if(download.type === 'docx') { %>
+                          <i data-lucide="file" class="h-8 w-8 text-blue-500 mr-4"></i>
+                        <% } else { %>
+                          <i data-lucide="file" class="h-8 w-8 text-gray-500 mr-4"></i>
+                        <% } %>
+                        
+                        <div class="flex-grow">
+                          <div class="text-sm font-medium text-gray-900"><%= download.title %></div>
+                          <div class="flex items-center mt-1 space-x-4">
+                            <span class="text-xs text-gray-500"><%= download.file.split('/').pop() %></span>
+                            <span class="text-xs text-gray-500"><%= download.size %></span>
+                          </div>
+                          <input type="hidden" name="downloads[<%= index %>].title" value="<%= download.title %>">
+                          <input type="hidden" name="downloads[<%= index %>].file" value="<%= download.file %>">
+                          <input type="hidden" name="downloads[<%= index %>].type" value="<%= download.type %>">
+                          <input type="hidden" name="downloads[<%= index %>].size" value="<%= download.size %>">
+                        </div>
+                        
+                        <div class="ml-4 flex items-center">
+                          <div class="relative inline-block">
+                            <input type="checkbox" name="downloads[<%= index %>].isPublic" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-gray-300 appearance-none cursor-pointer focus:outline-none transition-all duration-200 checked:border-primary-dark checked:right-0" <%= download.isPublic ? 'checked' : '' %>>
+                            <label class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer w-12"></label>
+                          </div>
+                          <span class="ml-2 text-xs text-gray-700">Public</span>
+                        </div>
+                      </div>
+                    <% }) %>
+                  </div>
+                <% } else { %>
+                  <div class="py-10 text-center">
+                    <i data-lucide="file" class="h-12 w-12 text-gray-400 mx-auto mb-2"></i>
+                    <p class="text-sm text-gray-500">No downloadable files added yet</p>
+                    <p class="text-xs text-gray-500 mt-1">Add PDF brochures, case study documents, presentations, etc.</p>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Related Items Tab -->
+      <div class="tab-panel" id="related-panel" style="display: none;">
+        <div class="space-y-6">
+          <!-- Services -->
+          <div>
+            <h3 class="text-base font-medium text-gray-900 mb-2">Related Services</h3>
+            <div class="bg-gray-50 p-4 rounded-md">
+              <p class="text-sm text-gray-700 mb-3">Select the services that were provided as part of this case study</p>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3" id="services-container">
+                <% if(locals.services && services.length > 0) { %>
+                  <% services.forEach(service => { %>
+                    <div class="relative flex items-start">
+                      <div class="flex items-center h-5">
+                        <input id="service-<%= service._id %>" name="services[]" value="<%= service._id %>" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" 
+                        <%= caseStudy && caseStudy.services && caseStudy.services.some(s => s._id.toString() === service._id.toString() || s.toString() === service._id.toString()) ? 'checked' : '' %>>
+                      </div>
+                      <div class="ml-3 text-sm">
+                        <label for="service-<%= service._id %>" class="font-medium text-gray-700"><%= service.name %></label>
+                        <p class="text-gray-500"><%= service.category %></p>
+                      </div>
+                    </div>
+                  <% }) %>
+                <% } else { %>
+                  <div class="col-span-full">
+                    <p class="text-sm text-gray-500">No services available. You need to create services first.</p>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Consultants -->
+          <div>
+            <h3 class="text-base font-medium text-gray-900 mb-2">Consultants Involved</h3>
+            <div class="bg-gray-50 p-4 rounded-md">
+              <p class="text-sm text-gray-700 mb-3">Select the consultants who worked on this project</p>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3" id="consultants-container">
+                <% if(locals.consultants && consultants.length > 0) { %>
+                  <% consultants.forEach(consultant => { %>
+                    <div class="relative flex items-start">
+                      <div class="flex items-center h-5">
+                        <input id="consultant-<%= consultant._id %>" name="consultants[]" value="<%= consultant._id %>" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                        <%= caseStudy && caseStudy.consultants && caseStudy.consultants.some(c => c._id.toString() === consultant._id.toString() || c.toString() === consultant._id.toString()) ? 'checked' : '' %>>
+                      </div>
+                      <div class="ml-3 text-sm">
+                        <label for="consultant-<%= consultant._id %>" class="font-medium text-gray-700"><%= consultant.profile.firstName %> <%= consultant.profile.lastName %></label>
+                        <p class="text-gray-500"><%= consultant.professional && consultant.professional.title ? consultant.professional.title : 'Consultant' %></p>
+                      </div>
+                    </div>
+                  <% }) %>
+                <% } else { %>
+                  <div class="col-span-full">
+                    <p class="text-sm text-gray-500">No consultants available. You need to add consultants first.</p>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Related Case Studies -->
+          <div>
+            <h3 class="text-base font-medium text-gray-900 mb-2">Related Case Studies</h3>
+            <div class="bg-gray-50 p-4 rounded-md">
+              <p class="text-sm text-gray-700 mb-3">Select other case studies that are related to this one</p>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="related-case-studies-container">
+                <% if(locals.relatedCaseStudies && relatedCaseStudies.length > 0) { %>
+                  <% relatedCaseStudies.forEach(relatedCase => { %>
+                    <% if(!caseStudy || caseStudy._id.toString() !== relatedCase._id.toString()) { %>
+                      <div class="relative flex items-start">
+                        <div class="flex items-center h-5">
+                          <input id="related-case-<%= relatedCase._id %>" name="relatedCaseStudies[]" value="<%= relatedCase._id %>" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                          <%= caseStudy && caseStudy.relatedCaseStudies && caseStudy.relatedCaseStudies.some(r => r._id.toString() === relatedCase._id.toString() || r.toString() === relatedCase._id.toString()) ? 'checked' : '' %>>
+                        </div>
+                        <div class="ml-3 text-sm">
+                          <label for="related-case-<%= relatedCase._id %>" class="font-medium text-gray-700"><%= relatedCase.title %></label>
+                          <p class="text-gray-500"><%= relatedCase.client.industry.replace('_', ' ').charAt(0).toUpperCase() + relatedCase.client.industry.replace('_', ' ').slice(1) %></p>
+                        </div>
+                      </div>
+                    <% } %>
+                  <% }) %>
+                <% } else { %>
+                  <div class="col-span-full">
+                    <p class="text-sm text-gray-500">No other case studies available for linking.</p>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Tags -->
+          <div>
+            <h3 class="text-base font-medium text-gray-900 mb-2">Tags</h3>
+            <div class="bg-gray-50 p-4 rounded-md">
+              <p class="text-sm text-gray-700 mb-3">Add tags to make your case study more discoverable (comma separated)</p>
+              
+              <div class="flex items-center">
+                <div class="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-md bg-gray-100 mr-3">
+                  <i data-lucide="tag" class="h-4 w-4 text-gray-500"></i>
+                </div>
+                <div class="flex-grow">
+                  <input type="text" id="tags-input" name="tags" value="<%= caseStudy && caseStudy.tags ? caseStudy.tags.join(', ') : '' %>" placeholder="strategy, digital transformation, analytics, ..." class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm">
+                </div>
+              </div>
+              
+              <% if(locals.popularTags && popularTags.length > 0) { %>
+                <div class="mt-3">
+                  <p class="text-xs text-gray-500 mb-2">Popular tags:</p>
+                  <div class="flex flex-wrap gap-2">
+                    <% popularTags.forEach(tag => { %>
+                      <button type="button" class="add-tag-btn inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200">
+                        #<%= tag.name %> (<%= tag.count %>)
+                      </button>
+                    <% }) %>
+                  </div>
+                </div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Settings Tab -->
+      <div class="tab-panel" id="settings-panel" style="display: none;">
+        <div class="space-y-6">
+          <!-- Featured Flag -->
+          <div class="bg-gray-50 p-4 rounded-md">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-base font-medium text-gray-900">Featured Case Study</h3>
+                <p class="text-sm text-gray-500 mt-1">Mark this as a featured case study to highlight it on the homepage and listings</p>
+              </div>
+              
+              <div class="relative inline-block">
+                <input type="checkbox" id="featured" name="featured" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-gray-300 appearance-none cursor-pointer focus:outline-none transition-all duration-200 checked:border-primary-dark checked:right-0" <%= caseStudy && caseStudy.featured ? 'checked' : '' %>>
+                <label for="featured" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer w-12"></label>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Permissions -->
+          <div class="bg-gray-50 p-4 rounded-md">
+            <h3 class="text-base font-medium text-gray-900 mb-2">Visibility & Permissions</h3>
+            
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="text-sm font-medium text-gray-900">Public Case Study</h4>
+                  <p class="text-xs text-gray-500 mt-1">Make this case study visible to anyone on your website</p>
+                </div>
+                
+                <div class="relative inline-block">
+                  <input type="checkbox" id="permissions-public" name="permissions.isPublic" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-gray-300 appearance-none cursor-pointer focus:outline-none transition-all duration-200 checked:border-primary-dark checked:right-0" <%= !caseStudy || (caseStudy.permissions && caseStudy.permissions.isPublic) ? 'checked' : '' %>>
+                  <label for="permissions-public" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer w-12"></label>
+                </div>
+              </div>
+              
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="text-sm font-medium text-gray-900">Require Authentication</h4>
+                  <p class="text-xs text-gray-500 mt-1">Only allow logged-in users to view this case study</p>
+                </div>
+                
+                <div class="relative inline-block">
+                  <input type="checkbox" id="permissions-auth" name="permissions.requiresAuthentication" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-gray-300 appearance-none cursor-pointer focus:outline-none transition-all duration-200 checked:border-primary-dark checked:right-0" <%= caseStudy && caseStudy.permissions && caseStudy.permissions.requiresAuthentication ? 'checked' : '' %>>
+                  <label for="permissions-auth" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer w-12"></label>
+                </div>
+              </div>
+              
+              <div class="border-t border-gray-200 pt-4">
+                <h4 class="text-sm font-medium text-gray-900 mb-2">Allowed User Roles</h4>
+                <p class="text-xs text-gray-500 mb-3">If authentication is required, which user roles can access this case study?</p>
+                
+                <div class="space-y-2">
+                  <div class="relative flex items-start">
+                    <div class="flex items-center h-5">
+                      <input id="role-admin" name="permissions.allowedRoles[]" value="admin" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" <%= caseStudy && caseStudy.permissions && caseStudy.permissions.allowedRoles && caseStudy.permissions.allowedRoles.includes('admin') ? 'checked' : '' %>>
+                    </div>
+                    <div class="ml-3 text-sm">
+                      <label for="role-admin" class="font-medium text-gray-700">Administrators</label>
+                    </div>
+                  </div>
+                  
+                  <div class="relative flex items-start">
+                    <div class="flex items-center h-5">
+                      <input id="role-consultant" name="permissions.allowedRoles[]" value="consultant" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" <%= caseStudy && caseStudy.permissions && caseStudy.permissions.allowedRoles && caseStudy.permissions.allowedRoles.includes('consultant') ? 'checked' : '' %>>
+                    </div>
+                    <div class="ml-3 text-sm">
+                      <label for="role-consultant" class="font-medium text-gray-700">Consultants</label>
+                    </div>
+                  </div>
+                  
+                  <div class="relative flex items-start">
+                    <div class="flex items-center h-5">
+                      <input id="role-client" name="permissions.allowedRoles[]" value="client" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" <%= caseStudy && caseStudy.permissions && caseStudy.permissions.allowedRoles && caseStudy.permissions.allowedRoles.includes('client') ? 'checked' : '' %>>
+                    </div>
+                    <div class="ml-3 text-sm">
+                      <label for="role-client" class="font-medium text-gray-700">Clients</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- SEO Settings -->
+          <div class="bg-gray-50 p-4 rounded-md">
+            <h3 class="text-base font-medium text-gray-900 mb-2">SEO Settings (Optional)</h3>
+            
+            <div class="space-y-4">
+              <div>
+                <label for="seo-title" class="block text-sm font-medium text-gray-700 mb-1">SEO Title</label>
+                <input type="text" id="seo-title" name="seo.title" value="<%= caseStudy && caseStudy.seo ? caseStudy.seo.title : '' %>" placeholder="Custom title for search engines" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm">
+                <p class="mt-1 text-xs text-gray-500">Leave blank to use the case study title</p>
+              </div>
+              
+              <div>
+                <label for="seo-description" class="block text-sm font-medium text-gray-700 mb-1">Meta Description</label>
+                <textarea id="seo-description" name="seo.description" rows="2" placeholder="Brief description for search results" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm"><%= caseStudy && caseStudy.seo ? caseStudy.seo.description : '' %></textarea>
+                <p class="mt-1 text-xs text-gray-500">Leave blank to use the case study summary</p>
+              </div>
+              
+              <div>
+                <label for="seo-keywords" class="block text-sm font-medium text-gray-700 mb-1">Meta Keywords</label>
+                <input type="text" id="seo-keywords" name="seo.keywords" value="<%= caseStudy && caseStudy.seo && caseStudy.seo.keywords ? caseStudy.seo.keywords.join(', ') : '' %>" placeholder="keyword1, keyword2, keyword3" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm">
+                <p class="mt-1 text-xs text-gray-500">Comma-separated list of keywords (optional)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Form Actions -->
+    <div class="mt-8 border-t border-gray-200 pt-6 flex items-center justify-between">
+      <div>
+        <% if(caseStudy) { %>
+          <p class="text-xs text-gray-500">
+            Created: <%= new Date(caseStudy.createdAt).toLocaleString() %> 
+            <% if(caseStudy.updatedAt && caseStudy.updatedAt > caseStudy.createdAt) { %>
+              | Last updated: <%= new Date(caseStudy.updatedAt).toLocaleString() %>
+            <% } %>
+          </p>
+        <% } %>
+      </div>
+      
+      <div class="flex space-x-3">
+        <a href="<%= caseStudy ? '/api/case-studies/' + caseStudy.slug : '/api/case-studies' %>" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none">
+          Cancel
+        </a>
+        
+        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-dark bg-primary hover:bg-primary-dark focus:outline-none">
+          <i data-lucide="save" class="h-4 w-4 mr-2"></i>
+          <%= caseStudy ? 'Save Changes' : 'Create Case Study' %>
+        </button>
+      </div>
+    </div>
+  </form>
+  
+  <!-- Hidden Forms for Status Changes -->
+  <% if(caseStudy) { %>
+    <form id="status-change-form" method="POST" action="/api/case-studies/<%= caseStudy._id %>/status?_method=PATCH" style="display: none;">
+      <input type="hidden" id="status-input" name="status" value="">
+    </form>
+  <% } %>
+  
+  <!-- Hidden Forms for Image Uploads -->
+  <form id="featured-image-form" method="POST" action="/api/case-studies/<%= caseStudy ? caseStudy._id : '' %>/image?type=featured" enctype="multipart/form-data" style="display: none;">
+    <input type="file" id="featured-image-input" name="image" accept="image/*">
+  </form>
+  
+  <form id="gallery-image-form" method="POST" action="/api/case-studies/<%= caseStudy ? caseStudy._id : '' %>/image?type=gallery" enctype="multipart/form-data" style="display: none;">
+    <input type="file" id="gallery-image-input" name="image" accept="image/*">
+  </form>
+  
+  <form id="logo-image-form" method="POST" action="/api/case-studies/<%= caseStudy ? caseStudy._id : '' %>/image?type=client-logo" enctype="multipart/form-data" style="display: none;">
+    <input type="file" id="logo-image-input" name="image" accept="image/*">
+  </form>
+  
+  <form id="avatar-image-form" method="POST" action="/api/case-studies/<%= caseStudy ? caseStudy._id : '' %>/image?type=testimonial-avatar" enctype="multipart/form-data" style="display: none;">
+    <input type="file" id="avatar-image-input" name="image" accept="image/*">
+  </form>
+  
+  <form id="download-file-form" method="POST" action="/api/case-studies/<%= caseStudy ? caseStudy._id : '' %>/file" enctype="multipart/form-data" style="display: none;">
+    <input type="file" id="download-file-input" name="file">
+    <input type="hidden" id="download-title-input" name="title" value="">
+    <input type="hidden" id="download-type-input" name="type" value="">
+    <input type="hidden" id="download-size-input" name="size" value="">
+    <input type="hidden" id="download-public-input" name="isPublic" value="true">
+  </form>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Tab switching functionality
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabPanels = document.querySelectorAll('.tab-panel');
+    
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        // Remove active class from all tabs
+        tabBtns.forEach(btn => btn.classList.remove('active', 'border-primary', 'text-gray-900'));
+        tabBtns.forEach(btn => btn.classList.add('border-transparent', 'text-gray-500'));
+        
+        // Hide all panels
+        tabPanels.forEach(panel => panel.style.display = 'none');
+        
+        // Add active class to clicked tab
+        this.classList.add('active', 'border-primary', 'text-gray-900');
+        this.classList.remove('border-transparent', 'text-gray-500');
+        
+        // Show corresponding panel
+        const panelId = this.getAttribute('data-tab') + '-panel';
+        document.getElementById(panelId).style.display = 'block';
+      });
+    });
+    
+    // Character counters
+    const textareas = [
+      { id: 'summary', limit: 500 },
+      { id: 'challenge', limit: 3000 },
+      { id: 'approach', limit: 3000 },
+      { id: 'solution', limit: 3000 },
+      { id: 'results-description', limit: 3000 }
+    ];
+    
+    textareas.forEach(({ id, limit }) => {
+      const textarea = document.getElementById(id);
+      const counter = document.getElementById(`${id}-chars`);
+      
+      if (textarea && counter) {
+        // Initial count
+        counter.textContent = textarea.value.length;
+        
+        // Update on input
+        textarea.addEventListener('input', function() {
+          counter.textContent = this.value.length;
+          
+          // Visual feedback for approaching limit
+          if (this.value.length > limit * 0.9) {
+            counter.classList.add('text-yellow-600');
+          } else {
+            counter.classList.remove('text-yellow-600');
+          }
+          
+          if (this.value.length > limit) {
+            counter.classList.add('text-red-600');
+            counter.classList.remove('text-yellow-600');
+          } else {
+            counter.classList.remove('text-red-600');
+          }
+        });
+      }
+    });
+    
+    // Status change buttons
+    const publishBtn = document.getElementById('publish-btn');
+    const draftBtn = document.getElementById('draft-btn');
+    const archiveBtn = document.getElementById('archive-btn');
+    const statusForm = document.getElementById('status-change-form');
+    const statusInput = document.getElementById('status-input');
+    
+    if (publishBtn) {
+      publishBtn.addEventListener('click', function() {
+        if (confirm('Are you sure you want to publish this case study? It will be visible to the public.')) {
+          statusInput.value = 'published';
+          statusForm.submit();
+        }
+      });
+    }
+    
+    if (draftBtn) {
+      draftBtn.addEventListener('click', function() {
+        if (confirm('Set this case study back to draft status? It will no longer be publicly visible.')) {
+          statusInput.value = 'draft';
+          statusForm.submit();
+        }
+      });
+    }
+    
+    if (archiveBtn) {
+      archiveBtn.addEventListener('click', function() {
+        if (confirm('Are you sure you want to archive this case study? It will be hidden from listings.')) {
+          statusInput.value = 'archived';
+          statusForm.submit();
+        }
+      });
+    }
+    
+    // Image upload handling
+    const uploadFeaturedBtn = document.getElementById('upload-featured-btn');
+    const featuredImageInput = document.getElementById('featured-image-input');
+    const featuredImageForm = document.getElementById('featured-image-form');
+    
+    if (uploadFeaturedBtn && featuredImageInput) {
+      uploadFeaturedBtn.addEventListener('click', function() {
+        featuredImageInput.click();
+      });
+      
+      featuredImageInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          if (confirm('Upload this image as the case study featured image?')) {
+            featuredImageForm.submit();
+          }
+        }
+      });
+    }
+    
+    // Client logo upload
+    const uploadLogoBtn = document.getElementById('upload-logo-btn');
+    const logoImageInput = document.getElementById('logo-image-input');
+    const logoImageForm = document.getElementById('logo-image-form');
+    
+    if (uploadLogoBtn && logoImageInput) {
+      uploadLogoBtn.addEventListener('click', function() {
+        logoImageInput.click();
+      });
+      
+      logoImageInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          if (confirm('Upload this image as the client logo?')) {
+            logoImageForm.submit();
+          }
+        }
+      });
+    }
+    
+    // Avatar upload
+    const uploadAvatarBtn = document.getElementById('upload-avatar-btn');
+    const avatarImageInput = document.getElementById('avatar-image-input');
+    const avatarImageForm = document.getElementById('avatar-image-form');
+    
+    if (uploadAvatarBtn && avatarImageInput) {
+      uploadAvatarBtn.addEventListener('click', function() {
+        avatarImageInput.click();
+      });
+      
+      avatarImageInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          if (confirm('Upload this image as the testimonial avatar?')) {
+            avatarImageForm.submit();
+          }
+        }
+      });
+    }
+    
+    // Gallery image upload
+    const addGalleryImageBtn = document.getElementById('add-gallery-image-btn');
+    const galleryImageInput = document.getElementById('gallery-image-input');
+    const galleryImageForm = document.getElementById('gallery-image-form');
+    
+    if (addGalleryImageBtn && galleryImageInput) {
+      addGalleryImageBtn.addEventListener('click', function() {
+        galleryImageInput.click();
+      });
+      
+      galleryImageInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          if (confirm('Add this image to the case study gallery?')) {
+            galleryImageForm.submit();
+          }
+        }
+      });
+    }
+    
+    // Add result metric
+    const addMetricBtn = document.getElementById('add-metric-btn');
+    const metricsContainer = document.getElementById('metrics-container');
+    
+    if (addMetricBtn && metricsContainer) {
+      let metricIndex = document.querySelectorAll('.metric-item').length;
+      
+      addMetricBtn.addEventListener('click', function() {
+        const metricItem = document.createElement('div');
+        metricItem.className = 'metric-item bg-gray-50 p-3 rounded-md border border-gray-200 relative';
+        metricItem.innerHTML = `
+          <button type="button" class="remove-metric-btn absolute top-2 right-2 text-gray-400 hover:text-gray-600">
+            <i data-lucide="x" class="h-4 w-4"></i>
+          </button>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-gray-700 mb-1">Label</label>
+              <input type="text" name="results.metrics[${metricIndex}].label" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-xs" placeholder="e.g., 'Increase in Revenue'">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-700 mb-1">Value</label>
+              <input type="text" name="results.metrics[${metricIndex}].value" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-xs" placeholder="e.g., '32%' or '$1.2M'">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-700 mb-1">Icon (Optional)</label>
+              <input type="text" name="results.metrics[${metricIndex}].icon" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary text-xs" placeholder="e.g., 'trending-up'">
+            </div>
+          </div>
+        `;
+        
+        metricsContainer.appendChild(metricItem);
+        metricIndex++;
+        
+        // Initialize Lucide icons in the new content
+        if (typeof lucide !== 'undefined') {
+          lucide.createIcons({
+            icons: {
+              x: true
+            }
+          });
+        }
+        
+        // Add event listener to the new remove button
+        const removeBtn = metricItem.querySelector('.remove-metric-btn');
+        if (removeBtn) {
+          removeBtn.addEventListener('click', function() {
+            if (confirm('Remove this metric?')) {
+              metricItem.remove();
+            }
+          });
+        }
+      });
+      
+      // Handle existing remove metric buttons
+      document.querySelectorAll('.remove-metric-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          if (confirm('Remove this metric?')) {
+            this.closest('.metric-item').remove();
+          }
+        });
+      });
+    }
+    
+    // Downloadable file handling
+    const addDownloadBtn = document.getElementById('add-download-btn');
+    const downloadFileInput = document.getElementById('download-file-input');
+    const downloadTitleInput = document.getElementById('download-title-input');
+    const downloadTypeInput = document.getElementById('download-type-input');
+    const downloadSizeInput = document.getElementById('download-size-input');
+    const downloadPublicInput = document.getElementById('download-public-input');
+    const downloadFileForm = document.getElementById('download-file-form');
+    
+    if (addDownloadBtn && downloadFileInput) {
+      addDownloadBtn.addEventListener('click', function() {
+        downloadFileInput.click();
+      });
+      
+      downloadFileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          const file = this.files[0];
+          const fileName = file.name;
+          const fileSize = (file.size / 1024).toFixed(1) + ' KB';
+          const fileType = fileName.split('.').pop().toLowerCase();
+          
+          const title = prompt('Enter a title for this downloadable file:', fileName.split('.')[0]);
+          
+          if (title) {
+            downloadTitleInput.value = title;
+            downloadTypeInput.value = fileType;
+            downloadSizeInput.value = fileSize;
+            downloadPublicInput.value = 'true';
+            downloadFileForm.submit();
+          }
+        }
+      });
+      
+      // Handle existing remove download buttons
+      document.querySelectorAll('.remove-download-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          if (confirm('Remove this downloadable file?')) {
+            this.closest('.download-item').remove();
+          }
+        });
+      });
+    }
+    
+    // Tags handling
+    const tagsInput = document.getElementById('tags-input');
+    const addTagBtns = document.querySelectorAll('.add-tag-btn');
+    
+    if (tagsInput && addTagBtns.length > 0) {
+      addTagBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const tagText = this.textContent.trim().split('(')[0].trim().substring(1); // Remove # and count
+          
+          // Get current tags
+          const currentTags = tagsInput.value.split(',').map(tag => tag.trim()).filter(tag => tag);
+          
+          // Add tag if not already present
+          if (!currentTags.includes(tagText)) {
+            if (currentTags.length > 0 && currentTags[0] !== '') {
+              tagsInput.value = currentTags.join(', ') + ', ' + tagText;
+            } else {
+              tagsInput.value = tagText;
+            }
+          }
+        });
+      });
+    }
+    
+    // Auto-populate slug from title
+    const titleInput = document.getElementById('title');
+    const slugInput = document.getElementById('slug');
+    
+    if (titleInput && slugInput) {
+      titleInput.addEventListener('blur', function() {
+        // Only auto-generate if slug is empty
+        if (!slugInput.value) {
+          const slug = this.value
+            .toLowerCase()
+            .replace(/[^\w\s-]/g, '') // Remove special chars
+            .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
+            .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+          
+          slugInput.value = slug;
+        }
+      });
+    }
+  });
+</script>

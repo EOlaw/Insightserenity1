@@ -1,0 +1,98 @@
+<!-- views/partials/footer.ejs -->
+<footer class="bg-secondary text-gray-300 mt-auto">
+    <div class="container mx-auto px-4 py-10">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <!-- Logo and brand -->
+            <div>
+                <div class="text-white font-bold text-2xl mb-4">
+                    Insight<span class="text-primary">Serenity</span>
+                </div>
+                <p class="text-gray-400 mb-4">
+                    Your comprehensive platform for connecting clients with expert consultants.
+                </p>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                        <i data-lucide="facebook" class="h-5 w-5"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                        <i data-lucide="twitter" class="h-5 w-5"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                        <i data-lucide="instagram" class="h-5 w-5"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                        <i data-lucide="linkedin" class="h-5 w-5"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Quick Links -->
+            <div>
+                <h3 class="text-white font-semibold text-lg mb-4">Quick Links</h3>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="/" class="text-gray-400 hover:text-primary transition-colors">Home</a>
+                    </li>
+                    <li>
+                        <a href="/about" class="text-gray-400 hover:text-primary transition-colors">About Us</a>
+                    </li>
+                    <li>
+                        <a href="/services" class="text-gray-400 hover:text-primary transition-colors">Services</a>
+                    </li>
+                    <li>
+                        <a href="/contact" class="text-gray-400 hover:text-primary transition-colors">Contact</a>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- For Clients -->
+            <div>
+                <h3 class="text-white font-semibold text-lg mb-4">For Clients</h3>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="/find-consultants" class="text-gray-400 hover:text-primary transition-colors">Find Consultants</a>
+                    </li>
+                    <li>
+                        <a href="/post-project" class="text-gray-400 hover:text-primary transition-colors">Post a Project</a>
+                    </li>
+                    <li>
+                        <a href="/how-it-works/clients" class="text-gray-400 hover:text-primary transition-colors">How It Works</a>
+                    </li>
+                    <li>
+                        <a href="/success-stories" class="text-gray-400 hover:text-primary transition-colors">Success Stories</a>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- For Consultants -->
+            <div>
+                <h3 class="text-white font-semibold text-lg mb-4">For Consultants</h3>
+                <ul class="space-y-2">
+                    <li>
+                        <a href="/find-projects" class="text-gray-400 hover:text-primary transition-colors">Find Projects</a>
+                    </li>
+                    <li>
+                        <a href="/create-portfolio" class="text-gray-400 hover:text-primary transition-colors">Create Portfolio</a>
+                    </li>
+                    <li>
+                        <a href="/how-it-works/consultants" class="text-gray-400 hover:text-primary transition-colors">How It Works</a>
+                    </li>
+                    <li>
+                        <a href="/community" class="text-gray-400 hover:text-primary transition-colors">Community</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="mt-10 pt-6 border-t border-gray-700 flex flex-col md:flex-row justify-between">
+            <p class="text-gray-400 text-sm">
+                &copy; <%= new Date().getFullYear() %> InsightSerenity. All rights reserved.
+            </p>
+            <div class="flex space-x-6 mt-4 md:mt-0">
+                <a href="/terms" class="text-gray-400 hover:text-primary text-sm transition-colors">Terms of Service</a>
+                <a href="/privacy" class="text-gray-400 hover:text-primary text-sm transition-colors">Privacy Policy</a>
+                <a href="/cookies" class="text-gray-400 hover:text-primary text-sm transition-colors">Cookie Policy</a>
+            </div>
+        </div>
+    </div>
+</footer>

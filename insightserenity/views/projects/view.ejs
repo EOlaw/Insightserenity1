@@ -1,0 +1,504 @@
+<!-- views/projects/view.ejs -->
+<% layout('layouts/dashboard') -%>
+<% block('title', `${project.title} - Project Details - InsightSerenity`) -%>
+
+<!-- Page header with actions -->
+<div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+    <div>
+        <div class="flex items-center mb-2">
+            <a href="javascript:history.back()" class="mr-2 p-1 rounded-full hover:bg-gray-200">
+                <i data-lucide="arrow-left" class="h-5 w-5 text-gray-500"></i>
+            </a>
+            <h1 class="text-2xl font-bold"><%= project.title %></h1>
+        </div>
+        <div class="flex items-center text-sm text-gray-500">
+            <span class="mr-2">Project ID: <%= project._id %></span>
+            <span class="mx-2 text-gray-300">|</span>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-medium
+                <% if(project.status === 'active') { %>
+                    bg-green-100 text-green-800
+                <% } else if(project.status === 'in_progress') { %>
+                    bg-blue-100 text-blue-800
+                <% } else if(project.status === 'completed') { %>
+                    bg-gray-100 text-gray-800
+                <% } else if(project.status === 'on_hold') { %>
+                    bg-yellow-100 text-yellow-800
+                <% } else if(project.status === 'cancelled') { %>
+                    bg-red-100 text-red-800
+                <% } else { %>
+                    bg-gray-100 text-gray-800
+                <% } %>">
+                <%= project.status.replace(/_/g, ' ').charAt(0).toUpperCase() + project.status.replace(/_/g, ' ').slice(1) %>
+            </span>
+        </div>
+    </div>
+    <div class="mt-4 md:mt-0 flex flex-wrap gap-3">
+        <% if (currentUser.role === 'client') { %>
+            <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                <i data-lucide="edit-3" class="h-4 w-4 mr-2"></i>
+                Edit Project
+            </button>
+        <% } %>
+        
+        <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            <i data-lucide="file-text" class="h-4 w-4 mr-2"></i>
+            Documents
+        </button>
+        
+        <a href="<%= currentUser.role === 'client' ? `/clients/messages/${project.conversationId || ''}` : `/consultants/messages/${project.conversationId || ''}` %>" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+            <i data-lucide="message-circle" class="h-4 w-4 mr-2"></i>
+            Messages
+        </a>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Left column - Project details -->
+    <div class="lg:col-span-2 space-y-6">
+        <!-- Project overview -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Project Overview</h2>
+            </div>
+            <div class="px-6 py-5">
+                <p class="text-gray-700 whitespace-pre-line mb-6"><%= project.description %></p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-2">Category</h3>
+                        <p class="text-gray-900"><%= project.category ? project.category.replace(/_/g, ' ').charAt(0).toUpperCase() + project.category.replace(/_/g, ' ').slice(1) : 'Not specified' %></p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-2">Timeline</h3>
+                        <p class="text-gray-900">
+                            <% if (project.timeline && project.timeline.startDate) { %>
+                                <%= new Date(project.timeline.startDate).toLocaleDateString() %>
+                                <% if (project.timeline && project.timeline.endDate) { %>
+                                    - <%= new Date(project.timeline.endDate).toLocaleDateString() %>
+                                <% } %>
+                            <% } else if (project.timeline && project.timeline.duration) { %>
+                                <%= project.timeline.duration %>
+                            <% } else { %>
+                                Not specified
+                            <% } %>
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-2">Budget</h3>
+                        <p class="text-gray-900">
+                            <% if (project.budget) { %>
+                                <% if (project.budget.min && project.budget.max) { %>
+                                    $<%= project.budget.min.toLocaleString() %> - $<%= project.budget.max.toLocaleString() %>
+                                <% } else if (project.budget.min) { %>
+                                    From $<%= project.budget.min.toLocaleString() %>
+                                <% } else if (project.budget.max) { %>
+                                    Up to $<%= project.budget.max.toLocaleString() %>
+                                <% } else { %>
+                                    Not specified
+                                <% } %>
+                                <% if (project.budget.type) { %>
+                                    (<%= project.budget.type %>)
+                                <% } %>
+                            <% } else { %>
+                                Not specified
+                            <% } %>
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-2">Created</h3>
+                        <p class="text-gray-900"><%= new Date(project.createdAt).toLocaleDateString() %></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Requirements -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Requirements</h2>
+            </div>
+            <div class="px-6 py-5">
+                <% if (project.requirements && project.requirements.skills && project.requirements.skills.length > 0) { %>
+                    <div class="mb-6">
+                        <h3 class="text-sm font-medium text-gray-500 mb-2">Skills</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <% project.requirements.skills.forEach(skill => { %>
+                                <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                    <%= skill %>
+                                </span>
+                            <% }); %>
+                        </div>
+                    </div>
+                <% } %>
+                
+                <% if (project.requirements && project.requirements.deliverables) { %>
+                    <div class="mb-6">
+                        <h3 class="text-sm font-medium text-gray-500 mb-2">Deliverables</h3>
+                        <ul class="list-disc pl-5 text-gray-700 space-y-1">
+                            <% project.requirements.deliverables.forEach(deliverable => { %>
+                                <li><%= deliverable %></li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                <% } %>
+                
+                <% if (project.requirements && project.requirements.additionalInfo) { %>
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-500 mb-2">Additional Information</h3>
+                        <p class="text-gray-700 whitespace-pre-line"><%= project.requirements.additionalInfo %></p>
+                    </div>
+                <% } %>
+                
+                <% if (!project.requirements || (!project.requirements.skills || project.requirements.skills.length === 0) && !project.requirements.deliverables && !project.requirements.additionalInfo) { %>
+                    <p class="text-gray-500 italic">No specific requirements provided.</p>
+                <% } %>
+            </div>
+        </div>
+        
+        <!-- Milestones -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-200 flex justify-between items-center">
+                <h2 class="text-lg font-medium text-gray-900">Milestones</h2>
+                <button type="button" class="inline-flex items-center text-sm font-medium text-primary-dark hover:text-primary">
+                    <i data-lucide="plus" class="h-4 w-4 mr-1"></i>
+                    Add Milestone
+                </button>
+            </div>
+            <div class="px-6 py-5">
+                <% if (project.milestones && project.milestones.length > 0) { %>
+                    <div class="flow-root">
+                        <ul role="list" class="-mb-8">
+                            <% project.milestones.forEach((milestone, index) => { %>
+                                <li>
+                                    <div class="relative pb-8">
+                                        <% if (index !== project.milestones.length - 1) { %>
+                                            <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                                        <% } %>
+                                        <div class="relative flex space-x-3">
+                                            <div>
+                                                <span class="h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white
+                                                    <% if (milestone.status === 'completed') { %>
+                                                        bg-green-500
+                                                    <% } else if (milestone.status === 'in_progress') { %>
+                                                        bg-blue-500
+                                                    <% } else if (milestone.status === 'upcoming') { %>
+                                                        bg-gray-500
+                                                    <% } else { %>
+                                                        bg-gray-500
+                                                    <% } %>
+                                                ">
+                                                    <% if (milestone.status === 'completed') { %>
+                                                        <i data-lucide="check" class="h-5 w-5 text-white"></i>
+                                                    <% } else if (milestone.status === 'in_progress') { %>
+                                                        <i data-lucide="loader" class="h-5 w-5 text-white"></i>
+                                                    <% } else { %>
+                                                        <i data-lucide="clock" class="h-5 w-5 text-white"></i>
+                                                    <% } %>
+                                                </span>
+                                            </div>
+                                            <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                                                <div>
+                                                    <p class="text-sm text-gray-900 font-medium"><%= milestone.title %></p>
+                                                    <% if (milestone.description) { %>
+                                                        <p class="mt-1 text-sm text-gray-500"><%= milestone.description %></p>
+                                                    <% } %>
+                                                </div>
+                                                <div class="text-right text-sm whitespace-nowrap text-gray-500">
+                                                    <div>
+                                                        <% if (milestone.dueDate) { %>
+                                                            Due: <%= new Date(milestone.dueDate).toLocaleDateString() %>
+                                                        <% } %>
+                                                    </div>
+                                                    <% if (milestone.status === 'completed' && milestone.completedAt) { %>
+                                                        <div class="text-green-600">
+                                                            Completed: <%= new Date(milestone.completedAt).toLocaleDateString() %>
+                                                        </div>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                <% } else { %>
+                    <div class="text-center py-6">
+                        <div class="mb-4">
+                            <i data-lucide="flag" class="h-12 w-12 mx-auto text-gray-400"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-1">No milestones yet</h3>
+                        <p class="text-gray-500 mb-4">Add project milestones to track progress</p>
+                        <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                            <i data-lucide="plus" class="h-4 w-4 mr-2"></i>
+                            Create First Milestone
+                        </button>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+        
+        <!-- Attachments -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-200 flex justify-between items-center">
+                <h2 class="text-lg font-medium text-gray-900">Attachments</h2>
+                <button type="button" class="inline-flex items-center text-sm font-medium text-primary-dark hover:text-primary">
+                    <i data-lucide="upload" class="h-4 w-4 mr-1"></i>
+                    Upload File
+                </button>
+            </div>
+            <div class="px-6 py-5">
+                <% if (project.attachments && project.attachments.length > 0) { %>
+                    <ul class="divide-y divide-gray-200">
+                        <% project.attachments.forEach(attachment => { %>
+                            <li class="py-3 flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <% 
+                                        let iconName = 'file';
+                                        if (attachment.fileType === 'image') iconName = 'image';
+                                        else if (attachment.fileType === 'pdf') iconName = 'file-text';
+                                        else if (attachment.fileType === 'doc' || attachment.fileType === 'docx') iconName = 'file-text';
+                                        else if (attachment.fileType === 'xls' || attachment.fileType === 'xlsx') iconName = 'file-text';
+                                        else if (attachment.fileType === 'ppt' || attachment.fileType === 'pptx') iconName = 'file-text';
+                                        else if (attachment.fileType === 'zip' || attachment.fileType === 'rar') iconName = 'file-text';
+                                    %>
+                                    <i data-lucide="<%= iconName %>" class="h-5 w-5 text-gray-400 mr-3"></i>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900"><%= attachment.fileName %></p>
+                                        <p class="text-xs text-gray-500">
+                                            <%= attachment.fileSize ? `${(attachment.fileSize / 1024).toFixed(2)} KB` : 'Unknown size' %> • 
+                                            <%= new Date(attachment.uploadedAt).toLocaleDateString() %>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <a href="<%= attachment.fileUrl %>" download class="text-gray-400 hover:text-gray-500">
+                                        <i data-lucide="download" class="h-5 w-5"></i>
+                                    </a>
+                                    <button type="button" class="text-gray-400 hover:text-gray-500">
+                                        <i data-lucide="trash-2" class="h-5 w-5"></i>
+                                    </button>
+                                </div>
+                            </li>
+                        <% }); %>
+                    </ul>
+                <% } else { %>
+                    <div class="text-center py-6">
+                        <div class="mb-4">
+                            <i data-lucide="file" class="h-12 w-12 mx-auto text-gray-400"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-1">No attachments yet</h3>
+                        <p class="text-gray-500 mb-4">Upload files to share with the project team</p>
+                        <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                            <i data-lucide="upload" class="h-4 w-4 mr-2"></i>
+                            Upload File
+                        </button>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Right column - Sidebar -->
+    <div class="space-y-6">
+        <!-- Participants -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Participants</h2>
+            </div>
+            <div class="px-6 py-5">
+                <!-- Client -->
+                <div class="mb-4">
+                    <h3 class="text-sm font-medium text-gray-500 mb-3">Client</h3>
+                    <% if (project.client && project.client.user) { %>
+                        <div class="flex items-center">
+                            <% if (project.client.user.profile && project.client.user.profile.avatarUrl) { %>
+                                <img class="h-10 w-10 rounded-full" src="<%= project.client.user.profile.avatarUrl %>" alt="<%= project.client.user.profile.firstName %>">
+                            <% } else { %>
+                                <div class="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-dark font-bold">
+                                    <%= project.client.user.profile.firstName.charAt(0) %><%= project.client.user.profile.lastName.charAt(0) %>
+                                </div>
+                            <% } %>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-gray-900">
+                                    <%= project.client.user.profile.firstName %> <%= project.client.user.profile.lastName %>
+                                </p>
+                                <% if (project.client.company && project.client.company.name) { %>
+                                    <p class="text-xs text-gray-500"><%= project.client.company.name %></p>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <p class="text-gray-500 italic">Client information not available</p>
+                    <% } %>
+                </div>
+                
+                <!-- Consultant -->
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-3">Consultant</h3>
+                    <% if (project.consultant && project.consultant.user) { %>
+                        <div class="flex items-center">
+                            <% if (project.consultant.user.profile && project.consultant.user.profile.avatarUrl) { %>
+                                <img class="h-10 w-10 rounded-full" src="<%= project.consultant.user.profile.avatarUrl %>" alt="<%= project.consultant.user.profile.firstName %>">
+                            <% } else { %>
+                                <div class="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-dark font-bold">
+                                    <%= project.consultant.user.profile.firstName.charAt(0) %><%= project.consultant.user.profile.lastName.charAt(0) %>
+                                </div>
+                            <% } %>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-gray-900">
+                                    <%= project.consultant.user.profile.firstName %> <%= project.consultant.user.profile.lastName %>
+                                </p>
+                                <% if (project.consultant.professional && project.consultant.professional.title) { %>
+                                    <p class="text-xs text-gray-500"><%= project.consultant.professional.title %></p>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <p class="text-gray-500 italic">No consultant assigned yet</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Activity -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Recent Activity</h2>
+            </div>
+            <div class="px-6 py-5">
+                <% if (project.activity && project.activity.length > 0) { %>
+                    <div class="flow-root">
+                        <ul role="list" class="-mb-8">
+                            <% project.activity.slice(0, 5).forEach((activity, index) => { %>
+                                <li>
+                                    <div class="relative pb-8">
+                                        <% if (index !== Math.min(project.activity.length - 1, 4)) { %>
+                                            <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                                        <% } %>
+                                        <div class="relative flex space-x-3">
+                                            <div>
+                                                <span class="h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white
+                                                    <% if (activity.type === 'milestone_completed') { %>
+                                                        bg-green-500
+                                                    <% } else if (activity.type === 'comment_added') { %>
+                                                        bg-blue-500
+                                                    <% } else if (activity.type === 'file_uploaded') { %>
+                                                        bg-purple-500
+                                                    <% } else if (activity.type === 'status_changed') { %>
+                                                        bg-yellow-500
+                                                    <% } else { %>
+                                                        bg-gray-500
+                                                    <% } %>
+                                                ">
+                                                    <% if (activity.type === 'milestone_completed') { %>
+                                                        <i data-lucide="check" class="h-5 w-5 text-white"></i>
+                                                    <% } else if (activity.type === 'comment_added') { %>
+                                                        <i data-lucide="message-circle" class="h-5 w-5 text-white"></i>
+                                                    <% } else if (activity.type === 'file_uploaded') { %>
+                                                        <i data-lucide="file-plus" class="h-5 w-5 text-white"></i>
+                                                    <% } else if (activity.type === 'status_changed') { %>
+                                                        <i data-lucide="refresh-cw" class="h-5 w-5 text-white"></i>
+                                                    <% } else { %>
+                                                        <i data-lucide="activity" class="h-5 w-5 text-white"></i>
+                                                    <% } %>
+                                                </span>
+                                            </div>
+                                            <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                                                <div>
+                                                    <p class="text-sm text-gray-500">
+                                                        <%= activity.message %>
+                                                        <% if (activity.user) { %>
+                                                            by <span class="font-medium text-gray-900"><%= activity.user.name %></span>
+                                                        <% } %>
+                                                    </p>
+                                                </div>
+                                                <div class="text-right text-sm whitespace-nowrap text-gray-500">
+                                                    <time datetime="<%= activity.timestamp %>">
+                                                        <%= new Date(activity.timestamp).toLocaleString() %>
+                                                    </time>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            <% }); %>
+                        </ul>
+                    </div>
+                    
+                    <% if (project.activity.length > 5) { %>
+                        <div class="mt-4 text-center">
+                            <button type="button" class="inline-flex items-center text-sm font-medium text-primary-dark hover:text-primary">
+                                View all activity
+                                <i data-lucide="chevron-right" class="h-4 w-4 ml-1"></i>
+                            </button>
+                        </div>
+                    <% } %>
+                <% } else { %>
+                    <div class="text-center py-6">
+                        <div class="mb-4">
+                            <i data-lucide="activity" class="h-10 w-10 mx-auto text-gray-400"></i>
+                        </div>
+                        <p class="text-gray-500">No activity recorded yet</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+        
+        <!-- Status and actions -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Status & Actions</h2>
+            </div>
+            <div class="px-6 py-5">
+                <% if (currentUser.role === 'client') { %>
+                    <!-- Client actions -->
+                    <div class="space-y-4">
+                        <button type="button" class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                            <i data-lucide="edit-2" class="h-4 w-4 mr-2"></i>
+                            Update Project
+                        </button>
+                        
+                        <% if (!project.consultant) { %>
+                            <button type="button" class="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                <i data-lucide="search" class="h-4 w-4 mr-2"></i>
+                                Find Consultant
+                            </button>
+                        <% } %>
+                        
+                        <button type="button" class="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            <i data-lucide="copy" class="h-4 w-4 mr-2"></i>
+                            Duplicate Project
+                        </button>
+                        
+                        <button type="button" class="w-full inline-flex items-center justify-center px-4 py-2 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50">
+                            <i data-lucide="archive" class="h-4 w-4 mr-2"></i>
+                            Archive Project
+                        </button>
+                    </div>
+                <% } else if (currentUser.role === 'consultant') { %>
+                    <!-- Consultant actions -->
+                    <div class="space-y-4">
+                        <button type="button" class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                            <i data-lucide="check-circle" class="h-4 w-4 mr-2"></i>
+                            Mark Milestone Complete
+                        </button>
+                        
+                        <button type="button" class="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            <i data-lucide="clock" class="h-4 w-4 mr-2"></i>
+                            Log Time
+                        </button>
+                        
+                        <button type="button" class="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            <i data-lucide="file-text" class="h-4 w-4 mr-2"></i>
+                            Submit Deliverable
+                        </button>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,190 @@
+<% layout('layouts/auth') -%>
+<% block('title', 'Register as Client - InsightSerenity') -%>
+
+<div class="text-center md:text-left">
+    <h1 class="text-2xl font-bold text-gray-800 mb-1">Create Client Account</h1>
+    <p class="text-gray-600 mb-6">Join our platform to find the best consultants for your needs</p>
+</div>
+
+<!-- Registration Form -->
+<form action="/api/auth/register/client" method="POST" class="space-y-4">
+    <!-- Personal Information Section -->
+    <div class="space-y-4 mb-6">
+        <h2 class="text-lg font-semibold text-gray-700 border-b pb-2">Personal Information</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- First Name -->
+            <div>
+                <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="user" class="h-5 w-5 text-gray-400"></i>
+                    </div>
+                    <input type="text" id="firstName" name="firstName" required
+                        class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                        placeholder="Your first name"
+                        value="<%= typeof formData !== 'undefined' && formData.firstName ? formData.firstName : '' %>">
+                </div>
+            </div>
+            
+            <!-- Last Name -->
+            <div>
+                <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="user" class="h-5 w-5 text-gray-400"></i>
+                    </div>
+                    <input type="text" id="lastName" name="lastName" required
+                        class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                        placeholder="Your last name"
+                        value="<%= typeof formData !== 'undefined' && formData.lastName ? formData.lastName : '' %>">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Email Address -->
+        <div>
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i data-lucide="mail" class="h-5 w-5 text-gray-400"></i>
+                </div>
+                <input type="email" id="email" name="email" required
+                    class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                    placeholder="Your email address"
+                    value="<%= typeof formData !== 'undefined' && formData.email ? formData.email : '' %>">
+            </div>
+        </div>
+        
+        <!-- Phone Number (Optional) -->
+        <div>
+            <label for="phoneNumber" class="block text-sm font-medium text-gray-700 mb-1">Phone Number <span class="text-gray-400">(Optional)</span></label>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i data-lucide="phone" class="h-5 w-5 text-gray-400"></i>
+                </div>
+                <input type="tel" id="phoneNumber" name="phoneNumber"
+                    class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                    placeholder="Your phone number"
+                    value="<%= typeof formData !== 'undefined' && formData.phoneNumber ? formData.phoneNumber : '' %>">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Password Section -->
+    <div class="space-y-4 mb-6">
+        <h2 class="text-lg font-semibold text-gray-700 border-b pb-2">Create Password</h2>
+        
+        <!-- Password -->
+        <div>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i data-lucide="lock" class="h-5 w-5 text-gray-400"></i>
+                </div>
+                <input type="password" id="password" name="password" required
+                    class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                    placeholder="Create a strong password">
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer" id="togglePassword">
+                    <i data-lucide="eye" class="h-5 w-5 text-gray-400"></i>
+                </div>
+            </div>
+            <p class="mt-1 text-xs text-gray-500">
+                Must be at least 8 characters with uppercase, lowercase, number and special character.
+            </p>
+        </div>
+    </div>
+    
+    <!-- Company Information Section (Optional) -->
+    <div class="space-y-4 mb-6">
+        <h2 class="text-lg font-semibold text-gray-700 border-b pb-2">Company Information <span class="text-gray-400">(Optional)</span></h2>
+        
+        <!-- Company Name -->
+        <div>
+            <label for="company.name" class="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i data-lucide="briefcase" class="h-5 w-5 text-gray-400"></i>
+                </div>
+                <input type="text" id="company.name" name="company.name"
+                    class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                    placeholder="Your company name"
+                    value="<%= typeof formData !== 'undefined' && formData.company && formData.company.name ? formData.company.name : '' %>">
+            </div>
+        </div>
+        
+        <!-- Industry -->
+        <div>
+            <label for="company.industry" class="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i data-lucide="building" class="h-5 w-5 text-gray-400"></i>
+                </div>
+                <select id="company.industry" name="company.industry"
+                    class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary appearance-none">
+                    <option value="" disabled selected>Select your industry</option>
+                    <option value="technology" <%= typeof formData !== 'undefined' && formData.company && formData.company.industry === 'technology' ? 'selected' : '' %>>Technology</option>
+                    <option value="finance" <%= typeof formData !== 'undefined' && formData.company && formData.company.industry === 'finance' ? 'selected' : '' %>>Finance</option>
+                    <option value="healthcare" <%= typeof formData !== 'undefined' && formData.company && formData.company.industry === 'healthcare' ? 'selected' : '' %>>Healthcare</option>
+                    <option value="education" <%= typeof formData !== 'undefined' && formData.company && formData.company.industry === 'education' ? 'selected' : '' %>>Education</option>
+                    <option value="retail" <%= typeof formData !== 'undefined' && formData.company && formData.company.industry === 'retail' ? 'selected' : '' %>>Retail</option>
+                    <option value="manufacturing" <%= typeof formData !== 'undefined' && formData.company && formData.company.industry === 'manufacturing' ? 'selected' : '' %>>Manufacturing</option>
+                    <option value="other" <%= typeof formData !== 'undefined' && formData.company && formData.company.industry === 'other' ? 'selected' : '' %>>Other</option>
+                </select>
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <i data-lucide="chevron-down" class="h-5 w-5 text-gray-400"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Terms and Privacy Policy -->
+    <div class="flex items-start mb-6">
+        <div class="flex items-center h-5">
+            <input id="terms" name="terms" type="checkbox" required
+                class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+        </div>
+        <div class="ml-3 text-sm">
+            <label for="terms" class="font-medium text-gray-700">
+                I agree to the <a href="/terms" class="text-primary-dark hover:text-primary">Terms of Service</a> and <a href="/privacy" class="text-primary-dark hover:text-primary">Privacy Policy</a>
+            </label>
+        </div>
+    </div>
+    
+    <!-- Registration Button -->
+    <div>
+        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            Create Account
+        </button>
+    </div>
+    
+    <!-- Sign in link -->
+    <div class="text-center mt-6">
+        <p class="text-sm text-gray-600">
+            Already have an account?
+            <a href="/api/auth/login" class="font-medium text-primary-dark hover:text-primary">
+                Sign in now
+            </a>
+        </p>
+    </div>
+</form>
+
+<% block('additionalJS', `
+<script>
+    // Toggle password visibility
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const passwordInput = document.getElementById('password');
+        const icon = this.querySelector('i');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.setAttribute('data-lucide', 'eye-off');
+        } else {
+            passwordInput.type = 'password';
+            icon.setAttribute('data-lucide', 'eye');
+        }
+        
+        lucide.createIcons();
+    });
+</script>
+`) -%>

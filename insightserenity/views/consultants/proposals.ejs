@@ -1,0 +1,405 @@
+<!-- views/consultants/proposals.ejs -->
+<% layout('layouts/dashboard') -%>
+<% block('title', 'Project Proposals - InsightSerenity') -%>
+
+<!-- Page header -->
+<div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold mb-1">Project Proposals</h1>
+        <p class="text-gray-600">Manage your submitted proposals and track their status</p>
+    </div>
+    <div class="mt-4 md:mt-0 flex flex-col sm:flex-row gap-3">
+        <a href="/consultants/available-projects" class="inline-flex items-center justify-center px-4 py-2 bg-primary border border-transparent rounded-md shadow-sm text-sm font-medium text-dark hover:bg-primary-dark">
+            <i data-lucide="search" class="h-4 w-4 mr-2"></i>
+            Find New Projects
+        </a>
+    </div>
+</div>
+
+<!-- Filters and search -->
+<div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+    <div class="flex flex-col md:flex-row md:items-center gap-4">
+        <div class="relative flex-grow">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i data-lucide="search" class="h-5 w-5 text-gray-400"></i>
+            </div>
+            <input type="text" id="search-input" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm" placeholder="Search projects...">
+        </div>
+        
+        <div class="flex flex-wrap gap-2">
+            <select id="status-filter" class="block w-full md:w-auto pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="under_review">Under Review</option>
+                <option value="accepted">Accepted</option>
+                <option value="rejected">Rejected</option>
+                <option value="withdrawn">Withdrawn</option>
+            </select>
+            
+            <select id="date-filter" class="block w-full md:w-auto pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                <option value="">All Time</option>
+                <option value="last_week">Last Week</option>
+                <option value="last_month">Last Month</option>
+                <option value="last_3_months">Last 3 Months</option>
+                <option value="last_year">Last Year</option>
+            </select>
+            
+            <button type="button" id="filter-button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                <i data-lucide="sliders" class="h-4 w-4 mr-2"></i>
+                More Filters
+            </button>
+        </div>
+    </div>
+    
+    <!-- Advanced filter panel (hidden by default) -->
+    <div id="advanced-filters" class="hidden mt-4 pt-4 border-t border-gray-200">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label for="client-filter" class="block text-sm font-medium text-gray-700 mb-1">Client</label>
+                <select id="client-filter" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                    <option value="">All Clients</option>
+                    <!-- Client options would be populated dynamically -->
+                    <option value="client1">Acme Corporation</option>
+                    <option value="client2">Global Industries</option>
+                    <option value="client3">Tech Solutions Inc.</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="budget-filter" class="block text-sm font-medium text-gray-700 mb-1">Budget Range</label>
+                <select id="budget-filter" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                    <option value="">Any Budget</option>
+                    <option value="under_1000">Under $1,000</option>
+                    <option value="1000_5000">$1,000 - $5,000</option>
+                    <option value="5000_10000">$5,000 - $10,000</option>
+                    <option value="10000_25000">$10,000 - $25,000</option>
+                    <option value="over_25000">Over $25,000</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="sort-by" class="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+                <select id="sort-by" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                    <option value="submitted_desc">Date Submitted (Newest)</option>
+                    <option value="submitted_asc">Date Submitted (Oldest)</option>
+                    <option value="updated_desc">Last Updated (Newest)</option>
+                    <option value="updated_asc">Last Updated (Oldest)</option>
+                    <option value="rate_desc">Proposed Rate (Highest)</option>
+                    <option value="rate_asc">Proposed Rate (Lowest)</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="flex justify-end mt-4">
+            <button type="button" id="clear-filters" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 mr-3">
+                Clear Filters
+            </button>
+            <button type="button" id="apply-filters" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                Apply Filters
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Proposal list tabs -->
+<div class="mb-6 border-b border-gray-200">
+    <ul class="flex flex-wrap -mb-px" role="tablist">
+        <li class="mr-2" role="presentation">
+            <button class="inline-block py-4 px-4 text-sm font-medium text-center text-primary-dark border-b-2 border-primary rounded-t-lg active" 
+                   id="all-tab" 
+                   data-tabs-target="#all-proposals" 
+                   type="button" 
+                   role="tab" 
+                   aria-controls="all-proposals" 
+                   aria-selected="true">
+                All Proposals
+            </button>
+        </li>
+        <li class="mr-2" role="presentation">
+            <button class="inline-block py-4 px-4 text-sm font-medium text-center text-gray-500 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" 
+                   id="pending-tab" 
+                   data-tabs-target="#pending-proposals" 
+                   type="button" 
+                   role="tab" 
+                   aria-controls="pending-proposals" 
+                   aria-selected="false">
+                Pending
+                <% if (proposals && proposals.proposals) { %>
+                    <span class="inline-flex items-center justify-center w-5 h-5 ml-2 text-xs font-semibold text-dark bg-primary-light rounded-full">
+                        <%= proposals.proposals.filter(p => p.status === 'pending' || p.status === 'under_review').length %>
+                    </span>
+                <% } %>
+            </button>
+        </li>
+        <li class="mr-2" role="presentation">
+            <button class="inline-block py-4 px-4 text-sm font-medium text-center text-gray-500 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" 
+                   id="accepted-tab" 
+                   data-tabs-target="#accepted-proposals" 
+                   type="button" 
+                   role="tab" 
+                   aria-controls="accepted-proposals" 
+                   aria-selected="false">
+                Accepted
+            </button>
+        </li>
+        <li class="mr-2" role="presentation">
+            <button class="inline-block py-4 px-4 text-sm font-medium text-center text-gray-500 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" 
+                   id="rejected-tab" 
+                   data-tabs-target="#rejected-proposals" 
+                   type="button" 
+                   role="tab" 
+                   aria-controls="rejected-proposals" 
+                   aria-selected="false">
+                Rejected
+            </button>
+        </li>
+    </ul>
+</div>
+
+<!-- Tab content -->
+<div id="tabContent">
+    <!-- All proposals tab -->
+    <div class="block" id="all-proposals" role="tabpanel" aria-labelledby="all-tab">
+        <% if (proposals && proposals.proposals && proposals.proposals.length > 0) { %>
+            <div class="overflow-x-auto bg-white rounded-lg shadow">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Proposed</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <% proposals.proposals.forEach(proposal => { %>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900"><%= proposal.project ? proposal.project.title : 'Unnamed Project' %></div>
+                                    <div class="text-xs text-gray-500"><%= proposal.project && proposal.project.category ? proposal.project.category.replace(/_/g, ' ') : 'Uncategorized' %></div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <% if (proposal.client && proposal.client.user) { %>
+                                            <% const client = proposal.client.user; %>
+                                            <% if (client.profile && client.profile.avatarUrl) { %>
+                                                <img class="h-8 w-8 rounded-full" src="<%= client.profile.avatarUrl %>" alt="<%= client.profile.firstName %>">
+                                            <% } else { %>
+                                                <div class="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-dark font-bold">
+                                                    <%= client.profile.firstName.charAt(0) %><%= client.profile.lastName.charAt(0) %>
+                                                </div>
+                                            <% } %>
+                                            <div class="ml-3">
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    <%= client.profile.firstName %> <%= client.profile.lastName %>
+                                                </div>
+                                                <% if (proposal.client.company && proposal.client.company.name) { %>
+                                                    <div class="text-xs text-gray-500"><%= proposal.client.company.name %></div>
+                                                <% } %>
+                                            </div>
+                                        <% } else { %>
+                                            <div class="text-sm text-gray-500">Unknown client</div>
+                                        <% } %>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        <% if(proposal.status === 'accepted') { %>
+                                            bg-green-100 text-green-800
+                                        <% } else if(proposal.status === 'pending') { %>
+                                            bg-yellow-100 text-yellow-800
+                                        <% } else if(proposal.status === 'under_review') { %>
+                                            bg-blue-100 text-blue-800
+                                        <% } else if(proposal.status === 'rejected') { %>
+                                            bg-red-100 text-red-800
+                                        <% } else if(proposal.status === 'withdrawn') { %>
+                                            bg-gray-100 text-gray-800
+                                        <% } else { %>
+                                            bg-gray-100 text-gray-800
+                                        <% } %>">
+                                        <%= proposal.status.replace(/_/g, ' ').charAt(0).toUpperCase() + proposal.status.replace(/_/g, ' ').slice(1) %>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <%= new Date(proposal.submittedAt).toLocaleDateString() %>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">
+                                        $<%= proposal.rate.toLocaleString() %>
+                                        <% if (proposal.estimatedHours) { %>
+                                            <span class="text-xs text-gray-500">× <%= proposal.estimatedHours %> hrs</span>
+                                        <% } %>
+                                    </div>
+                                    <% if (proposal.estimatedDuration) { %>
+                                        <div class="text-xs text-gray-500">
+                                            <%= proposal.estimatedDuration %>
+                                        </div>
+                                    <% } %>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex justify-end space-x-2">
+                                        <a href="/consultants/proposals/<%= proposal._id %>" class="text-primary-dark hover:text-primary">View</a>
+                                        <% if (proposal.status === 'pending') { %>
+                                            <a href="/consultants/proposals/<%= proposal._id %>/edit" class="text-gray-600 hover:text-gray-900">Edit</a>
+                                            <form action="/api/consultants/proposals/<%= proposal._id %>/withdraw" method="POST" class="inline">
+                                                <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Are you sure you want to withdraw this proposal?')">
+                                                    Withdraw
+                                                </button>
+                                            </form>
+                                        <% } %>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <% if (proposals.pagination && proposals.pagination.pages > 1) { %>
+                <%- include('../partials/pagination', { 
+                    pagination: proposals.pagination,
+                    baseUrl: '/consultants/proposals',
+                    query: {} 
+                }) %>
+            <% } %>
+        <% } else { %>
+            <div class="bg-white rounded-lg shadow p-6 text-center">
+                <div class="mb-4">
+                    <i data-lucide="file-text" class="h-12 w-12 mx-auto text-gray-400"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-1">No proposals found</h3>
+                <p class="text-gray-500 mb-4">You haven't submitted any proposals yet or none match your current filters.</p>
+                <a href="/consultants/available-projects" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                    <i data-lucide="search" class="h-4 w-4 mr-2"></i>
+                    Find Projects to Bid On
+                </a>
+            </div>
+        <% } %>
+    </div>
+    
+    <!-- Pending proposals tab (initially hidden) -->
+    <div class="hidden" id="pending-proposals" role="tabpanel" aria-labelledby="pending-tab">
+        <!-- Content for pending proposals would be loaded via AJAX or pre-populated and toggled -->
+        <div class="bg-white rounded-lg shadow p-6 text-center">
+            <p class="text-gray-500">Loading pending proposals...</p>
+        </div>
+    </div>
+    
+    <!-- Accepted proposals tab (initially hidden) -->
+    <div class="hidden" id="accepted-proposals" role="tabpanel" aria-labelledby="accepted-tab">
+        <!-- Content for accepted proposals would be loaded via AJAX or pre-populated and toggled -->
+        <div class="bg-white rounded-lg shadow p-6 text-center">
+            <p class="text-gray-500">Loading accepted proposals...</p>
+        </div>
+    </div>
+    
+    <!-- Rejected proposals tab (initially hidden) -->
+    <div class="hidden" id="rejected-proposals" role="tabpanel" aria-labelledby="rejected-tab">
+        <!-- Content for rejected proposals would be loaded via AJAX or pre-populated and toggled -->
+        <div class="bg-white rounded-lg shadow p-6 text-center">
+            <p class="text-gray-500">Loading rejected proposals...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Card -->
+<div class="mt-8 bg-white rounded-lg shadow p-6">
+    <h2 class="text-lg font-semibold mb-4">Proposal Statistics</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="text-center">
+            <div class="text-3xl font-bold text-gray-800">
+                <%= proposals ? proposals.proposals.length : 0 %>
+            </div>
+            <div class="text-sm text-gray-500">Total Proposals</div>
+        </div>
+        <div class="text-center">
+            <div class="text-3xl font-bold text-yellow-500">
+                <%= proposals ? proposals.proposals.filter(p => p.status === 'pending' || p.status === 'under_review').length : 0 %>
+            </div>
+            <div class="text-sm text-gray-500">Pending Review</div>
+        </div>
+        <div class="text-center">
+            <div class="text-3xl font-bold text-green-500">
+                <%= proposals ? proposals.proposals.filter(p => p.status === 'accepted').length : 0 %>
+            </div>
+            <div class="text-sm text-gray-500">Accepted</div>
+        </div>
+        <div class="text-center">
+            <div class="text-3xl font-bold text-red-500">
+                <%= proposals ? proposals.proposals.filter(p => p.status === 'rejected').length : 0 %>
+            </div>
+            <div class="text-sm text-gray-500">Rejected</div>
+        </div>
+    </div>
+    
+    <% if (proposals && proposals.proposals.length > 0) { %>
+        <div class="mt-6">
+            <h3 class="text-sm font-medium text-gray-700 mb-2">Success Rate</h3>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <% 
+                    const acceptedCount = proposals.proposals.filter(p => p.status === 'accepted').length;
+                    const completedCount = proposals.proposals.filter(p => p.status === 'accepted' || p.status === 'rejected').length;
+                    const successRate = completedCount > 0 ? Math.round((acceptedCount / completedCount) * 100) : 0;
+                %>
+                <div class="bg-green-500 h-2.5 rounded-full" style="width: <%= successRate %>%"></div>
+            </div>
+            <div class="flex justify-between mt-1">
+                <span class="text-xs text-gray-500">0%</span>
+                <span class="text-xs font-medium text-gray-700"><%= successRate %>%</span>
+                <span class="text-xs text-gray-500">100%</span>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Filter toggle
+        const filterButton = document.getElementById('filter-button');
+        const advancedFilters = document.getElementById('advanced-filters');
+        
+        if (filterButton && advancedFilters) {
+            filterButton.addEventListener('click', function() {
+                advancedFilters.classList.toggle('hidden');
+            });
+        }
+        
+        // Tab switching
+        const tabButtons = document.querySelectorAll('[role="tab"]');
+        const tabContents = document.querySelectorAll('[role="tabpanel"]');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Deactivate all tabs
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('text-primary-dark', 'border-primary');
+                    btn.classList.add('text-gray-500', 'border-transparent');
+                    btn.setAttribute('aria-selected', 'false');
+                });
+                
+                // Hide all tab contents
+                tabContents.forEach(content => {
+                    content.classList.add('hidden');
+                });
+                
+                // Activate clicked tab
+                this.classList.remove('text-gray-500', 'border-transparent');
+                this.classList.add('text-primary-dark', 'border-primary');
+                this.setAttribute('aria-selected', 'true');
+                
+                // Show corresponding content
+                const tabId = this.getAttribute('data-tabs-target');
+                document.querySelector(tabId).classList.remove('hidden');
+                
+                // Here you would typically load the tab content via AJAX
+                // For this demo, we're just showing/hiding pre-loaded content
+            });
+        });
+        
+        // Handle filter form submission, clear filters, etc.
+        // This would typically involve AJAX calls to reload the proposals list
+    });
+</script>

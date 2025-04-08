@@ -1,0 +1,329 @@
+<!-- views/consultants/available-projects.ejs -->
+<% layout('layouts/dashboard') -%>
+<% block('title', 'Available Projects - InsightSerenity') -%>
+
+<!-- Page header -->
+<div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold mb-1">Available Projects</h1>
+        <p class="text-gray-600">Browse projects that match your skills and expertise</p>
+    </div>
+    <div class="mt-4 md:mt-0">
+        <a href="/consultants/proposals" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+            <i data-lucide="file-text" class="h-4 w-4 mr-2"></i>
+            My Proposals
+        </a>
+    </div>
+</div>
+
+<!-- Search and filter section -->
+<div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+    <form id="search-form" action="/consultants/available-projects" method="GET">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+            <div class="md:col-span-2">
+                <label for="query" class="block text-sm font-medium text-gray-700 mb-1">Search by keyword</label>
+                <div class="relative rounded-md shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="search" class="h-5 w-5 text-gray-400"></i>
+                    </div>
+                    <input type="text" name="query" id="query" class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Project title, description or skills">
+                </div>
+            </div>
+            
+            <div>
+                <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <select id="category" name="category" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                    <option value="">All Categories</option>
+                    <option value="software_development">Software Development</option>
+                    <option value="web_development">Web Development</option>
+                    <option value="mobile_development">Mobile Development</option>
+                    <option value="ui_ux_design">UI/UX Design</option>
+                    <option value="data_science">Data Science</option>
+                    <option value="cloud_architecture">Cloud Architecture</option>
+                    <option value="cybersecurity">Cybersecurity</option>
+                    <option value="project_management">Project Management</option>
+                    <option value="digital_marketing">Digital Marketing</option>
+                    <option value="content_creation">Content Creation</option>
+                    <option value="business_strategy">Business Strategy</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="budget" class="block text-sm font-medium text-gray-700 mb-1">Budget Range</label>
+                <select id="budget" name="budget" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                    <option value="">Any Budget</option>
+                    <option value="under_1000">Under $1,000</option>
+                    <option value="1000_5000">$1,000 - $5,000</option>
+                    <option value="5000_10000">$5,000 - $10,000</option>
+                    <option value="10000_25000">$10,000 - $25,000</option>
+                    <option value="25000_50000">$25,000 - $50,000</option>
+                    <option value="50000_plus">Over $50,000</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-3 mt-4">
+            <div>
+                <label for="projectLength" class="block text-sm font-medium text-gray-700 mb-1">Project Length</label>
+                <select id="projectLength" name="projectLength" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                    <option value="">Any Length</option>
+                    <option value="less_than_week">Less than a week</option>
+                    <option value="1_2_weeks">1-2 weeks</option>
+                    <option value="2_4_weeks">2-4 weeks</option>
+                    <option value="1_3_months">1-3 months</option>
+                    <option value="3_6_months">3-6 months</option>
+                    <option value="over_6_months">Over 6 months</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="projectStatus" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select id="projectStatus" name="projectStatus" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                    <option value="open" selected>Open for Proposals</option>
+                    <option value="all">All Available Projects</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="sortBy" class="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+                <select id="sortBy" name="sortBy" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                    <option value="relevance">Best Match</option>
+                    <option value="newest">Newest First</option>
+                    <option value="budget_high">Budget (Highest First)</option>
+                    <option value="budget_low">Budget (Lowest First)</option>
+                    <option value="deadline">Deadline (Soonest First)</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="mt-4 flex justify-end">
+            <button type="reset" class="mr-3 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                Reset
+            </button>
+            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                <i data-lucide="filter" class="h-4 w-4 mr-2"></i>
+                Apply Filters
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Project matching badge -->
+<div class="flex items-center mb-4">
+    <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+        <i data-lucide="zap" class="h-3 w-3 inline mr-1"></i>
+        <%= projects && projects.length ? projects.length : '0' %> projects match your profile
+    </span>
+    <% if (projects && projects.length) { %>
+        <span class="text-xs text-gray-500 ml-2">
+            Showing projects that match your skills and expertise
+        </span>
+    <% } %>
+</div>
+
+<!-- Projects list -->
+<div class="space-y-6">
+    <% if (projects && projects.length > 0) { %>
+        <% projects.forEach(project => { %>
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                <div class="p-6">
+                    <div class="flex flex-col md:flex-row md:items-start md:justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center mb-2">
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                    <%= project.status === 'open' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' %>">
+                                    <%= project.status === 'open' ? 'Open for Proposals' : project.status.replace('_', ' ').charAt(0).toUpperCase() + project.status.replace('_', ' ').slice(1) %>
+                                </span>
+                                <span class="ml-2 text-xs text-gray-500">
+                                    Posted <%= new Date(project.createdAt).toLocaleDateString() %>
+                                </span>
+                                <% if (project.proposals && project.proposals.length > 0) { %>
+                                    <span class="ml-2 text-xs text-gray-500">
+                                        <%= project.proposals.length %> proposals
+                                    </span>
+                                <% } %>
+                            </div>
+                            
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                                <%= project.title %>
+                            </h3>
+                            
+                            <p class="text-sm text-gray-600 mb-4 line-clamp-2">
+                                <%= project.description %>
+                            </p>
+                            
+                            <div class="flex flex-wrap gap-1 mb-4">
+                                <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">
+                                    <%= project.category ? project.category.replace(/_/g, ' ') : 'Uncategorized' %>
+                                </span>
+                                
+                                <% if (project.requirements && project.requirements.skills && project.requirements.skills.length > 0) { %>
+                                    <% project.requirements.skills.slice(0, 3).forEach(skill => { %>
+                                        <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">
+                                            <%= skill %>
+                                        </span>
+                                    <% }); %>
+                                    
+                                    <% if (project.requirements.skills.length > 3) { %>
+                                        <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">
+                                            +<%= project.requirements.skills.length - 3 %> more
+                                        </span>
+                                    <% } %>
+                                <% } %>
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <% if (project.client && project.client.user) { %>
+                                    <% const client = project.client.user; %>
+                                    <% if (client.profile && client.profile.avatarUrl) { %>
+                                        <img class="h-6 w-6 rounded-full mr-2" src="<%= client.profile.avatarUrl %>" alt="<%= client.profile.firstName %>">
+                                    <% } else { %>
+                                        <div class="h-6 w-6 rounded-full bg-primary flex items-center justify-center text-dark font-bold mr-2">
+                                            <%= client.profile.firstName.charAt(0) %><%= client.profile.lastName.charAt(0) %>
+                                        </div>
+                                    <% } %>
+                                    <span class="text-sm text-gray-600">
+                                        <%= client.profile.firstName %> <%= client.profile.lastName %>
+                                        <% if (project.client.company && project.client.company.name) { %>
+                                            • <%= project.client.company.name %>
+                                        <% } %>
+                                    </span>
+                                <% } else { %>
+                                    <span class="text-sm text-gray-600">Anonymous Client</span>
+                                <% } %>
+                            </div>
+                        </div>
+                        
+                        <div class="md:ml-6 mt-4 md:mt-0 md:text-right">
+                            <div class="mb-3">
+                                <span class="text-sm font-medium text-gray-900">Budget:</span>
+                                <% if (project.budget) { %>
+                                    <% if (project.budget.min && project.budget.max) { %>
+                                        <div class="text-base font-semibold">$<%= project.budget.min.toLocaleString() %> - $<%= project.budget.max.toLocaleString() %></div>
+                                    <% } else if (project.budget.min) { %>
+                                        <div class="text-base font-semibold">From $<%= project.budget.min.toLocaleString() %></div>
+                                    <% } else if (project.budget.max) { %>
+                                        <div class="text-base font-semibold">Up to $<%= project.budget.max.toLocaleString() %></div>
+                                    <% } else { %>
+                                        <div class="text-base font-semibold">Not specified</div>
+                                    <% } %>
+                                    <% if (project.budget.type) { %>
+                                        <div class="text-xs text-gray-500"><%= project.budget.type.charAt(0).toUpperCase() + project.budget.type.slice(1) %></div>
+                                    <% } %>
+                                <% } else { %>
+                                    <div class="text-base font-semibold">Not specified</div>
+                                <% } %>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <span class="text-sm font-medium text-gray-900">Timeline:</span>
+                                <% if (project.timeline) { %>
+                                    <% if (project.timeline.duration) { %>
+                                        <div class="text-sm"><%= project.timeline.duration %></div>
+                                    <% } else if (project.timeline.startDate && project.timeline.endDate) { %>
+                                        <div class="text-sm">
+                                            <%= new Date(project.timeline.startDate).toLocaleDateString() %> - 
+                                            <%= new Date(project.timeline.endDate).toLocaleDateString() %>
+                                        </div>
+                                    <% } else { %>
+                                        <div class="text-sm">Not specified</div>
+                                    <% } %>
+                                <% } else { %>
+                                    <div class="text-sm">Not specified</div>
+                                <% } %>
+                            </div>
+                            
+                            <div class="flex flex-col-reverse md:flex-col gap-2">
+                                <a href="/projects/<%= project._id %>" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                    View Details
+                                </a>
+                                <a href="/consultants/proposals/<%= project._id %>/new" class="inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                                    Submit Proposal
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+        
+        <!-- Pagination -->
+        <% if (projects.length > 0 && pagination && pagination.pages > 1) { %>
+            <%- include('../partials/pagination', { 
+                pagination: pagination,
+                baseUrl: '/consultants/available-projects',
+                query: {} 
+            }) %>
+        <% } %>
+    <% } else { %>
+        <div class="bg-white rounded-lg shadow-sm p-8 text-center">
+            <div class="mb-4">
+                <i data-lucide="search-x" class="h-12 w-12 mx-auto text-gray-400"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-1">No available projects found</h3>
+            <p class="text-gray-500 mb-4">
+                We couldn't find any projects matching your criteria. Try adjusting your filters or check back later.
+            </p>
+            <div class="flex justify-center">
+                <button type="button" id="clear-all-filters" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                    Clear All Filters
+                </button>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<!-- Skills matching panel -->
+<div class="mt-8 bg-white rounded-lg shadow-sm p-6">
+    <h2 class="text-lg font-semibold mb-4">Improve Your Project Matching</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+            <h3 class="text-sm font-medium text-gray-900 mb-2">Update Your Skills</h3>
+            <p class="text-sm text-gray-600 mb-3">
+                Add or update your skills to get more relevant project recommendations. Make sure all your expertise areas are properly represented in your profile.
+            </p>
+            <a href="/consultants/profile" class="inline-flex items-center text-sm font-medium text-primary-dark hover:text-primary">
+                Update Skills <i data-lucide="arrow-right" class="h-4 w-4 ml-1"></i>
+            </a>
+        </div>
+        
+        <div>
+            <h3 class="text-sm font-medium text-gray-900 mb-2">Complete Your Profile</h3>
+            <p class="text-sm text-gray-600 mb-3">
+                A complete profile increases your visibility to clients and helps us match you with the best projects. Make sure your portfolio showcases your best work.
+            </p>
+            <a href="/consultants/portfolio" class="inline-flex items-center text-sm font-medium text-primary-dark hover:text-primary">
+                Update Portfolio <i data-lucide="arrow-right" class="h-4 w-4 ml-1"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchForm = document.getElementById('search-form');
+        const clearAllFiltersButton = document.getElementById('clear-all-filters');
+        
+        // Handle search form submission
+        searchForm.addEventListener('submit', function(event) {
+            // This would be removed in production, as we would want the form to submit
+            // For demo purposes, we're preventing default
+            // event.preventDefault();
+            
+            // You would implement search logic here
+        });
+        
+        // Handle clear all filters button
+        if (clearAllFiltersButton) {
+            clearAllFiltersButton.addEventListener('click', function() {
+                // Clear all form inputs
+                searchForm.reset();
+                
+                // Submit the form to reload with no filters
+                searchForm.submit();
+            });
+        }
+    });
+</script>

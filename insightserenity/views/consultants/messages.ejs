@@ -1,0 +1,263 @@
+<!-- views/consultants/messages.ejs -->
+<% layout('layouts/dashboard') -%>
+<% block('title', 'Messages - InsightSerenity') -%>
+
+<!-- Page header -->
+<div class="mb-6">
+    <h1 class="text-2xl font-bold">Messages</h1>
+    <p class="text-gray-600">Manage conversations with clients and team members</p>
+</div>
+
+<div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="flex h-[calc(100vh-12rem)]">
+        <!-- Sidebar with conversation list -->
+        <div class="w-full md:w-1/3 border-r border-gray-200 flex flex-col">
+            <!-- Search -->
+            <div class="p-4 border-b border-gray-200">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="search" class="h-5 w-5 text-gray-400"></i>
+                    </div>
+                    <input type="text" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm" placeholder="Search messages...">
+                </div>
+            </div>
+            
+            <!-- Filter tabs -->
+            <div class="px-2 pt-2 pb-1 border-b border-gray-200">
+                <div class="flex space-x-1">
+                    <button type="button" class="px-3 py-2 text-sm font-medium rounded-md bg-primary text-dark">
+                        All
+                    </button>
+                    <button type="button" class="px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100">
+                        Unread
+                    </button>
+                    <button type="button" class="px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100">
+                        Clients
+                    </button>
+                    <button type="button" class="px-3 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100">
+                        Team
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Conversation list -->
+            <div class="overflow-y-auto flex-grow">
+                <% if (conversations && conversations.length > 0) { %>
+                    <ul class="divide-y divide-gray-200">
+                        <% conversations.forEach(conversation => { %>
+                            <li>
+                                <a href="/consultants/messages/<%= conversation._id %>" class="block hover:bg-gray-50 <%= activeConversation && activeConversation._id === conversation._id ? 'bg-gray-50' : '' %>">
+                                    <div class="px-4 py-4 sm:px-6">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <% if (conversation.otherUser && conversation.otherUser.profile && conversation.otherUser.profile.avatarUrl) { %>
+                                                    <img class="h-10 w-10 rounded-full" src="<%= conversation.otherUser.profile.avatarUrl %>" alt="<%= conversation.otherUser.profile.firstName %>">
+                                                <% } else { %>
+                                                    <div class="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-dark font-bold">
+                                                        <%= conversation.otherUser ? conversation.otherUser.profile.firstName.charAt(0) + conversation.otherUser.profile.lastName.charAt(0) : '?' %>
+                                                    </div>
+                                                <% } %>
+                                                <div class="ml-3">
+                                                    <p class="text-sm font-medium text-gray-900">
+                                                        <%= conversation.otherUser ? `${conversation.otherUser.profile.firstName} ${conversation.otherUser.profile.lastName}` : 'Unknown User' %>
+                                                    </p>
+                                                    <% if (conversation.project) { %>
+                                                        <p class="text-xs text-gray-500">
+                                                            Project: <%= conversation.project.title %>
+                                                        </p>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-col items-end">
+                                                <p class="text-xs text-gray-500">
+                                                    <%= new Date(conversation.lastMessageAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %>
+                                                </p>
+                                                <% if (conversation.unreadCount > 0) { %>
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary text-dark mt-1">
+                                                        <%= conversation.unreadCount %>
+                                                    </span>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <p class="text-sm text-gray-600 truncate">
+                                                <%= conversation.lastMessage %>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        <% }); %>
+                    </ul>
+                <% } else { %>
+                    <div class="text-center py-8">
+                        <div class="mb-4">
+                            <i data-lucide="message-square" class="h-12 w-12 mx-auto text-gray-400"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-1">No conversations yet</h3>
+                        <p class="text-gray-500 text-sm px-6">Messages from clients and team members will appear here</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+        
+        <!-- Main conversation area -->
+        <div class="hidden md:flex md:w-2/3 flex-col">
+            <% if (activeConversation) { %>
+                <!-- Conversation header -->
+                <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <% if (activeConversation.otherUser && activeConversation.otherUser.profile && activeConversation.otherUser.profile.avatarUrl) { %>
+                            <img class="h-10 w-10 rounded-full" src="<%= activeConversation.otherUser.profile.avatarUrl %>" alt="<%= activeConversation.otherUser.profile.firstName %>">
+                        <% } else { %>
+                            <div class="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-dark font-bold">
+                                <%= activeConversation.otherUser ? activeConversation.otherUser.profile.firstName.charAt(0) + activeConversation.otherUser.profile.lastName.charAt(0) : '?' %>
+                            </div>
+                        <% } %>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-gray-900">
+                                <%= activeConversation.otherUser ? `${activeConversation.otherUser.profile.firstName} ${activeConversation.otherUser.profile.lastName}` : 'Unknown User' %>
+                            </p>
+                            <% if (activeConversation.project) { %>
+                                <p class="text-xs text-gray-500">
+                                    Project: <%= activeConversation.project.title %>
+                                </p>
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button type="button" class="p-2 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            <i data-lucide="phone" class="h-5 w-5"></i>
+                        </button>
+                        <button type="button" class="p-2 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            <i data-lucide="video" class="h-5 w-5"></i>
+                        </button>
+                        <button type="button" class="p-2 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            <i data-lucide="more-vertical" class="h-5 w-5"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Messages -->
+                <div class="flex-grow overflow-y-auto p-4 space-y-4">
+                    <% if (activeConversation.messages && activeConversation.messages.length > 0) { %>
+                        <% activeConversation.messages.forEach(message => { %>
+                            <div class="flex <%= message.sentBy === 'me' ? 'justify-end' : 'justify-start' %>">
+                                <div class="max-w-md">
+                                    <div class="<%= message.sentBy === 'me' ? 'bg-primary text-dark' : 'bg-gray-100 text-gray-800' %> rounded-lg px-4 py-2 shadow">
+                                        <p class="text-sm"><%= message.text %></p>
+                                    </div>
+                                    <div class="mt-1 <%= message.sentBy === 'me' ? 'text-right' : '' %>">
+                                        <span class="text-xs text-gray-500"><%= new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %></span>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="text-center py-8">
+                            <div class="mb-4">
+                                <i data-lucide="message-circle" class="h-12 w-12 mx-auto text-gray-400"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-1">No messages yet</h3>
+                            <p class="text-gray-500 text-sm">Start the conversation by sending a message below</p>
+                        </div>
+                    <% } %>
+                </div>
+                
+                <!-- Message input -->
+                <div class="p-4 border-t border-gray-200">
+                    <form id="message-form" class="flex items-end">
+                        <div class="flex-grow mr-4">
+                            <div class="relative">
+                                <textarea id="message-input" class="block w-full border-gray-300 rounded-md focus:ring-primary focus:border-primary" rows="3" placeholder="Type your message..."></textarea>
+                                <div class="absolute bottom-2 right-2 flex">
+                                    <button type="button" class="p-1 rounded-full text-gray-400 hover:text-gray-500">
+                                        <i data-lucide="paperclip" class="h-5 w-5"></i>
+                                    </button>
+                                    <button type="button" class="p-1 rounded-full text-gray-400 hover:text-gray-500">
+                                        <i data-lucide="smile" class="h-5 w-5"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-dark bg-primary hover:bg-primary-dark">
+                            <i data-lucide="send" class="h-4 w-4 mr-2"></i>
+                            Send
+                        </button>
+                    </form>
+                </div>
+            <% } else { %>
+                <!-- No active conversation selected -->
+                <div class="flex items-center justify-center h-full">
+                    <div class="text-center">
+                        <div class="mb-4">
+                            <i data-lucide="message-square" class="h-16 w-16 mx-auto text-gray-300"></i>
+                        </div>
+                        <h3 class="text-xl font-medium text-gray-900 mb-1">Select a conversation</h3>
+                        <p class="text-gray-500 max-w-md mx-auto">Choose a conversation from the list or start a new one to begin messaging</p>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const messageForm = document.getElementById('message-form');
+        const messageInput = document.getElementById('message-input');
+        
+        if (messageForm && messageInput) {
+            messageForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const message = messageInput.value.trim();
+                if (message) {
+                    // In a real implementation, you would send this message via AJAX
+                    // and then update the UI when successful
+                    console.log('Sending message:', message);
+                    
+                    // Clear input
+                    messageInput.value = '';
+                    
+                    // Add message to UI (this would be done after server confirmation in a real app)
+                    const messagesContainer = document.querySelector('.overflow-y-auto.p-4');
+                    if (messagesContainer) {
+                        const messageEl = document.createElement('div');
+                        messageEl.className = 'flex justify-end';
+                        messageEl.innerHTML = `
+                            <div class="max-w-md">
+                                <div class="bg-primary text-dark rounded-lg px-4 py-2 shadow">
+                                    <p class="text-sm">${message}</p>
+                                </div>
+                                <div class="mt-1 text-right">
+                                    <span class="text-xs text-gray-500">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                                </div>
+                            </div>
+                        `;
+                        messagesContainer.appendChild(messageEl);
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    }
+                }
+            });
+        }
+        
+        // Handle responsiveness for mobile
+        const conversationItems = document.querySelectorAll('.conversation-list-item');
+        const backButton = document.getElementById('back-to-conversations');
+        
+        if (conversationItems && backButton) {
+            conversationItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    document.querySelector('.conversation-list').classList.add('hidden');
+                    document.querySelector('.conversation-view').classList.remove('hidden');
+                });
+            });
+            
+            backButton.addEventListener('click', function() {
+                document.querySelector('.conversation-list').classList.remove('hidden');
+                document.querySelector('.conversation-view').classList.add('hidden');
+            });
+        }
+    });
+</script>

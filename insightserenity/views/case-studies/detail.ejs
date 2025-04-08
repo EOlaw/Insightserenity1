@@ -1,0 +1,559 @@
+<!-- views/case-studies/detail.ejs -->
+<% layout('layouts/case-study') %>
+
+<div class="bg-white shadow-sm rounded-lg overflow-hidden">
+  <!-- Back Button & Actions -->
+  <div class="bg-gray-50 border-b border-gray-200 px-6 py-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex items-center mb-2 sm:mb-0">
+        <a href="/api/case-studies" class="inline-flex items-center text-sm text-gray-700 hover:text-primary">
+          <i data-lucide="arrow-left" class="h-4 w-4 mr-1"></i>
+          Back to Case Studies
+        </a>
+      </div>
+      
+      <div class="flex items-center space-x-3">
+        <% if(locals.user && ['admin', 'consultant'].includes(locals.user.role)) { %>
+          <a href="/api/case-studies/<%= caseStudy._id %>/edit" class="inline-flex items-center px-3 py-1.5 bg-blue-50 border border-blue-300 text-xs font-medium rounded-md text-blue-700 hover:bg-blue-100">
+            <i data-lucide="edit-3" class="h-3.5 w-3.5 mr-1"></i>
+            Edit
+          </a>
+        <% } %>
+        
+        <button id="share-btn" class="inline-flex items-center px-3 py-1.5 bg-gray-50 border border-gray-300 text-xs font-medium rounded-md text-gray-700 hover:bg-gray-100">
+          <i data-lucide="share-2" class="h-3.5 w-3.5 mr-1"></i>
+          Share
+        </button>
+        
+        <% if(caseStudy.downloads && caseStudy.downloads.length > 0 && caseStudy.downloads.some(d => d.isPublic)) { %>
+          <div class="relative" x-data="{ open: false }">
+            <button @click="open = !open" class="inline-flex items-center px-3 py-1.5 bg-primary border border-primary-dark text-xs font-medium rounded-md text-dark hover:bg-primary-dark">
+              <i data-lucide="download" class="h-3.5 w-3.5 mr-1"></i>
+              Download
+            </button>
+            
+            <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 ring-1 ring-black ring-opacity-5" style="display: none;">
+              <div class="py-1">
+                <% caseStudy.downloads.filter(d => d.isPublic).forEach(download => { %>
+                  <a href="<%= download.file %>" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" 
+                     onclick="recordDownload('<%= caseStudy._id %>', '<%= download._id %>')">
+                    <% if(download.type === 'pdf') { %>
+                      <i data-lucide="file-text" class="h-4 w-4 mr-2 text-red-500"></i>
+                    <% } else if(download.type === 'pptx') { %>
+                      <i data-lucide="file-presentation" class="h-4 w-4 mr-2 text-orange-500"></i>
+                    <% } else if(download.type === 'docx') { %>
+                      <i data-lucide="file" class="h-4 w-4 mr-2 text-blue-500"></i>
+                    <% } else { %>
+                      <i data-lucide="file" class="h-4 w-4 mr-2 text-gray-500"></i>
+                    <% } %>
+                    <%= download.title %> <span class="text-xs text-gray-500 ml-1">(<%= download.size %>)</span>
+                  </a>
+                <% }) %>
+              </div>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Hero Section -->
+  <div class="relative">
+    <% if(caseStudy.media && caseStudy.media.featuredImage) { %>
+      <div class="h-64 md:h-80 bg-gray-200 relative">
+        <img src="<%= caseStudy.media.featuredImage %>" alt="<%= caseStudy.title %>" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+      </div>
+    <% } else { %>
+      <div class="h-48 md:h-64 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+    <% } %>
+    
+    <div class="absolute bottom-0 left-0 right-0 px-6 py-5 md:py-8">
+      <!-- Industry Badge -->
+      <div class="flex items-center mb-3">
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+          <i data-lucide="briefcase" class="h-3 w-3 mr-1"></i>
+          <%= caseStudy.client.industry.replace('_', ' ').charAt(0).toUpperCase() + caseStudy.client.industry.replace('_', ' ').slice(1) %>
+        </span>
+        
+        <% if(caseStudy.featured) { %>
+          <span class="ml-2 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+            <i data-lucide="star" class="h-3 w-3 mr-1"></i>
+            Featured
+          </span>
+        <% } %>
+        
+        <% if(caseStudy.tags && caseStudy.tags.length > 0) { %>
+          <span class="ml-auto text-xs text-white">
+            <% caseStudy.tags.slice(0, 3).forEach((tag, index) => { %>
+              <span class="inline-block"><%= index > 0 ? ', ' : '' %>#<%= tag %></span>
+            <% }) %>
+            <% if(caseStudy.tags.length > 3) { %>
+              <span class="inline-block">+<%= caseStudy.tags.length - 3 %> more</span>
+            <% } %>
+          </span>
+        <% } %>
+      </div>
+      
+      <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-white leading-tight">
+        <%= caseStudy.title %>
+      </h1>
+    </div>
+  </div>
+  
+  <!-- Client Info -->
+  <div class="px-6 py-5 border-b border-gray-200">
+    <div class="flex flex-col md:flex-row md:items-center justify-between">
+      <div class="flex items-center mb-4 md:mb-0">
+        <% if(caseStudy.client.logo) { %>
+          <div class="w-12 h-12 rounded-full overflow-hidden bg-white border border-gray-200 mr-4 flex-shrink-0">
+            <img src="<%= caseStudy.client.logo %>" alt="<%= caseStudy.client.name %> logo" class="w-full h-full object-contain p-1">
+          </div>
+        <% } else { %>
+          <div class="w-12 h-12 rounded-full bg-gray-100 mr-4 flex-shrink-0 flex items-center justify-center">
+            <i data-lucide="building" class="h-6 w-6 text-gray-400"></i>
+          </div>
+        <% } %>
+        
+        <div>
+          <h3 class="text-base font-medium text-gray-900">
+            <% if(!caseStudy.client.isAnonymous) { %>
+              <%= caseStudy.client.name %>
+            <% } else { %>
+              <em>Confidential Client</em>
+            <% } %>
+          </h3>
+          
+          <div class="flex items-center mt-1 text-sm text-gray-500">
+            <% if(caseStudy.client.size) { %>
+              <span class="flex items-center">
+                <i data-lucide="users" class="h-3.5 w-3.5 mr-1"></i>
+                <%= caseStudy.client.size %> employees
+              </span>
+            <% } %>
+            
+            <% if(caseStudy.client.location) { %>
+              <span class="flex items-center ml-4">
+                <i data-lucide="map-pin" class="h-3.5 w-3.5 mr-1"></i>
+                <%= caseStudy.client.location %>
+              </span>
+            <% } %>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flex items-center">
+        <% if(caseStudy.duration) { %>
+          <div class="flex items-center text-sm text-gray-500">
+            <i data-lucide="calendar" class="h-3.5 w-3.5 mr-1"></i>
+            <span>
+              <% if(caseStudy.formattedTimeframe) { %>
+                <%= caseStudy.formattedTimeframe %>
+              <% } else if(caseStudy.duration.timeframe) { %>
+                <%= caseStudy.duration.timeframe %>
+              <% } else { %>
+                <%= caseStudy.duration.startDate ? new Date(caseStudy.duration.startDate).toLocaleDateString() : '' %> - 
+                <%= caseStudy.duration.endDate ? new Date(caseStudy.duration.endDate).toLocaleDateString() : '' %>
+              <% } %>
+            </span>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Main Content -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 px-6 py-6">
+    <!-- Left Column -->
+    <div class="md:col-span-2">
+      <!-- Summary -->
+      <div class="mb-8">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3">Executive Summary</h2>
+        <p class="text-sm text-gray-700 leading-relaxed">
+          <%= caseStudy.summary %>
+        </p>
+      </div>
+      
+      <!-- Challenge -->
+      <div class="mb-8">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3">
+          <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-100 text-red-700 mr-2 text-xs">1</span>
+          Challenge
+        </h2>
+        <div class="text-sm text-gray-700 leading-relaxed">
+          <% 
+            // Convert newlines to paragraphs for better formatting
+            const challengeParagraphs = caseStudy.challenge.split('\n\n');
+          %>
+          <% challengeParagraphs.forEach(paragraph => { %>
+            <p class="mb-3"><%= paragraph %></p>
+          <% }) %>
+        </div>
+      </div>
+      
+      <!-- Approach -->
+      <div class="mb-8">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3">
+          <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-yellow-100 text-yellow-700 mr-2 text-xs">2</span>
+          Approach
+        </h2>
+        <div class="text-sm text-gray-700 leading-relaxed">
+          <% 
+            const approachParagraphs = caseStudy.approach.split('\n\n');
+          %>
+          <% approachParagraphs.forEach(paragraph => { %>
+            <p class="mb-3"><%= paragraph %></p>
+          <% }) %>
+        </div>
+      </div>
+      
+      <!-- Solution -->
+      <div class="mb-8">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3">
+          <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-700 mr-2 text-xs">3</span>
+          Solution
+        </h2>
+        <div class="text-sm text-gray-700 leading-relaxed">
+          <% 
+            const solutionParagraphs = caseStudy.solution.split('\n\n');
+          %>
+          <% solutionParagraphs.forEach(paragraph => { %>
+            <p class="mb-3"><%= paragraph %></p>
+          <% }) %>
+        </div>
+      </div>
+      
+      <!-- Results -->
+      <div class="mb-8">
+        <h2 class="text-lg font-semibold text-gray-900 mb-3">
+          <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-700 mr-2 text-xs">4</span>
+          Results
+        </h2>
+        
+        <% if(caseStudy.results.metrics && caseStudy.results.metrics.length > 0) { %>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <% caseStudy.results.metrics.forEach(metric => { %>
+              <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <div class="flex items-start">
+                  <% if(metric.icon) { %>
+                    <i data-lucide="<%= metric.icon %>" class="h-5 w-5 text-primary mr-3 mt-1"></i>
+                  <% } else { %>
+                    <i data-lucide="chart-line-up" class="h-5 w-5 text-primary mr-3 mt-1"></i>
+                  <% } %>
+                  <div>
+                    <div class="text-lg font-bold text-gray-900"><%= metric.value %></div>
+                    <div class="text-xs text-gray-600"><%= metric.label %></div>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+        
+        <div class="text-sm text-gray-700 leading-relaxed">
+          <% 
+            const resultsParagraphs = caseStudy.results.description.split('\n\n');
+          %>
+          <% resultsParagraphs.forEach(paragraph => { %>
+            <p class="mb-3"><%= paragraph %></p>
+          <% }) %>
+        </div>
+      </div>
+      
+      <!-- Media Gallery -->
+      <% if(caseStudy.media && caseStudy.media.gallery && caseStudy.media.gallery.length > 0) { %>
+        <div class="mb-8">
+          <h2 class="text-lg font-semibold text-gray-900 mb-3">Gallery</h2>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <% caseStudy.media.gallery.forEach(image => { %>
+              <a href="<%= image %>" class="block rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200" target="_blank">
+                <img src="<%= image %>" alt="Case Study Image" class="w-full h-32 object-cover">
+              </a>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+      
+      <!-- Related Case Studies -->
+      <% if(caseStudy.relatedCaseStudies && caseStudy.relatedCaseStudies.length > 0) { %>
+        <div class="mb-8">
+          <h2 class="text-lg font-semibold text-gray-900 mb-3">Related Case Studies</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <% caseStudy.relatedCaseStudies.forEach(relatedCase => { %>
+              <a href="/api/case-studies/<%= relatedCase.slug %>" class="flex items-start p-3 rounded-lg border border-gray-200 hover:bg-gray-50">
+                <% if(relatedCase.media && relatedCase.media.featuredImage) { %>
+                  <div class="w-16 h-16 rounded overflow-hidden mr-3 flex-shrink-0">
+                    <img src="<%= relatedCase.media.featuredImage %>" alt="<%= relatedCase.title %>" class="w-full h-full object-cover">
+                  </div>
+                <% } else { %>
+                  <div class="w-16 h-16 rounded bg-gray-100 mr-3 flex-shrink-0 flex items-center justify-center">
+                    <i data-lucide="file-text" class="h-6 w-6 text-gray-400"></i>
+                  </div>
+                <% } %>
+                <div>
+                  <h3 class="text-sm font-medium text-gray-900 line-clamp-2"><%= relatedCase.title %></h3>
+                  <p class="text-xs text-gray-500 mt-1 line-clamp-2"><%= relatedCase.summary %></p>
+                </div>
+              </a>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+    </div>
+    
+    <!-- Right Column - Sidebar -->
+    <div class="md:col-span-1">
+      <!-- Testimonial -->
+      <% if(caseStudy.testimonial && caseStudy.testimonial.quote) { %>
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-5 mb-6">
+          <div class="flex items-start mb-4">
+            <i data-lucide="quote" class="h-5 w-5 text-primary mr-2"></i>
+          </div>
+          
+          <blockquote class="text-sm italic text-gray-700 mb-4">
+            "<%= caseStudy.testimonial.quote %>"
+          </blockquote>
+          
+          <div class="flex items-center">
+            <% if(caseStudy.testimonial.avatar) { %>
+              <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                <img src="<%= caseStudy.testimonial.avatar %>" alt="<%= caseStudy.testimonial.author %>" class="w-full h-full object-cover">
+              </div>
+            <% } else { %>
+              <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3">
+                <i data-lucide="user" class="h-5 w-5 text-gray-500"></i>
+              </div>
+            <% } %>
+            
+            <div>
+              <p class="text-xs font-medium text-gray-900"><%= caseStudy.testimonial.author %></p>
+              <p class="text-xs text-gray-500"><%= caseStudy.testimonial.position %></p>
+            </div>
+          </div>
+        </div>
+      <% } %>
+      
+      <!-- Services Used -->
+      <% if(caseStudy.services && caseStudy.services.length > 0) { %>
+        <div class="mb-6">
+          <h3 class="text-sm font-semibold text-gray-900 mb-3">Services Provided</h3>
+          <div class="space-y-2">
+            <% caseStudy.services.forEach(service => { %>
+              <a href="/api/services/<%= service.slug %>" class="flex items-center p-3 rounded-md border border-gray-200 hover:bg-gray-50 transition-colors duration-200">
+                <div class="ml-2">
+                  <h3 class="text-sm font-medium text-gray-900">
+                    <%= service.name %>
+                  </h3>
+                  <p class="text-xs text-gray-500">
+                    <%= service.category %>
+                  </p>
+                </div>
+              </a>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+      
+      <!-- Consultants -->
+      <% if(caseStudy.consultants && caseStudy.consultants.length > 0) { %>
+        <div class="mb-6">
+          <h3 class="text-sm font-semibold text-gray-900 mb-3">Delivery Team</h3>
+          <div class="space-y-2">
+            <% caseStudy.consultants.forEach(consultant => { %>
+              <div class="flex items-center p-3 rounded-md border border-gray-200">
+                <% if(consultant.profile && consultant.profile.avatarUrl) { %>
+                  <div class="w-8 h-8 rounded-full overflow-hidden mr-3">
+                    <img src="<%= consultant.profile.avatarUrl %>" alt="<%= consultant.profile.firstName %> <%= consultant.profile.lastName %>" class="w-full h-full object-cover">
+                  </div>
+                <% } else { %>
+                  <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-3">
+                    <i data-lucide="user" class="h-4 w-4 text-gray-500"></i>
+                  </div>
+                <% } %>
+                
+                <div>
+                  <h3 class="text-sm font-medium text-gray-900">
+                    <%= consultant.profile.firstName %> <%= consultant.profile.lastName %>
+                  </h3>
+                  <p class="text-xs text-gray-500">
+                    <%= consultant.professional && consultant.professional.title ? consultant.professional.title : 'Consultant' %>
+                  </p>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+      
+      <!-- Download Assets -->
+      <% if(caseStudy.downloads && caseStudy.downloads.length > 0 && caseStudy.downloads.some(d => d.isPublic)) { %>
+        <div class="mb-6">
+          <h3 class="text-sm font-semibold text-gray-900 mb-3">Downloads</h3>
+          <div class="space-y-2">
+            <% caseStudy.downloads.filter(d => d.isPublic).forEach(download => { %>
+              <a href="<%= download.file %>" class="flex items-center p-3 rounded-md border border-gray-200 hover:bg-gray-50 transition-colors duration-200"
+                 onclick="recordDownload('<%= caseStudy._id %>', '<%= download._id %>')">
+                <% if(download.type === 'pdf') { %>
+                  <i data-lucide="file-text" class="h-5 w-5 text-red-500 mr-3"></i>
+                <% } else if(download.type === 'pptx') { %>
+                  <i data-lucide="file-presentation" class="h-5 w-5 text-orange-500 mr-3"></i>
+                <% } else if(download.type === 'docx') { %>
+                  <i data-lucide="file" class="h-5 w-5 text-blue-500 mr-3"></i>
+                <% } else { %>
+                  <i data-lucide="file" class="h-5 w-5 text-gray-500 mr-3"></i>
+                <% } %>
+                
+                <div>
+                  <h3 class="text-sm font-medium text-gray-900">
+                    <%= download.title %>
+                  </h3>
+                  <p class="text-xs text-gray-500">
+                    <%= download.size || 'Download' %>
+                  </p>
+                </div>
+              </a>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+      
+      <!-- Tags -->
+      <% if(caseStudy.tags && caseStudy.tags.length > 0) { %>
+        <div class="mb-6">
+          <h3 class="text-sm font-semibold text-gray-900 mb-3">Tags</h3>
+          <div class="flex flex-wrap gap-2">
+            <% caseStudy.tags.forEach(tag => { %>
+              <a href="/api/case-studies?tags=<%= tag %>" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 hover:bg-gray-200">
+                #<%= tag %>
+              </a>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+      
+      <!-- Share Section -->
+      <div id="share-section" class="mb-6">
+        <h3 class="text-sm font-semibold text-gray-900 mb-3">Share This Case Study</h3>
+        <div class="flex space-x-2">
+          <a href="javascript:void(0)" onclick="shareOnLinkedIn()" class="w-8 h-8 rounded-full bg-blue-700 text-white flex items-center justify-center hover:bg-blue-800">
+            <i data-lucide="linkedin" class="h-4 w-4"></i>
+          </a>
+          <a href="javascript:void(0)" onclick="shareOnTwitter()" class="w-8 h-8 rounded-full bg-blue-400 text-white flex items-center justify-center hover:bg-blue-500">
+            <i data-lucide="twitter" class="h-4 w-4"></i>
+          </a>
+          <a href="javascript:void(0)" onclick="shareByEmail()" class="w-8 h-8 rounded-full bg-gray-500 text-white flex items-center justify-center hover:bg-gray-600">
+            <i data-lucide="mail" class="h-4 w-4"></i>
+          </a>
+          <button onclick="copyLink()" id="copy-link-btn" class="w-8 h-8 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center hover:bg-gray-300">
+            <i data-lucide="link" class="h-4 w-4"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- CTA Section -->
+  <div class="border-t border-gray-200 px-6 py-8 bg-gray-50">
+    <div class="text-center max-w-3xl mx-auto">
+      <h2 class="text-lg font-bold text-gray-900 mb-2">Ready to achieve similar results?</h2>
+      <p class="text-sm text-gray-600 mb-5">Contact us to discuss how our consulting services can help you overcome your business challenges.</p>
+      <div class="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+        <a href="/api/contact" class="inline-flex items-center justify-center px-5 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-dark bg-primary hover:bg-primary-dark focus:outline-none w-full sm:w-auto">
+          Contact Us
+        </a>
+        <a href="/api/services" class="inline-flex items-center justify-center px-5 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none w-full sm:w-auto">
+          Explore Our Services
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Alpine.js components if available
+    if (typeof Alpine !== 'undefined') {
+      Alpine.start();
+    }
+    
+    // Share button functionality
+    const shareBtn = document.getElementById('share-btn');
+    const shareSection = document.getElementById('share-section');
+    
+    if (shareBtn) {
+      shareBtn.addEventListener('click', function() {
+        shareSection.scrollIntoView({behavior: 'smooth'});
+      });
+    }
+  });
+  
+  // Record download analytics
+  function recordDownload(caseStudyId, downloadId) {
+    fetch(`/api/case-studies/${caseStudyId}/downloads/${downloadId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).catch(error => {
+      console.error('Error recording download:', error);
+    });
+  }
+  
+  // Share functionality
+  function shareOnLinkedIn() {
+    const url = encodeURIComponent(window.location.href);
+    const title = encodeURIComponent(document.title);
+    window.open(`https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${title}`, '_blank');
+  }
+  
+  function shareOnTwitter() {
+    const url = encodeURIComponent(window.location.href);
+    const title = encodeURIComponent(document.title);
+    window.open(`https://twitter.com/intent/tweet?text=${title}&url=${url}`, '_blank');
+  }
+  
+  function shareByEmail() {
+    const subject = encodeURIComponent(document.title);
+    const body = encodeURIComponent(`Check out this case study: ${window.location.href}`);
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  }
+  
+  function copyLink() {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      const copyBtn = document.getElementById('copy-link-btn');
+      
+      // Show temporary success indication
+      copyBtn.innerHTML = '<i data-lucide="check" class="h-4 w-4"></i>';
+      copyBtn.classList.add('bg-green-500', 'text-white');
+      copyBtn.classList.remove('bg-gray-200', 'text-gray-700');
+      
+      // Initialize the icon
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons({
+          icons: {
+            check: true
+          }
+        });
+      }
+      
+      // Reset after 2 seconds
+      setTimeout(() => {
+        copyBtn.innerHTML = '<i data-lucide="link" class="h-4 w-4"></i>';
+        copyBtn.classList.remove('bg-green-500', 'text-white');
+        copyBtn.classList.add('bg-gray-200', 'text-gray-700');
+        
+        // Re-initialize the icon
+        if (typeof lucide !== 'undefined') {
+          lucide.createIcons({
+            icons: {
+              link: true
+            }
+          });
+        }
+      }, 2000);
+    }).catch(err => {
+      console.error('Could not copy text: ', err);
+    });
+  }
+</script>

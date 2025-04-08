@@ -1,0 +1,384 @@
+<!-- views/clients/new-project.ejs -->
+<% layout('layouts/dashboard') -%>
+<% block('title', 'Create New Project - InsightSerenity') -%>
+
+<div class="mb-6">
+  <h1 class="text-2xl font-bold mb-2">Create a New Project</h1>
+  <p class="text-gray-600">Describe your project details to find the right consultant</p>
+</div>
+
+<% if (error && error.length > 0) { %>
+  <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-red-700"><%= error %></p>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<div class="card bg-white p-6">
+  <form action="/api/clients/projects" method="POST" id="project-form">
+    <!-- Project Basics Section -->
+    <div class="mb-8">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">Project Basics</h2>
+      
+      <div class="mb-4">
+        <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Project Title*</label>
+        <input type="text" id="title" name="title" required class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary" 
+          placeholder="Give your project a clear, descriptive title" maxlength="100">
+        <p class="mt-1 text-xs text-gray-500">Be specific and concise (5-100 characters)</p>
+      </div>
+      
+      <div class="mb-4">
+        <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Project Category*</label>
+        <select id="category" name="category" required class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary appearance-none">
+          <option value="" disabled selected>Select a category</option>
+          <% projectOptions.categories.forEach(category => { %>
+            <option value="<%= category.value %>"><%= category.label %></option>
+          <% }) %>
+        </select>
+      </div>
+      
+      <div class="mb-4">
+        <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Project Description*</label>
+        <textarea id="description" name="description" required rows="6" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary" 
+          placeholder="Provide a detailed description of your project, including goals, scope, and any specific requirements"></textarea>
+        <p class="mt-1 text-xs text-gray-500">Be as detailed as possible (minimum 20 characters)</p>
+      </div>
+    </div>
+    
+    <!-- Budget & Timeline Section -->
+    <div class="mb-8">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">Budget & Timeline</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Budget Type*</label>
+          <div class="mt-2 space-y-2">
+            <div class="flex items-center">
+              <input id="budget-type-fixed" name="budget.type" type="radio" value="fixed" checked class="h-4 w-4 text-primary focus:ring-primary border-gray-300">
+              <label for="budget-type-fixed" class="ml-3 block text-sm font-medium text-gray-700">Fixed Price</label>
+            </div>
+            <div class="flex items-center">
+              <input id="budget-type-hourly" name="budget.type" type="radio" value="hourly" class="h-4 w-4 text-primary focus:ring-primary border-gray-300">
+              <label for="budget-type-hourly" class="ml-3 block text-sm font-medium text-gray-700">Hourly Rate</label>
+            </div>
+            <div class="flex items-center">
+              <input id="budget-type-range" name="budget.type" type="radio" value="range" class="h-4 w-4 text-primary focus:ring-primary border-gray-300">
+              <label for="budget-type-range" class="ml-3 block text-sm font-medium text-gray-700">Budget Range</label>
+            </div>
+          </div>
+        </div>
+        
+        <div id="budget-fields">
+          <div id="fixed-budget" class="budget-field">
+            <label for="budget-fixed" class="block text-sm font-medium text-gray-700 mb-1">Fixed Budget ($)*</label>
+            <input type="number" id="budget-fixed" name="budget.fixed" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary" 
+              placeholder="Enter amount" min="1" step="1">
+          </div>
+          
+          <div id="hourly-budget" class="budget-field hidden">
+            <label for="budget-hourly" class="block text-sm font-medium text-gray-700 mb-1">Hourly Rate ($)*</label>
+            <input type="number" id="budget-hourly" name="budget.hourly" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary" 
+              placeholder="Enter hourly rate" min="1" step="1">
+          </div>
+          
+          <div id="range-budget" class="budget-field hidden">
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label for="budget-min" class="block text-sm font-medium text-gray-700 mb-1">Min ($)*</label>
+                <input type="number" id="budget-min" name="budget.min" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary" 
+                  placeholder="Minimum" min="1" step="1">
+              </div>
+              <div>
+                <label for="budget-max" class="block text-sm font-medium text-gray-700 mb-1">Max ($)*</label>
+                <input type="number" id="budget-max" name="budget.max" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary" 
+                  placeholder="Maximum" min="1" step="1">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+          <label for="timeline-duration" class="block text-sm font-medium text-gray-700 mb-1">Estimated Duration*</label>
+          <select id="timeline-duration" name="timeline.duration" required class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary appearance-none">
+            <option value="" disabled selected>Select duration</option>
+            <% projectOptions.durations.forEach(duration => { %>
+              <option value="<%= duration.value %>"><%= duration.label %></option>
+            <% }) %>
+          </select>
+        </div>
+        
+        <div>
+          <label for="timeline-startDate" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+          <input type="date" id="timeline-startDate" name="timeline.startDate" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+        </div>
+      </div>
+    </div>
+    
+    <!-- Requirements Section -->
+    <div class="mb-8">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">Requirements</h2>
+      
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Required Skills</label>
+        <div id="skills-container" class="flex flex-wrap gap-2 mb-2">
+          <div class="inline-block">
+            <input type="text" id="skill-input" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary" 
+              placeholder="Add a skill...">
+            <button type="button" id="add-skill-btn" class="ml-2 px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+              Add
+            </button>
+          </div>
+        </div>
+        <div id="selected-skills" class="flex flex-wrap gap-2 mt-2"></div>
+        <input type="hidden" id="skills-json" name="requirements.skills" value="[]">
+        <p class="mt-1 text-xs text-gray-500">Press Enter or click Add after typing each skill</p>
+      </div>
+      
+      <div class="mb-4">
+        <label for="requirements-experience" class="block text-sm font-medium text-gray-700 mb-1">Experience Level</label>
+        <select id="requirements-experience" name="requirements.experience" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary appearance-none">
+          <option value="" disabled selected>Select experience level</option>
+          <option value="entry">Entry Level</option>
+          <option value="intermediate">Intermediate</option>
+          <option value="expert">Expert</option>
+          <option value="any">Any Level</option>
+        </select>
+      </div>
+      
+      <div class="mb-4">
+        <label for="requirements-deliverables" class="block text-sm font-medium text-gray-700 mb-1">Deliverables</label>
+        <textarea id="requirements-deliverables" name="requirements.deliverables" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary" 
+          placeholder="List the specific deliverables you expect (one per line)"></textarea>
+        <p class="mt-1 text-xs text-gray-500">Clearly outline what you expect the consultant to deliver</p>
+      </div>
+    </div>
+    
+    <!-- Additional Information Section -->
+    <div class="mb-8">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">Additional Information</h2>
+      
+      <div class="mb-4">
+        <label for="additionalDetails" class="block text-sm font-medium text-gray-700 mb-1">Additional Details</label>
+        <textarea id="additionalDetails" name="requirements.additionalDetails" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary" 
+          placeholder="Any other information that might be helpful for consultants"></textarea>
+      </div>
+      
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Project Visibility</label>
+        <div class="mt-2 space-y-2">
+          <div class="flex items-start">
+            <div class="flex items-center h-5">
+              <input id="visibility-public" name="visibility" type="radio" value="public" checked class="h-4 w-4 text-primary focus:ring-primary border-gray-300">
+            </div>
+            <div class="ml-3 text-sm">
+              <label for="visibility-public" class="font-medium text-gray-700">Public</label>
+              <p class="text-gray-500">All consultants can view and submit proposals</p>
+            </div>
+          </div>
+          
+          <div class="flex items-start">
+            <div class="flex items-center h-5">
+              <input id="visibility-invite" name="visibility" type="radio" value="invite_only" class="h-4 w-4 text-primary focus:ring-primary border-gray-300">
+            </div>
+            <div class="ml-3 text-sm">
+              <label for="visibility-invite" class="font-medium text-gray-700">Invite Only</label>
+              <p class="text-gray-500">Only consultants you invite can view and submit proposals</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <% if (consultant) { %>
+        <div class="mb-4">
+          <div class="p-4 bg-gray-50 rounded-md">
+            <div class="flex items-center">
+              <input id="invite-consultant" name="consultantId" type="checkbox" value="<%= consultant.id %>" class="h-4 w-4 text-primary focus:ring-primary border-gray-300">
+              <label for="invite-consultant" class="ml-3 block text-sm font-medium text-gray-700">
+                Invite <%= consultant.name %> to this project
+              </label>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+    
+    <!-- Submit section -->
+    <div class="flex justify-end space-x-4">
+      <button type="button" id="save-draft" class="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+        Save as Draft
+      </button>
+      <button type="submit" class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+        Create Project
+      </button>
+    </div>
+  </form>
+</div>
+
+<% block('additionalJS', `
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Handle budget type selection
+    const budgetTypeRadios = document.querySelectorAll('input[name="budget.type"]');
+    const budgetFields = document.querySelectorAll('.budget-field');
+    
+    budgetTypeRadios.forEach(radio => {
+      radio.addEventListener('change', function() {
+        budgetFields.forEach(field => field.classList.add('hidden'));
+        
+        if (this.value === 'fixed') {
+          document.getElementById('fixed-budget').classList.remove('hidden');
+          document.getElementById('budget-fixed').setAttribute('required', '');
+          document.getElementById('budget-hourly').removeAttribute('required');
+          document.getElementById('budget-min').removeAttribute('required');
+          document.getElementById('budget-max').removeAttribute('required');
+        } else if (this.value === 'hourly') {
+          document.getElementById('hourly-budget').classList.remove('hidden');
+          document.getElementById('budget-hourly').setAttribute('required', '');
+          document.getElementById('budget-fixed').removeAttribute('required');
+          document.getElementById('budget-min').removeAttribute('required');
+          document.getElementById('budget-max').removeAttribute('required');
+        } else if (this.value === 'range') {
+          document.getElementById('range-budget').classList.remove('hidden');
+          document.getElementById('budget-min').setAttribute('required', '');
+          document.getElementById('budget-max').setAttribute('required', '');
+          document.getElementById('budget-fixed').removeAttribute('required');
+          document.getElementById('budget-hourly').removeAttribute('required');
+        }
+      });
+    });
+    
+    // Skills management
+    const skillInput = document.getElementById('skill-input');
+    const addSkillBtn = document.getElementById('add-skill-btn');
+    const selectedSkills = document.getElementById('selected-skills');
+    const skillsJson = document.getElementById('skills-json');
+    let skills = [];
+    
+    function addSkill() {
+      const skill = skillInput.value.trim();
+      if (skill && !skills.includes(skill) && skills.length < 10) {
+        skills.push(skill);
+        updateSkills();
+        skillInput.value = '';
+      }
+    }
+    
+    function updateSkills() {
+      selectedSkills.innerHTML = '';
+      skills.forEach((skill, index) => {
+        const skillChip = document.createElement('div');
+        skillChip.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-blue-100 text-blue-800';
+        skillChip.innerHTML = \`
+          <span>\${skill}</span>
+          <button type="button" data-index="\${index}" class="remove-skill ml-1 h-4 w-4 rounded-full inline-flex items-center justify-center text-blue-400 hover:text-blue-600 focus:outline-none focus:text-blue-600">
+            <span class="sr-only">Remove</span>
+            <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        \`;
+        selectedSkills.appendChild(skillChip);
+      });
+      
+      skillsJson.value = JSON.stringify(skills);
+    }
+    
+    skillInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addSkill();
+      }
+    });
+    
+    addSkillBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      addSkill();
+    });
+    
+    selectedSkills.addEventListener('click', function(e) {
+      if (e.target.closest('.remove-skill')) {
+        const index = parseInt(e.target.closest('.remove-skill').dataset.index);
+        skills.splice(index, 1);
+        updateSkills();
+      }
+    });
+    
+    // Handle draft saving
+    document.getElementById('save-draft').addEventListener('click', function() {
+      const form = document.getElementById('project-form');
+      const statusInput = document.createElement('input');
+      statusInput.type = 'hidden';
+      statusInput.name = 'status';
+      statusInput.value = 'draft';
+      form.appendChild(statusInput);
+      
+      // Remove required attributes for draft saving
+      const requiredFields = form.querySelectorAll('[required]');
+      requiredFields.forEach(field => {
+        field.removeAttribute('required');
+      });
+      
+      form.submit();
+    });
+    
+    // Ensure submit button sets status to open
+    document.getElementById('project-form').addEventListener('submit', function(e) {
+      // Remove any existing status input
+      const existingStatus = this.querySelector('input[name="status"]');
+      if (existingStatus) {
+        existingStatus.remove();
+      }
+      
+      // Add status input with value 'open'
+      const statusInput = document.createElement('input');
+      statusInput.type = 'hidden';
+      statusInput.name = 'status';
+      statusInput.value = 'open';
+      this.appendChild(statusInput);
+      
+      // Validate budget inputs
+      const budgetType = document.querySelector('input[name="budget.type"]:checked').value;
+      
+      if (budgetType === 'range') {
+        const minBudget = parseFloat(document.getElementById('budget-min').value);
+        const maxBudget = parseFloat(document.getElementById('budget-max').value);
+        
+        if (maxBudget <= minBudget) {
+          e.preventDefault();
+          alert('Maximum budget must be greater than minimum budget');
+          return false;
+        }
+      }
+    });
+    
+    // Convert deliverables textarea to array on submit
+    document.getElementById('project-form').addEventListener('submit', function(e) {
+      const deliverablesField = document.getElementById('requirements-deliverables');
+      if (deliverablesField.value.trim()) {
+        // Split by new line and store as JSON
+        const deliverables = deliverablesField.value
+          .split('\\n')
+          .map(item => item.trim())
+          .filter(item => item.length > 0);
+        
+        // Create hidden field for proper array handling
+        const deliverablesJson = document.createElement('input');
+        deliverablesJson.type = 'hidden';
+        deliverablesJson.name = 'requirements.deliverablesJson';
+        deliverablesJson.value = JSON.stringify(deliverables);
+        this.appendChild(deliverablesJson);
+      }
+    });
+  });
+</script>
+`) -%>

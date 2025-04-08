@@ -1,0 +1,646 @@
+{
+  "common": {
+    "appName": "InsightSerenity",
+    "tagline": "Expert consulting solutions designed to transform your business",
+    "navigation": {
+      "home": "Home",
+      "services": "Services",
+      "caseStudies": "Case Studies",
+      "blog": "Blog",
+      "about": "About Us",
+      "contact": "Contact",
+      "login": "Login",
+      "signup": "Sign Up",
+      "dashboard": "Dashboard",
+      "profile": "Profile",
+      "settings": "Settings",
+      "logout": "Logout"
+    },
+    "actions": {
+      "submit": "Submit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "view": "View",
+      "search": "Search",
+      "filter": "Filter",
+      "sort": "Sort",
+      "apply": "Apply",
+      "clear": "Clear",
+      "back": "Back",
+      "next": "Next",
+      "previous": "Previous",
+      "continue": "Continue",
+      "finish": "Finish",
+      "confirm": "Confirm",
+      "download": "Download",
+      "upload": "Upload"
+    },
+    "status": {
+      "loading": "Loading...",
+      "success": "Success",
+      "error": "Error",
+      "warning": "Warning",
+      "info": "Information",
+      "pending": "Pending",
+      "active": "Active",
+      "inactive": "Inactive",
+      "completed": "Completed",
+      "processing": "Processing",
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived"
+    },
+    "time": {
+      "now": "Just now",
+      "minutesAgo": "{{count}} minute ago",
+      "minutesAgo_plural": "{{count}} minutes ago",
+      "hoursAgo": "{{count}} hour ago",
+      "hoursAgo_plural": "{{count}} hours ago",
+      "daysAgo": "{{count}} day ago",
+      "daysAgo_plural": "{{count}} days ago",
+      "weeksAgo": "{{count}} week ago",
+      "weeksAgo_plural": "{{count}} weeks ago",
+      "monthsAgo": "{{count}} month ago",
+      "monthsAgo_plural": "{{count}} months ago",
+      "yearsAgo": "{{count}} year ago",
+      "yearsAgo_plural": "{{count}} years ago",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "tomorrow": "Tomorrow"
+    },
+    "meta": {
+      "pageTitle": "{{title}} | InsightSerenity",
+      "description": "InsightSerenity provides expert consulting solutions designed to transform your business and drive meaningful results.",
+      "keywords": "consulting, business consulting, expert consultants, business transformation"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Login to your account",
+      "email": "Email",
+      "password": "Password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "loginButton": "Login",
+      "continueWithGoogle": "Continue with Google",
+      "continueWithLinkedIn": "Continue with LinkedIn",
+      "errors": {
+        "invalidCredentials": "Invalid email or password",
+        "accountLocked": "Your account has been locked. Please contact support.",
+        "accountNotVerified": "Please verify your email before logging in"
+      }
+    },
+    "register": {
+      "title": "Create your account",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "accountType": "Account type",
+      "client": "Client",
+      "consultant": "Consultant",
+      "agreeTerms": "I agree to the {{termsLink}} and {{privacyLink}}",
+      "termsLink": "Terms of Service",
+      "privacyLink": "Privacy Policy",
+      "alreadyHaveAccount": "Already have an account?",
+      "login": "Login",
+      "createAccountButton": "Create Account",
+      "errors": {
+        "passwordMismatch": "Passwords do not match",
+        "emailTaken": "Email is already in use",
+        "weakPassword": "Password is too weak",
+        "termsRequired": "You must agree to the terms and privacy policy"
+      }
+    },
+    "forgotPassword": {
+      "title": "Reset your password",
+      "email": "Email",
+      "instructions": "Enter your email address and we'll send you instructions to reset your password",
+      "sendButton": "Send Reset Link",
+      "backToLogin": "Back to login",
+      "success": "Check your email for password reset instructions",
+      "errors": {
+        "emailNotFound": "No account found with this email address"
+      }
+    },
+    "resetPassword": {
+      "title": "Create new password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "resetButton": "Reset Password",
+      "success": "Your password has been reset successfully",
+      "loginPrompt": "You can now login with your new password",
+      "errors": {
+        "passwordMismatch": "Passwords do not match",
+        "weakPassword": "Password is too weak",
+        "invalidToken": "Invalid or expired reset token"
+      }
+    },
+    "verification": {
+      "title": "Verify your email",
+      "success": "Your email has been verified successfully",
+      "alreadyVerified": "Your email has already been verified",
+      "loginPrompt": "You can now login to your account",
+      "errors": {
+        "invalidToken": "Invalid or expired verification token"
+      }
+    },
+    "twoFactor": {
+      "title": "Two-factor authentication",
+      "subtitle": "Enter the verification code from your authenticator app",
+      "code": "Verification code",
+      "verifyButton": "Verify",
+      "backupCode": "Use backup code",
+      "errors": {
+        "invalidCode": "Invalid verification code",
+        "expired": "Verification code has expired"
+      }
+    }
+  },
+  "dashboard": {
+    "welcome": "Welcome back, {{name}}",
+    "summary": {
+      "title": "Dashboard Summary",
+      "activeProjects": "Active Projects",
+      "pendingProposals": "Pending Proposals",
+      "upcomingMeetings": "Upcoming Meetings",
+      "recentMessages": "Recent Messages",
+      "tasks": "Tasks",
+      "invoices": "Invoices"
+    },
+    "client": {
+      "findConsultants": "Find Consultants",
+      "myProjects": "My Projects",
+      "projectRequests": "Project Requests",
+      "savedConsultants": "Saved Consultants"
+    },
+    "consultant": {
+      "availableProjects": "Available Projects",
+      "myClients": "My Clients",
+      "projectProposals": "Project Proposals",
+      "earnings": "Earnings",
+      "portfolio": "Portfolio"
+    },
+    "admin": {
+      "userManagement": "User Management",
+      "contentManagement": "Content Management",
+      "systemSettings": "System Settings",
+      "analytics": "Analytics",
+      "reports": "Reports"
+    }
+  },
+  "profile": {
+    "title": "My Profile",
+    "personalInfo": {
+      "title": "Personal Information",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone",
+      "location": "Location",
+      "about": "About Me",
+      "profilePicture": "Profile Picture",
+      "updateButton": "Update Information"
+    },
+    "professionalInfo": {
+      "title": "Professional Information",
+      "company": "Company",
+      "position": "Position",
+      "industry": "Industry",
+      "experience": "Years of Experience",
+      "skills": "Skills",
+      "specialties": "Specialties",
+      "education": "Education",
+      "certifications": "Certifications",
+      "languages": "Languages"
+    },
+    "security": {
+      "title": "Security Settings",
+      "changePassword": "Change Password",
+      "twoFactorAuth": "Two-Factor Authentication",
+      "loginHistory": "Login History",
+      "sessions": "Active Sessions",
+      "deactivateAccount": "Deactivate Account"
+    },
+    "preferences": {
+      "title": "Preferences",
+      "language": "Language",
+      "timezone": "Timezone",
+      "notifications": "Notifications",
+      "emailPreferences": "Email Preferences",
+      "privacy": "Privacy Settings"
+    }
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Expert consulting solutions designed to transform your business",
+    "categories": {
+      "strategy": "Business Strategy",
+      "operations": "Operations",
+      "technology": "Technology",
+      "digital": "Digital Transformation",
+      "finance": "Finance & Accounting",
+      "hr": "Human Resources",
+      "marketing": "Marketing",
+      "legal": "Legal",
+      "compliance": "Compliance & Risk",
+      "research": "Research & Development",
+      "education": "Training & Education",
+      "sustainability": "Sustainability",
+      "other": "Other Services"
+    },
+    "filters": {
+      "category": "Category",
+      "industry": "Industry",
+      "pricingModel": "Pricing Model",
+      "sortOptions": {
+        "nameAsc": "Name (A-Z)",
+        "nameDesc": "Name (Z-A)",
+        "newest": "Newest First",
+        "popular": "Most Popular"
+      }
+    },
+    "detail": {
+      "overview": "Overview",
+      "benefits": "Key Benefits",
+      "features": "Features",
+      "process": "Our Process",
+      "pricing": "Pricing",
+      "deliverables": "Deliverables",
+      "timeline": "Timeline",
+      "expertise": "Required Expertise",
+      "industries": "Industries Served",
+      "consultants": "Our Specialists",
+      "faqs": "Frequently Asked Questions",
+      "contact": "Request This Service",
+      "related": "Related Services"
+    },
+    "pricing": {
+      "models": {
+        "hourly": "Hourly Rate",
+        "fixed": "Fixed Price",
+        "retainer": "Monthly Retainer",
+        "milestone": "Milestone-based",
+        "value_based": "Value-based",
+        "mixed": "Mixed Pricing"
+      },
+      "customQuote": "Custom Quote",
+      "startingFrom": "Starting from",
+      "contactForPricing": "Contact for pricing"
+    }
+  },
+  "caseStudies": {
+    "title": "Case Studies",
+    "subtitle": "Real success stories from our clients",
+    "filters": {
+      "industry": "Industry",
+      "service": "Service Type",
+      "challenge": "Challenge",
+      "sortOptions": {
+        "newest": "Newest First",
+        "oldest": "Oldest First",
+        "alphabetical": "Alphabetical"
+      }
+    },
+    "detail": {
+      "client": "Client",
+      "industry": "Industry",
+      "duration": "Project Duration",
+      "services": "Services Provided",
+      "challenge": "The Challenge",
+      "approach": "Our Approach",
+      "solution": "The Solution",
+      "results": "Results & Impact",
+      "testimonial": "Client Testimonial",
+      "consultants": "Consultants Involved",
+      "downloads": "Related Downloads",
+      "relatedCaseStudies": "Related Case Studies"
+    }
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Insights and expertise from our consultants",
+    "readMore": "Read More",
+    "authorBy": "By",
+    "publishedOn": "Published on",
+    "minuteRead": "{{count}} minute read",
+    "minuteRead_plural": "{{count}} minute read",
+    "categories": "Categories",
+    "recentPosts": "Recent Posts",
+    "popularTags": "Popular Tags",
+    "post": {
+      "share": "Share this post",
+      "comments": "Comments",
+      "leaveComment": "Leave a comment",
+      "yourName": "Your Name",
+      "yourEmail": "Your Email",
+      "yourComment": "Your Comment",
+      "submitComment": "Submit Comment",
+      "relatedPosts": "Related Posts",
+      "authorBio": "About the Author"
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Get in touch with our team",
+    "form": {
+      "name": "Your Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "company": "Company Name",
+      "subject": "Subject",
+      "message": "Your Message",
+      "submitButton": "Send Message"
+    },
+    "info": {
+      "address": "Address",
+      "phone": "Phone",
+      "email": "Email",
+      "hours": "Business Hours"
+    },
+    "consultation": {
+      "title": "Request a Consultation",
+      "description": "Schedule a free consultation with one of our experts"
+    },
+    "success": "Your message has been sent successfully. We'll get back to you shortly.",
+    "error": "There was an error sending your message. Please try again."
+  },
+  "about": {
+    "title": "About Us",
+    "mission": {
+      "title": "Our Mission",
+      "description": "To empower organizations with the insights and expertise they need to achieve sustainable growth and excellence."
+    },
+    "vision": {
+      "title": "Our Vision",
+      "description": "To be the trusted partner that organizations turn to for transformative consulting solutions."
+    },
+    "values": {
+      "title": "Our Values",
+      "excellence": "Excellence",
+      "integrity": "Integrity",
+      "collaboration": "Collaboration",
+      "innovation": "Innovation",
+      "impact": "Impact"
+    },
+    "team": {
+      "title": "Our Team",
+      "leadership": "Leadership Team",
+      "consultants": "Our Consultants",
+      "viewProfile": "View Profile"
+    },
+    "history": {
+      "title": "Our History",
+      "description": "The story of InsightSerenity's journey and growth"
+    },
+    "clients": {
+      "title": "Clients We've Helped",
+      "testimonials": "Testimonials"
+    }
+  },
+  "projects": {
+    "title": "Projects",
+    "status": {
+      "draft": "Draft",
+      "pending": "Pending",
+      "active": "Active",
+      "onHold": "On Hold",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "client": {
+      "myProjects": "My Projects",
+      "createNew": "Create New Project",
+      "projectDetails": "Project Details",
+      "consultants": "Assigned Consultants",
+      "timeline": "Project Timeline",
+      "documents": "Project Documents",
+      "invoices": "Invoices",
+      "communication": "Communication"
+    },
+    "consultant": {
+      "myProjects": "My Projects",
+      "availableProjects": "Available Projects",
+      "projectDetails": "Project Details",
+      "client": "Client Information",
+      "timeline": "Project Timeline",
+      "tasks": "Tasks",
+      "deliverables": "Deliverables",
+      "timeTracking": "Time Tracking",
+      "documents": "Project Documents"
+    },
+    "form": {
+      "title": "Project Title",
+      "description": "Project Description",
+      "objectives": "Project Objectives",
+      "scope": "Project Scope",
+      "budget": "Budget",
+      "timeline": "Timeline",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "industry": "Industry",
+      "service": "Service Type",
+      "requirements": "Requirements",
+      "attachments": "Attachments"
+    }
+  },
+  "payments": {
+    "title": "Payments",
+    "client": {
+      "invoices": "Invoices",
+      "paymentMethods": "Payment Methods",
+      "transactions": "Transaction History",
+      "subscriptions": "Subscriptions"
+    },
+    "consultant": {
+      "earnings": "Earnings",
+      "pending": "Pending Payments",
+      "paid": "Paid Invoices",
+      "bankInfo": "Banking Information",
+      "taxDocuments": "Tax Documents"
+    },
+    "invoice": {
+      "number": "Invoice Number",
+      "date": "Invoice Date",
+      "dueDate": "Due Date",
+      "client": "Client",
+      "consultant": "Consultant",
+      "project": "Project",
+      "description": "Description",
+      "amount": "Amount",
+      "status": "Status",
+      "payNow": "Pay Now",
+      "download": "Download Invoice"
+    },
+    "status": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded"
+    }
+  },
+  "messages": {
+    "title": "Messages",
+    "inbox": "Inbox",
+    "sent": "Sent",
+    "archived": "Archived",
+    "newMessage": "New Message",
+    "noMessages": "No messages to display",
+    "to": "To",
+    "subject": "Subject",
+    "message": "Message",
+    "attachments": "Attachments",
+    "send": "Send Message",
+    "reply": "Reply",
+    "forward": "Forward",
+    "delete": "Delete",
+    "archive": "Archive"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark All as Read",
+    "noNotifications": "No notifications to display",
+    "types": {
+      "message": "New Message",
+      "project": "Project Update",
+      "proposal": "New Proposal",
+      "payment": "Payment",
+      "system": "System Notification"
+    }
+  },
+  "admin": {
+    "users": {
+      "title": "User Management",
+      "allUsers": "All Users",
+      "clients": "Clients",
+      "consultants": "Consultants",
+      "admins": "Administrators",
+      "userDetails": "User Details",
+      "createUser": "Create User",
+      "editUser": "Edit User",
+      "deactivateUser": "Deactivate User",
+      "activateUser": "Activate User",
+      "resetPassword": "Reset Password",
+      "roles": {
+        "client": "Client",
+        "consultant": "Consultant",
+        "admin": "Administrator"
+      }
+    },
+    "content": {
+      "title": "Content Management",
+      "services": "Services",
+      "caseStudies": "Case Studies",
+      "blog": "Blog Posts",
+      "pages": "Pages",
+      "categories": "Categories",
+      "media": "Media Library"
+    },
+    "settings": {
+      "title": "System Settings",
+      "general": "General Settings",
+      "appearance": "Appearance",
+      "email": "Email Settings",
+      "security": "Security Settings",
+      "integrations": "Integrations",
+      "apiKeys": "API Keys",
+      "billing": "Billing Settings"
+    },
+    "analytics": {
+      "title": "Analytics",
+      "overview": "Overview",
+      "users": "User Analytics",
+      "projects": "Project Analytics",
+      "revenue": "Revenue Analytics",
+      "content": "Content Analytics",
+      "export": "Export Data"
+    }
+  },
+  "errors": {
+    "general": {
+      "title": "An error occurred",
+      "message": "Something went wrong. Please try again.",
+      "retry": "Retry",
+      "contact": "Contact Support"
+    },
+    "notFound": {
+      "title": "Page Not Found",
+      "message": "The page you are looking for doesn't exist or may have been moved.",
+      "goHome": "Go to Homepage"
+    },
+    "unauthorized": {
+      "title": "Unauthorized",
+      "message": "You don't have permission to access this resource.",
+      "login": "Login"
+    },
+    "forbidden": {
+      "title": "Access Denied",
+      "message": "You don't have permission to access this page.",
+      "contact": "Contact Support"
+    },
+    "serverError": {
+      "title": "Server Error",
+      "message": "An internal server error occurred. Please try again later.",
+      "refresh": "Refresh Page"
+    },
+    "validation": {
+      "required": "This field is required",
+      "email": "Please enter a valid email address",
+      "minLength": "This field must be at least {{count}} character long",
+      "minLength_plural": "This field must be at least {{count}} characters long",
+      "maxLength": "This field must not exceed {{count}} character",
+      "maxLength_plural": "This field must not exceed {{count}} characters",
+      "passwordMatch": "Passwords must match",
+      "invalidFormat": "Invalid format"
+    }
+  },
+  "footer": {
+    "company": {
+      "about": "About Us",
+      "team": "Our Team",
+      "careers": "Careers",
+      "contact": "Contact Us"
+    },
+    "services": {
+      "title": "Services",
+      "consulting": "Consulting",
+      "strategy": "Strategy",
+      "operations": "Operations",
+      "technology": "Technology",
+      "viewAll": "View All Services"
+    },
+    "resources": {
+      "title": "Resources",
+      "blog": "Blog",
+      "caseStudies": "Case Studies",
+      "events": "Events",
+      "tools": "Free Tools"
+    },
+    "legal": {
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "cookies": "Cookie Policy",
+      "security": "Security"
+    },
+    "social": {
+      "followUs": "Follow Us",
+      "linkedin": "LinkedIn",
+      "twitter": "Twitter",
+      "facebook": "Facebook",
+      "instagram": "Instagram"
+    },
+    "newsletter": {
+      "title": "Subscribe to our newsletter",
+      "placeholder": "Your email address",
+      "button": "Subscribe",
+      "privacy": "We respect your privacy and will never share your information."
+    },
+    "copyright": "© {{year}} InsightSerenity. All rights reserved."
+  }
+}

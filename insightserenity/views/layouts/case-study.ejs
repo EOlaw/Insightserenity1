@@ -1,0 +1,459 @@
+<!-- views/layouts/case-study.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'Case Studies - InsightSerenity' %></title>
+    
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/public/img/favicon.ico" type="image/x-icon">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ffc451',
+                        secondary: '#212529',
+                        dark: '#000000',
+                        light: '#f8f9fa',
+                        'primary-light': '#ffe082',
+                        'primary-dark': '#e6ac00'
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Alpine.js (for component interactivity) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js"></script>
+    
+    <!-- Custom styles -->
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #212529;
+        }
+        .btn-primary {
+            background-color: #ffc451;
+            border-color: #ffc451;
+            color: #000000;
+        }
+        .btn-primary:hover {
+            background-color: #e6ac00;
+            border-color: #e6ac00;
+            color: #000000;
+        }
+        .text-primary {
+            color: #ffc451 !important;
+        }
+        .bg-primary {
+            background-color: #ffc451 !important;
+        }
+        .border-primary {
+            border-color: #ffc451 !important;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+        }
+        
+        /* Case Study Specific Styles */
+        .case-study-hero {
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            height: 400px;
+        }
+        
+        .case-study-hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.7) 100%);
+        }
+        
+        .case-study-hero-content {
+            position: relative;
+            z-index: 2;
+            color: white;
+        }
+        
+        .case-study-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #e6ac00;
+        }
+        
+        .toggle-label {
+            transition: background-color 0.2s;
+        }
+        
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #ffc451;
+        }
+        
+        .line-clamp-2 {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        
+        .line-clamp-3 {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+    </style>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Additional CSS -->
+    <% if(typeof additionalCSS !== 'undefined') { %>
+        <%- additionalCSS %>
+    <% } %>
+</head>
+<body class="min-h-screen flex flex-col bg-light">
+    <!-- Header for public pages -->
+    <header class="bg-secondary shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo and brand -->
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center">
+                        <div class="text-white font-bold text-2xl">
+                            Insight<span class="text-primary">Serenity</span>
+                        </div>
+                    </a>
+                </div>
+                
+                <!-- Public Navigation -->
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="/" class="text-gray-300 hover:text-primary transition-colors">
+                        Home
+                    </a>
+                    <a href="/about" class="text-gray-300 hover:text-primary transition-colors">
+                        About
+                    </a>
+                    <a href="/services" class="text-gray-300 hover:text-primary transition-colors">
+                        Services
+                    </a>
+                    <a href="/api/case-studies" class="text-gray-300 hover:text-primary transition-colors font-medium text-primary">
+                        Case Studies
+                    </a>
+                    <a href="/contact" class="text-gray-300 hover:text-primary transition-colors">
+                        Contact
+                    </a>
+                </nav>
+                
+                <!-- Auth Links -->
+                <div class="flex items-center space-x-4">
+                    <% if (locals.user) { %>
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="flex items-center text-gray-300 hover:text-primary transition-colors">
+                                <span class="mr-1"><%= user.profile ? (user.profile.firstName || user.email) : user.email %></span>
+                                <i data-lucide="chevron-down" class="h-4 w-4"></i>
+                            </button>
+                            
+                            <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 ring-1 ring-black ring-opacity-5" style="display: none;">
+                                <div class="py-1">
+                                    <% if (user.role === 'admin' || user.role === 'consultant') { %>
+                                        <a href="/api/case-studies/new" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                            <div class="flex items-center">
+                                                <i data-lucide="plus-circle" class="h-4 w-4 mr-2"></i>
+                                                New Case Study
+                                            </div>
+                                        </a>
+                                    <% } %>
+                                    <a href="/dashboard" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</a>
+                                    <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                                    <a href="/auth/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
+                                </div>
+                            </div>
+                        </div>
+                    <% } else { %>
+                        <a href="/auth/login" class="text-gray-300 hover:text-primary transition-colors">Sign in</a>
+                        <a href="/auth/register" class="ml-4 bg-primary text-dark px-4 py-2 rounded-md hover:bg-primary-dark transition-colors">Sign up</a>
+                    <% } %>
+                    
+                    <!-- Mobile menu button -->
+                    <button type="button" class="md:hidden p-2 text-gray-300 hover:text-primary focus:outline-none" id="mobile-menu-button">
+                        <i data-lucide="menu" class="h-6 w-6"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile menu -->
+            <div class="md:hidden hidden" id="mobile-menu">
+                <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                    <a href="/" class="block px-3 py-2 rounded-md text-gray-300 hover:text-primary hover:bg-gray-700">
+                        Home
+                    </a>
+                    <a href="/about" class="block px-3 py-2 rounded-md text-gray-300 hover:text-primary hover:bg-gray-700">
+                        About
+                    </a>
+                    <a href="/services" class="block px-3 py-2 rounded-md text-gray-300 hover:text-primary hover:bg-gray-700">
+                        Services
+                    </a>
+                    <a href="/api/case-studies" class="block px-3 py-2 rounded-md text-gray-300 hover:text-primary hover:bg-gray-700">
+                        Case Studies
+                    </a>
+                    <a href="/contact" class="block px-3 py-2 rounded-md text-gray-300 hover:text-primary hover:bg-gray-700">
+                        Contact
+                    </a>
+                    
+                    <% if (locals.user) { %>
+                        <hr class="border-gray-600 my-2">
+                        <% if (user.role === 'admin' || user.role === 'consultant') { %>
+                            <a href="/api/case-studies/new" class="block px-3 py-2 rounded-md text-gray-300 hover:text-primary hover:bg-gray-700">
+                                <div class="flex items-center">
+                                    <i data-lucide="plus-circle" class="h-4 w-4 mr-2"></i>
+                                    New Case Study
+                                </div>
+                            </a>
+                        <% } %>
+                        <a href="/dashboard" class="block px-3 py-2 rounded-md text-gray-300 hover:text-primary hover:bg-gray-700">Dashboard</a>
+                        <a href="/profile" class="block px-3 py-2 rounded-md text-gray-300 hover:text-primary hover:bg-gray-700">Profile</a>
+                        <a href="/auth/logout" class="block px-3 py-2 rounded-md text-gray-300 hover:text-primary hover:bg-gray-700">Sign out</a>
+                    <% } else { %>
+                        <a href="/auth/login" class="block px-3 py-2 rounded-md text-gray-300 hover:text-primary hover:bg-gray-700">
+                            Sign in
+                        </a>
+                        <a href="/auth/register" class="block px-3 py-2 rounded-md bg-primary text-dark hover:bg-primary-dark">
+                            Sign up
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Breadcrumbs (optional) -->
+    <% if (typeof showBreadcrumbs !== 'undefined' && showBreadcrumbs) { %>
+    <div class="bg-gray-100 border-b border-gray-200">
+        <div class="container mx-auto px-4 py-2">
+            <div class="text-sm text-gray-600">
+                <a href="/" class="hover:text-primary">Home</a>
+                <span class="mx-2">/</span>
+                <a href="/api/case-studies" class="hover:text-primary">Case Studies</a>
+                <% if (typeof caseStudy !== 'undefined' && caseStudy) { %>
+                    <span class="mx-2">/</span>
+                    <span class="text-gray-800"><%= caseStudy.title %></span>
+                <% } %>
+            </div>
+        </div>
+    </div>
+    <% } %>
+    
+    <!-- Main content -->
+    <main class="flex-grow">
+        <div class="container mx-auto px-4 py-6">
+            <!-- Alert messages -->
+            <% if (locals.success && success.length > 0) { %>
+                <div class="mb-4 bg-green-50 border-l-4 border-green-500 p-4 rounded-md">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i data-lucide="check-circle" class="h-5 w-5 text-green-500"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-green-700"><%= success %></p>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+            
+            <% if (locals.error && error.length > 0) { %>
+                <div class="mb-4 bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i data-lucide="alert-circle" class="h-5 w-5 text-red-500"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-red-700"><%= error %></p>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+            
+            <% if (locals.info && info.length > 0) { %>
+                <div class="mb-4 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-md">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i data-lucide="info" class="h-5 w-5 text-blue-500"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-blue-700"><%= info %></p>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+            
+            <% if (locals.warning && warning.length > 0) { %>
+                <div class="mb-4 bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-md">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i data-lucide="alert-triangle" class="h-5 w-5 text-yellow-500"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-yellow-700"><%= warning %></p>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+            
+            <!-- Page content -->
+            <%- body %>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-secondary text-white pt-12 pb-6">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Insight<span class="text-primary">Serenity</span></h3>
+                    <p class="text-gray-400 text-sm mb-4">Expert consulting services tailored to your business needs. We transform challenges into opportunities for growth.</p>
+                    <div class="flex space-x-3">
+                        <a href="#" class="text-gray-400 hover:text-primary">
+                            <i data-lucide="linkedin" class="h-5 w-5"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary">
+                            <i data-lucide="twitter" class="h-5 w-5"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary">
+                            <i data-lucide="facebook" class="h-5 w-5"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary">
+                            <i data-lucide="instagram" class="h-5 w-5"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold text-md mb-4">Services</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="/services/strategy-consulting" class="hover:text-primary">Strategy Consulting</a></li>
+                        <li><a href="/services/digital-transformation" class="hover:text-primary">Digital Transformation</a></li>
+                        <li><a href="/services/organizational-development" class="hover:text-primary">Organizational Development</a></li>
+                        <li><a href="/services/market-research" class="hover:text-primary">Market Research</a></li>
+                        <li><a href="/services" class="hover:text-primary">View All Services</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold text-md mb-4">Resources</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="/api/case-studies" class="hover:text-primary">Case Studies</a></li>
+                        <li><a href="/blog" class="hover:text-primary">Blog</a></li>
+                        <li><a href="/knowledge-base" class="hover:text-primary">Knowledge Base</a></li>
+                        <li><a href="/events" class="hover:text-primary">Events & Webinars</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold text-md mb-4">Contact Us</h4>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li class="flex items-start">
+                            <i data-lucide="map-pin" class="h-5 w-5 mr-2"></i>
+                            <span>123 Consulting St.<br>Business District, NY 10001</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-lucide="phone" class="h-5 w-5 mr-2"></i>
+                            <span>+1 (555) 234-5678</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-lucide="mail" class="h-5 w-5 mr-2"></i>
+                            <span>info@insightserenity.com</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <hr class="border-gray-700 my-6">
+            
+            <div class="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+                <div class="mb-4 md:mb-0">
+                    &copy; <%= new Date().getFullYear() %> InsightSerenity. All rights reserved.
+                </div>
+                <div class="flex space-x-4">
+                    <a href="/privacy-policy" class="hover:text-primary">Privacy Policy</a>
+                    <a href="/terms-of-service" class="hover:text-primary">Terms of Service</a>
+                    <a href="/sitemap" class="hover:text-primary">Sitemap</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-5 rounded-lg shadow-lg flex items-center">
+            <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary mr-3"></div>
+            <span class="text-gray-700">Loading...</span>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Initialize Lucide icons -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+            
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+            
+            // Show loading overlay when submitting forms
+            const forms = document.querySelectorAll('form:not(.no-loading)');
+            const loadingOverlay = document.getElementById('loading-overlay');
+            
+            if (forms.length > 0 && loadingOverlay) {
+                forms.forEach(form => {
+                    form.addEventListener('submit', function() {
+                        // Don't show loading for forms with data-no-loading attribute
+                        if (!this.getAttribute('data-no-loading')) {
+                            loadingOverlay.classList.remove('hidden');
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+    
+    <!-- Additional JavaScript -->
+    <% if(typeof additionalJS !== 'undefined') { %>
+        <%- additionalJS %>
+    <% } %>
+</body>
+</html>

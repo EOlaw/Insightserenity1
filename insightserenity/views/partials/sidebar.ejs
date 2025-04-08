@@ -1,0 +1,92 @@
+<!-- views/partials/sidebar.ejs -->
+<div class="sidebar w-64 hidden md:block">
+    <div class="p-4">
+        <% if (user) { %>
+            <% if (user.role === 'client') { %>
+                <!-- Client sidebar -->
+                <h3 class="text-white font-semibold text-lg mb-4">Client Dashboard</h3>
+                
+                <nav class="flex flex-col">
+                    <a href="/api/clients/dashboard" class="sidebar-link <%= pageContext === 'client-dashboard' ? 'active' : '' %>">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+                    </a>
+                    <a href="/api/clients/profile" class="sidebar-link <%= pageContext === 'client-profile' ? 'active' : '' %>">
+                        <i data-lucide="user" class="w-5 h-5"></i> My Profile
+                    </a>
+                    <a href="/api/clients/projects" class="sidebar-link <%= pageContext === 'client-projects' ? 'active' : '' %>">
+                        <i data-lucide="folder" class="w-5 h-5"></i> My Projects
+                    </a>
+                    <a href="/api/clients/find-consultants" class="sidebar-link <%= pageContext === 'find-consultants' ? 'active' : '' %>">
+                        <i data-lucide="search" class="w-5 h-5"></i> Find Consultants
+                    </a>
+                    <a href="/api/clients/saved-consultants" class="sidebar-link <%= pageContext === 'saved-consultants' ? 'active' : '' %>">
+                        <i data-lucide="bookmark" class="w-5 h-5"></i> Saved Consultants
+                    </a>
+                    <a href="/api/clients/messages" class="sidebar-link <%= pageContext === 'client-messages' ? 'active' : '' %>">
+                        <i data-lucide="message-square" class="w-5 h-5"></i> Messages
+                    </a>
+                    <a href="/api/clients/billing" class="sidebar-link <%= pageContext === 'client-billing' ? 'active' : '' %>">
+                        <i data-lucide="credit-card" class="w-5 h-5"></i> Billing & Payments
+                    </a>
+                    <a href="/api/clients/settings" class="sidebar-link <%= pageContext === 'client-settings' ? 'active' : '' %>">
+                        <i data-lucide="settings" class="w-5 h-5"></i> Settings
+                    </a>
+                </nav>
+            <% } else if (user.role === 'consultant') { %>
+                <!-- Consultant sidebar -->
+                <h3 class="text-white font-semibold text-lg mb-4">Consultant Dashboard</h3>
+                
+                <nav class="flex flex-col">
+                    <a href="/api/consultants/dashboard" class="sidebar-link <%= pageContext === 'consultant-dashboard' ? 'active' : '' %>">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+                    </a>
+                    <a href="/api/consultants/profile" class="sidebar-link <%= pageContext === 'consultant-profile' ? 'active' : '' %>">
+                        <i data-lucide="user" class="w-5 h-5"></i> My Profile
+                    </a>
+                    <a href="/api/consultants/portfolio" class="sidebar-link <%= pageContext === 'consultant-portfolio' ? 'active' : '' %>">
+                        <i data-lucide="briefcase" class="w-5 h-5"></i> Portfolio
+                    </a>
+                    <a href="/api/consultants/projects" class="sidebar-link <%= pageContext === 'consultant-projects' ? 'active' : '' %>">
+                        <i data-lucide="folder" class="w-5 h-5"></i> Active Projects
+                    </a>
+                    <a href="/api/consultants/proposals" class="sidebar-link <%= pageContext === 'consultant-proposals' ? 'active' : '' %>">
+                        <i data-lucide="file-text" class="w-5 h-5"></i> Proposals
+                    </a>
+                    <a href="/api/consultants/available-projects" class="sidebar-link <%= pageContext === 'available-projects' ? 'active' : '' %>">
+                        <i data-lucide="search" class="w-5 h-5"></i> Find Projects
+                    </a>
+                    <a href="/api/consultants/reviews" class="sidebar-link <%= pageContext === 'consultant-reviews' ? 'active' : '' %>">
+                        <i data-lucide="star" class="w-5 h-5"></i> Reviews
+                    </a>
+                    <a href="/api/consultants/messages" class="sidebar-link <%= pageContext === 'consultant-messages' ? 'active' : '' %>">
+                        <i data-lucide="message-square" class="w-5 h-5"></i> Messages
+                    </a>
+                    <a href="/api/consultants/earnings" class="sidebar-link <%= pageContext === 'consultant-earnings' ? 'active' : '' %>">
+                        <i data-lucide="dollar-sign" class="w-5 h-5"></i> Earnings
+                    </a>
+                    <a href="/api/consultants/settings" class="sidebar-link <%= pageContext === 'consultant-settings' ? 'active' : '' %>">
+                        <i data-lucide="settings" class="w-5 h-5"></i> Settings
+                    </a>
+                </nav>
+            <% } else { %>
+                <!-- Admin or default sidebar -->
+                <h3 class="text-white font-semibold text-lg mb-4">Dashboard</h3>
+                
+                <nav class="flex flex-col">
+                    <a href="/dashboard" class="sidebar-link <%= pageContext === 'dashboard' ? 'active' : '' %>">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Overview
+                    </a>
+                    <a href="/api/dashboard/notifications" class="sidebar-link <%= pageContext === 'notifications' ? 'active' : '' %>">
+                        <i data-lucide="bell" class="w-5 h-5"></i> Notifications
+                    </a>
+                    <a href="/api/dashboard/account-settings" class="sidebar-link <%= pageContext === 'account-settings' ? 'active' : '' %>">
+                        <i data-lucide="settings" class="w-5 h-5"></i> Account Settings
+                    </a>
+                    <a href="/api/dashboard/help" class="sidebar-link <%= pageContext === 'help' ? 'active' : '' %>">
+                        <i data-lucide="help-circle" class="w-5 h-5"></i> Help & Support
+                    </a>
+                </nav>
+            <% } %>
+        <% } %>
+    </div>
+</div>

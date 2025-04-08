@@ -1,0 +1,1054 @@
+<!-- views/consultants/settings.ejs -->
+<% layout('layouts/dashboard') -%>
+<% block('title', 'Settings - InsightSerenity') -%>
+
+<!-- Page header -->
+<div class="mb-6">
+    <h1 class="text-2xl font-bold mb-2">Consultant Settings</h1>
+    <p class="text-gray-600">Manage your account, availability, and notification preferences</p>
+</div>
+
+<!-- Settings tabs -->
+<div class="mb-6 border-b border-gray-200">
+    <ul class="flex flex-wrap -mb-px text-sm font-medium text-center">
+        <li class="mr-2">
+            <a href="#availability" class="inline-block p-4 border-b-2 border-primary text-primary-dark rounded-t-lg active" aria-current="page" id="availability-tab">
+                Availability
+            </a>
+        </li>
+        <li class="mr-2">
+            <a href="#service-rates" class="inline-block p-4 border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 rounded-t-lg" id="service-rates-tab">
+                Service Rates
+            </a>
+        </li>
+        <li class="mr-2">
+            <a href="#privacy" class="inline-block p-4 border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 rounded-t-lg" id="privacy-tab">
+                Privacy & Visibility
+            </a>
+        </li>
+        <li class="mr-2">
+            <a href="#notifications" class="inline-block p-4 border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 rounded-t-lg" id="notifications-tab">
+                Notifications
+            </a>
+        </li>
+        <li>
+            <a href="#integrations" class="inline-block p-4 border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 rounded-t-lg" id="integrations-tab">
+                Integrations
+            </a>
+        </li>
+    </ul>
+</div>
+
+<!-- Tab content -->
+<div id="tab-content">
+    <!-- Availability settings tab -->
+    <div id="availability-content" class="tab-pane">
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Availability Settings</h2>
+                <p class="text-sm text-gray-500">Manage your availability status and working hours</p>
+            </div>
+            
+            <form action="/api/consultants/availability" method="POST" class="p-6 space-y-6">
+                <input type="hidden" name="_method" value="PUT">
+                <!-- Availability status -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Current Availability</label>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <input type="radio" id="available" name="availability[status]" value="available" class="focus:ring-primary h-4 w-4 text-primary border-gray-300"
+                                <%= profile.services && profile.services.availability && profile.services.availability.status === 'available' ? 'checked' : '' %>>
+                            <label for="available" class="ml-3">
+                                <div class="text-sm font-medium text-gray-700">Available</div>
+                                <p class="text-sm text-gray-500">You're open to taking on new projects and clients</p>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="radio" id="limited" name="availability[status]" value="limited" class="focus:ring-primary h-4 w-4 text-primary border-gray-300"
+                                <%= profile.services && profile.services.availability && profile.services.availability.status === 'limited' ? 'checked' : '' %>>
+                            <label for="limited" class="ml-3">
+                                <div class="text-sm font-medium text-gray-700">Limited Availability</div>
+                                <p class="text-sm text-gray-500">You can take on small projects or limited work</p>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="radio" id="unavailable" name="availability[status]" value="unavailable" class="focus:ring-primary h-4 w-4 text-primary border-gray-300"
+                                <%= profile.services && profile.services.availability && profile.services.availability.status === 'unavailable' ? 'checked' : '' %>>
+                            <label for="unavailable" class="ml-3">
+                                <div class="text-sm font-medium text-gray-700">Unavailable</div>
+                                <p class="text-sm text-gray-500">You're not taking on new projects at this time</p>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hours per week -->
+                <div>
+                    <label for="hours-per-week" class="block text-sm font-medium text-gray-700 mb-2">Hours Per Week</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <input type="number" name="availability[hoursPerWeek]" id="hours-per-week" class="focus:ring-primary focus:border-primary block w-full pr-12 sm:text-sm border-gray-300 rounded-md" 
+                            placeholder="40" min="0" max="168" value="<%= profile.services && profile.services.availability && profile.services.availability.hoursPerWeek || '40' %>">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-sm">hours</span>
+                        </div>
+                    </div>
+                    <p class="mt-2 text-sm text-gray-500">
+                        How many hours per week you can dedicate to client projects
+                    </p>
+                </div>
+                
+                <!-- Next available date -->
+                <div>
+                    <label for="next-available-date" class="block text-sm font-medium text-gray-700 mb-2">Next Available Date</label>
+                    <input type="date" name="availability[nextAvailableDate]" id="next-available-date" class="focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"
+                        value="<%= profile.services && profile.services.availability && profile.services.availability.nextAvailableDate ? new Date(profile.services.availability.nextAvailableDate).toISOString().split('T')[0] : '' %>">
+                    <p class="mt-2 text-sm text-gray-500">
+                        When you'll be available to start new projects
+                    </p>
+                </div>
+                
+                <!-- Timezone -->
+                <div>
+                    <label for="timezone" class="block text-sm font-medium text-gray-700 mb-2">Your Timezone</label>
+                    <select id="timezone" name="availability[timezone]" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                        <option value="UTC" <%= profile.services && profile.services.availability && profile.services.availability.timezone === 'UTC' ? 'selected' : '' %>>UTC</option>
+                        <option value="America/New_York" <%= profile.services && profile.services.availability && profile.services.availability.timezone === 'America/New_York' ? 'selected' : '' %>>Eastern Time (ET)</option>
+                        <option value="America/Chicago" <%= profile.services && profile.services.availability && profile.services.availability.timezone === 'America/Chicago' ? 'selected' : '' %>>Central Time (CT)</option>
+                        <option value="America/Denver" <%= profile.services && profile.services.availability && profile.services.availability.timezone === 'America/Denver' ? 'selected' : '' %>>Mountain Time (MT)</option>
+                        <option value="America/Los_Angeles" <%= profile.services && profile.services.availability && profile.services.availability.timezone === 'America/Los_Angeles' ? 'selected' : '' %>>Pacific Time (PT)</option>
+                        <option value="Europe/London" <%= profile.services && profile.services.availability && profile.services.availability.timezone === 'Europe/London' ? 'selected' : '' %>>London (GMT)</option>
+                        <option value="Europe/Berlin" <%= profile.services && profile.services.availability && profile.services.availability.timezone === 'Europe/Berlin' ? 'selected' : '' %>>Central European Time (CET)</option>
+                        <option value="Asia/Tokyo" <%= profile.services && profile.services.availability && profile.services.availability.timezone === 'Asia/Tokyo' ? 'selected' : '' %>>Japan Standard Time (JST)</option>
+                        <option value="Australia/Sydney" <%= profile.services && profile.services.availability && profile.services.availability.timezone === 'Australia/Sydney' ? 'selected' : '' %>>Australian Eastern Time (AET)</option>
+                    </select>
+                </div>
+                
+                <!-- Weekly schedule -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-4">Weekly Working Schedule</label>
+                    <div class="space-y-4">
+                        <% 
+                        const days = [
+                            { id: 'monday', label: 'Monday' },
+                            { id: 'tuesday', label: 'Tuesday' },
+                            { id: 'wednesday', label: 'Wednesday' },
+                            { id: 'thursday', label: 'Thursday' },
+                            { id: 'friday', label: 'Friday' },
+                            { id: 'saturday', label: 'Saturday' },
+                            { id: 'sunday', label: 'Sunday' }
+                        ];
+                        %>
+                        
+                        <% days.forEach(day => { %>
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="<%= day.id %>-available" name="availability[workSchedule][<%= day.id %>][available]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                        <%= profile.services && profile.services.availability && profile.services.availability.workSchedule && profile.services.availability.workSchedule[day.id] && profile.services.availability.workSchedule[day.id].available ? 'checked' : '' %>>
+                                </div>
+                                <div class="ml-3 flex-grow">
+                                    <label for="<%= day.id %>-available" class="text-sm font-medium text-gray-700"><%= day.label %></label>
+                                </div>
+                                <div class="ml-4 flex-grow">
+                                    <input type="text" name="availability[workSchedule][<%= day.id %>][hours]" class="focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md" 
+                                        placeholder="9:00 AM - 5:00 PM"
+                                        value="<%= profile.services && profile.services.availability && profile.services.availability.workSchedule && profile.services.availability.workSchedule[day.id] ? profile.services.availability.workSchedule[day.id].hours || '' : '' %>"
+                                        <%= profile.services && profile.services.availability && profile.services.availability.workSchedule && profile.services.availability.workSchedule[day.id] && profile.services.availability.workSchedule[day.id].available ? '' : 'disabled' %>>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-dark bg-primary hover:bg-primary-dark">
+                        Save Availability Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Service rates tab (initially hidden) -->
+    <div id="service-rates-content" class="tab-pane hidden">
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Service Rates</h2>
+                <p class="text-sm text-gray-500">Set your rates and payment preferences</p>
+            </div>
+            <form action="/api/consultants/availability" method="POST" class="p-6 space-y-6">
+                <input type="hidden" name="_method" value="PUT">
+                <!-- Rate information -->
+                <div>
+                    <label for="hourly-rate" class="block text-sm font-medium text-gray-700 mb-2">Hourly Rate</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-gray-500 sm:text-sm">$</span>
+                        </div>
+                        <input type="number" name="services[rateInfo][hourlyRate]" id="hourly-rate" class="focus:ring-primary focus:border-primary block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md" 
+                            placeholder="100" min="0" value="<%= profile.services && profile.services.rateInfo && profile.services.rateInfo.hourlyRate || '' %>">
+                        <div class="absolute inset-y-0 right-0 flex items-center">
+                            <select id="rate-currency" name="services[rateInfo][currency]" class="focus:ring-primary focus:border-primary h-full py-0 pl-2 pr-7 border-transparent bg-transparent text-gray-500 sm:text-sm rounded-r-md">
+                                <option value="USD" <%= profile.services && profile.services.rateInfo && profile.services.rateInfo.currency === 'USD' ? 'selected' : '' %>>USD</option>
+                                <option value="EUR" <%= profile.services && profile.services.rateInfo && profile.services.rateInfo.currency === 'EUR' ? 'selected' : '' %>>EUR</option>
+                                <option value="GBP" <%= profile.services && profile.services.rateInfo && profile.services.rateInfo.currency === 'GBP' ? 'selected' : '' %>>GBP</option>
+                                <option value="CAD" <%= profile.services && profile.services.rateInfo && profile.services.rateInfo.currency === 'CAD' ? 'selected' : '' %>>CAD</option>
+                                <option value="AUD" <%= profile.services && profile.services.rateInfo && profile.services.rateInfo.currency === 'AUD' ? 'selected' : '' %>>AUD</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                        <input id="rate-negotiable" name="services[rateInfo][negotiable]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                            <%= profile.services && profile.services.rateInfo && profile.services.rateInfo.negotiable ? 'checked' : '' %>>
+                    </div>
+                    <div class="ml-3 text-sm">
+                        <label for="rate-negotiable" class="font-medium text-gray-700">Rate is negotiable</label>
+                        <p class="text-gray-500">Clients can negotiate rates based on project scope and duration</p>
+                    </div>
+                </div>
+                
+                <!-- Service offerings -->
+                <div>
+                    <h3 class="text-base font-medium text-gray-900 mb-4">Service Offerings</h3>
+                    <div class="space-y-4" id="service-offerings-container">
+                        <% if (profile.services && profile.services.offerings && profile.services.offerings.length > 0) { %>
+                            <% profile.services.offerings.forEach((service, index) => { %>
+                                <div class="service-item border border-gray-200 rounded-md p-4">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <h4 class="text-sm font-medium text-gray-900"><%= service.title %></h4>
+                                        <div class="flex space-x-2">
+                                            <button type="button" class="text-gray-400 hover:text-gray-500 edit-service" data-index="<%= index %>">
+                                                <i data-lucide="edit-2" class="h-5 w-5"></i>
+                                            </button>
+                                            <button type="button" class="text-gray-400 hover:text-red-500 remove-service" data-index="<%= index %>">
+                                                <i data-lucide="trash-2" class="h-5 w-5"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-gray-500 mb-2"><%= service.description %></p>
+                                    <div class="text-sm text-gray-900 font-medium">
+                                        $<%= service.price %> <%= service.pricingType %>
+                                    </div>
+                                    
+                                    <!-- Hidden fields for the form submission -->
+                                    <input type="hidden" name="services[offerings][<%= index %>][title]" value="<%= service.title %>">
+                                    <input type="hidden" name="services[offerings][<%= index %>][description]" value="<%= service.description %>">
+                                    <input type="hidden" name="services[offerings][<%= index %>][price]" value="<%= service.price %>">
+                                    <input type="hidden" name="services[offerings][<%= index %>][pricingType]" value="<%= service.pricingType %>">
+                                </div>
+                            <% }); %>
+                        <% } %>
+                    </div>
+                    
+                    <button type="button" id="add-service-btn" class="mt-4 inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        <i data-lucide="plus" class="h-4 w-4 mr-2"></i>
+                        Add Service Offering
+                    </button>
+                </div>
+                
+                <!-- Payment methods -->
+                <div>
+                    <h3 class="text-base font-medium text-gray-900 mb-4">Accepted Payment Methods</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="payment-platform" name="services[paymentMethods][platform]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.services && profile.services.paymentMethods && profile.services.paymentMethods.platform ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="payment-platform" class="font-medium text-gray-700">Platform Payments</label>
+                                <p class="text-gray-500">Accept payments through InsightSerenity's secure platform</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="payment-paypal" name="services[paymentMethods][paypal]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.services && profile.services.paymentMethods && profile.services.paymentMethods.paypal ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="payment-paypal" class="font-medium text-gray-700">PayPal</label>
+                                <input type="email" name="services[paymentMethods][paypalEmail]" placeholder="Your PayPal email" class="mt-1 focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"
+                                    value="<%= profile.services && profile.services.paymentMethods && profile.services.paymentMethods.paypalEmail || '' %>">
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="payment-bank" name="services[paymentMethods][bankTransfer]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.services && profile.services.paymentMethods && profile.services.paymentMethods.bankTransfer ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="payment-bank" class="font-medium text-gray-700">Bank Transfer</label>
+                                <p class="text-gray-500">Banking details will be shared securely with clients when needed</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="payment-other" name="services[paymentMethods][other]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.services && profile.services.paymentMethods && profile.services.paymentMethods.other ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="payment-other" class="font-medium text-gray-700">Other</label>
+                                <input type="text" name="services[paymentMethods][otherDetails]" placeholder="Specify other payment methods" class="mt-1 focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"
+                                    value="<%= profile.services && profile.services.paymentMethods && profile.services.paymentMethods.otherDetails || '' %>">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-dark bg-primary hover:bg-primary-dark">
+                        Save Rate Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Privacy settings tab (initially hidden) -->
+    <div id="privacy-content" class="tab-pane hidden">
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Privacy & Visibility</h2>
+                <p class="text-sm text-gray-500">Control the visibility of your profile and information</p>
+            </div>
+            <form action="/api/consultants/availability" method="POST" class="p-6 space-y-6">
+                <input type="hidden" name="_method" value="PUT">
+                <!-- Profile visibility -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Profile Visibility</label>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <input type="radio" id="visibility-public" name="settings[profileVisibility]" value="public" class="focus:ring-primary h-4 w-4 text-primary border-gray-300"
+                                <%= profile.settings && profile.settings.profileVisibility === 'public' ? 'checked' : '' %>>
+                            <label for="visibility-public" class="ml-3">
+                                <div class="text-sm font-medium text-gray-700">Public</div>
+                                <p class="text-sm text-gray-500">Your profile is visible to everyone, including search engines</p>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="radio" id="visibility-members" name="settings[profileVisibility]" value="members_only" class="focus:ring-primary h-4 w-4 text-primary border-gray-300"
+                                <%= profile.settings && profile.settings.profileVisibility === 'members_only' ? 'checked' : '' %>>
+                            <label for="visibility-members" class="ml-3">
+                                <div class="text-sm font-medium text-gray-700">Members Only</div>
+                                <p class="text-sm text-gray-500">Your profile is only visible to registered members of InsightSerenity</p>
+                            </label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="radio" id="visibility-private" name="settings[profileVisibility]" value="private" class="focus:ring-primary h-4 w-4 text-primary border-gray-300"
+                                <%= profile.settings && profile.settings.profileVisibility === 'private' ? 'checked' : '' %>>
+                            <label for="visibility-private" class="ml-3">
+                                <div class="text-sm font-medium text-gray-700">Private</div>
+                                <p class="text-sm text-gray-500">Your profile is only visible to clients you've worked with</p>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Information visibility -->
+                <div>
+                    <h3 class="text-base font-medium text-gray-900 mb-4">Information Visibility</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="show-email" name="settings[visibility][email]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.settings && profile.settings.visibility && profile.settings.visibility.email ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="show-email" class="font-medium text-gray-700">Show Email Address</label>
+                                <p class="text-gray-500">Your email will be visible to clients and other consultants</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="show-phone" name="settings[visibility][phone]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.settings && profile.settings.visibility && profile.settings.visibility.phone ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="show-phone" class="font-medium text-gray-700">Show Phone Number</label>
+                                <p class="text-gray-500">Your phone number will be visible to clients and other consultants</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="show-rates" name="settings[visibility][rates]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.settings && profile.settings.visibility && profile.settings.visibility.rates ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="show-rates" class="font-medium text-gray-700">Show Rates Publicly</label>
+                                <p class="text-gray-500">Your rates will be visible on your public profile</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="show-clients" name="settings[visibility][clients]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.settings && profile.settings.visibility && profile.settings.visibility.clients ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="show-clients" class="font-medium text-gray-700">Show Past Clients</label>
+                                <p class="text-gray-500">Your past clients will be visible on your profile</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="show-availability" name="settings[visibility][availability]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.settings && profile.settings.visibility && profile.settings.visibility.availability ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="show-availability" class="font-medium text-gray-700">Show Availability Status</label>
+                                <p class="text-gray-500">Your availability status will be visible on your profile</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Profile discover-ability -->
+                <div>
+                    <h3 class="text-base font-medium text-gray-900 mb-4">Discovery Settings</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="search-discoverable" name="settings[discoverable][search]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.settings && profile.settings.discoverable && profile.settings.discoverable.search ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="search-discoverable" class="font-medium text-gray-700">Appear in Search Results</label>
+                                <p class="text-gray-500">Your profile can be found through the platform's search functionality</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="directory-discoverable" name="settings[discoverable][directory]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.settings && profile.settings.discoverable && profile.settings.discoverable.directory ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="directory-discoverable" class="font-medium text-gray-700">Include in Consultant Directory</label>
+                                <p class="text-gray-500">Your profile will be listed in the consultant directory</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="recommendation-discoverable" name="settings[discoverable][recommendations]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.settings && profile.settings.discoverable && profile.settings.discoverable.recommendations ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="recommendation-discoverable" class="font-medium text-gray-700">Show in Recommendations</label>
+                                <p class="text-gray-500">Your profile may be recommended to clients based on their needs</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-dark bg-primary hover:bg-primary-dark">
+                        Save Privacy Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Notifications tab (initially hidden) -->
+    <div id="notifications-content" class="tab-pane hidden">
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Notification Settings</h2>
+                <p class="text-sm text-gray-500">Control how and when you receive notifications</p>
+            </div>
+            
+            <form action="/api/consultants/availability" method="POST" class="p-6 space-y-6">
+                <input type="hidden" name="_method" value="PUT">
+                <!-- Email notifications -->
+                <div>
+                    <h3 class="text-base font-medium text-gray-900 mb-4">Email Notifications</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="email-projects" name="settings[notifications][email][projects]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.settings && profile.settings.notifications && profile.settings.notifications.email && profile.settings.notifications.email.projects ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="email-projects" class="font-medium text-gray-700">Project Updates</label>
+                                <p class="text-gray-500">Receive emails about updates to your projects</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="email-messages" name="settings[notifications][email][messages]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.settings && profile.settings.notifications && profile.settings.notifications.email && profile.settings.notifications.email.messages ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="email-messages" class="font-medium text-gray-700">Messages</label>
+                                <p class="text-gray-500">Receive emails when you get new messages</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="email-inquiries" name="settings[notifications][email][inquiries]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.settings && profile.settings.notifications && profile.settings.notifications.email && profile.settings.notifications.email.inquiries ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="email-inquiries" class="font-medium text-gray-700">Client Inquiries</label>
+                                <p class="text-gray-500">Receive emails when clients inquire about your services</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="email-proposals" name="settings[notifications][email][proposals]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.settings && profile.settings.notifications && profile.settings.notifications.email && profile.settings.notifications.email.proposals ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="email-proposals" class="font-medium text-gray-700">Proposal Updates</label>
+                                <p class="text-gray-500">Receive emails about updates to your proposals</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="email-reviews" name="settings[notifications][email][reviews]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.settings && profile.settings.notifications && profile.settings.notifications.email && profile.settings.notifications.email.reviews ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="email-reviews" class="font-medium text-gray-700">Reviews</label>
+                                <p class="text-gray-500">Receive emails when you get new reviews</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="email-payments" name="settings[notifications][email][payments]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.settings && profile.settings.notifications && profile.settings.notifications.email && profile.settings.notifications.email.payments ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="email-payments" class="font-medium text-gray-700">Payments</label>
+                                <p class="text-gray-500">Receive emails about payment transactions</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="email-marketing" name="settings[notifications][email][marketing]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.settings && profile.settings.notifications && profile.settings.notifications.email && profile.settings.notifications.email.marketing ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="email-marketing" class="font-medium text-gray-700">Marketing & Promotions</label>
+                                <p class="text-gray-500">Receive emails about platform updates, tips, and promotions</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Browser notifications -->
+                <div>
+                    <h3 class="text-base font-medium text-gray-900 mb-4">Browser Notifications</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="browser-enable" name="settings[notifications][browser][enabled]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.settings && profile.settings.notifications && profile.settings.notifications.browser && profile.settings.notifications.browser.enabled ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="browser-enable" class="font-medium text-gray-700">Enable Browser Notifications</label>
+                                <p class="text-gray-500">Receive notifications in your browser when you're on the platform</p>
+                            </div>
+                        </div>
+                        
+                        <div class="ml-7 space-y-4">
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="browser-messages" name="settings[notifications][browser][messages]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                        <%= profile.settings && profile.settings.notifications && profile.settings.notifications.browser && profile.settings.notifications.browser.messages ? 'checked' : '' %>>
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="browser-messages" class="font-medium text-gray-700">Messages</label>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="browser-inquiries" name="settings[notifications][browser][inquiries]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                        <%= profile.settings && profile.settings.notifications && profile.settings.notifications.browser && profile.settings.notifications.browser.inquiries ? 'checked' : '' %>>
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="browser-inquiries" class="font-medium text-gray-700">Client Inquiries</label>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="browser-projects" name="settings[notifications][browser][projects]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                        <%= profile.settings && profile.settings.notifications && profile.settings.notifications.browser && profile.settings.notifications.browser.projects ? 'checked' : '' %>>
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="browser-projects" class="font-medium text-gray-700">Project Updates</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- SMS notifications -->
+                <div>
+                    <h3 class="text-base font-medium text-gray-900 mb-4">SMS Notifications</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="sms-enable" name="settings[notifications][sms][enabled]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                    <%= profile.settings && profile.settings.notifications && profile.settings.notifications.sms && profile.settings.notifications.sms.enabled ? 'checked' : '' %>>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="sms-enable" class="font-medium text-gray-700">Enable SMS Notifications</label>
+                                <p class="text-gray-500">Receive important notifications via SMS</p>
+                            </div>
+                        </div>
+                        
+                        <div class="ml-7 space-y-4">
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="sms-inquiries" name="settings[notifications][sms][inquiries]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                        <%= profile.settings && profile.settings.notifications && profile.settings.notifications.sms && profile.settings.notifications.sms.inquiries ? 'checked' : '' %>>
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="sms-inquiries" class="font-medium text-gray-700">Urgent Client Inquiries</label>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="sms-payments" name="settings[notifications][sms][payments]" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded"
+                                        <%= profile.settings && profile.settings.notifications && profile.settings.notifications.sms && profile.settings.notifications.sms.payments ? 'checked' : '' %>>
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="sms-payments" class="font-medium text-gray-700">Payment Confirmations</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-dark bg-primary hover:bg-primary-dark">
+                        Save Notification Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Integrations tab (initially hidden) -->
+    <div id="integrations-content" class="tab-pane hidden">
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900">Integrations</h2>
+                <p class="text-sm text-gray-500">Connect your account with other services</p>
+            </div>
+            
+            <div class="p-6 space-y-6">
+                <!-- Calendar integrations -->
+                <div>
+                    <h3 class="text-base font-medium text-gray-900 mb-4">Calendar Integrations</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start justify-between border rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <i data-lucide="calendar" class="h-8 w-8 text-blue-500"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-base font-medium text-gray-900">Google Calendar</h4>
+                                    <p class="text-sm text-gray-500">Sync your availability and project deadlines</p>
+                                </div>
+                            </div>
+                            <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                Connect
+                            </button>
+                        </div>
+                        
+                        <div class="flex items-start justify-between border rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <i data-lucide="calendar" class="h-8 w-8 text-blue-700"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-base font-medium text-gray-900">Microsoft Outlook</h4>
+                                    <p class="text-sm text-gray-500">Sync your availability and project deadlines</p>
+                                </div>
+                            </div>
+                            <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                Connect
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Project management integrations -->
+                <div>
+                    <h3 class="text-base font-medium text-gray-900 mb-4">Project Management</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start justify-between border rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <i data-lucide="trello" class="h-8 w-8 text-blue-400"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-base font-medium text-gray-900">Trello</h4>
+                                    <p class="text-sm text-gray-500">Sync your projects and tasks</p>
+                                </div>
+                            </div>
+                            <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                Connect
+                            </button>
+                        </div>
+                        
+                        <div class="flex items-start justify-between border rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <i data-lucide="github" class="h-8 w-8 text-gray-800"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-base font-medium text-gray-900">GitHub</h4>
+                                    <p class="text-sm text-gray-500">Connect to your repositories</p>
+                                </div>
+                            </div>
+                            <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                Connect
+                            </button>
+                        </div>
+                        
+                        <div class="flex items-start justify-between border rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <i data-lucide="slack" class="h-8 w-8 text-purple-500"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-base font-medium text-gray-900">Slack</h4>
+                                    <p class="text-sm text-gray-500">Get notifications in your Slack workspace</p>
+                                </div>
+                            </div>
+                            <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                Connect
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Social integrations -->
+                <div>
+                    <h3 class="text-base font-medium text-gray-900 mb-4">Social Media</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start justify-between border rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <i data-lucide="linkedin" class="h-8 w-8 text-blue-600"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-base font-medium text-gray-900">LinkedIn</h4>
+                                    <p class="text-sm text-gray-500">Connect your professional profile</p>
+                                </div>
+                            </div>
+                            <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                Connect
+                            </button>
+                        </div>
+                        
+                        <div class="flex items-start justify-between border rounded-lg p-4">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0">
+                                    <i data-lucide="twitter" class="h-8 w-8 text-blue-400"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-base font-medium text-gray-900">Twitter</h4>
+                                    <p class="text-sm text-gray-500">Connect your Twitter profile</p>
+                                </div>
+                            </div>
+                            <button type="button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                Connect
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <p class="text-sm text-gray-500">
+                    By connecting these services, you're allowing InsightSerenity to access and share relevant information with them according to our <a href="/privacy" class="text-primary-dark hover:text-primary">Privacy Policy</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Service offering modal (hidden by default) -->
+<div id="service-modal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Add Service Offering</h3>
+        <form action="/api/consultants/availability" method="POST" id="service-form" class="space-y-4">
+            <input type="hidden" name="_method" value="PUT">
+            <div>
+                <label for="service-title" class="block text-sm font-medium text-gray-700">Service Title</label>
+                <input type="text" id="service-title" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" required>
+            </div>
+            
+            <div>
+                <label for="service-description" class="block text-sm font-medium text-gray-700">Description</label>
+                <textarea id="service-description" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" required></textarea>
+            </div>
+            
+            <div>
+                <label for="service-price" class="block text-sm font-medium text-gray-700">Price</label>
+                <div class="mt-1 relative rounded-md shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span class="text-gray-500 sm:text-sm">$</span>
+                    </div>
+                    <input type="number" id="service-price" class="focus:ring-primary focus:border-primary block w-full pl-7 sm:text-sm border-gray-300 rounded-md" min="0" required>
+                </div>
+            </div>
+            
+            <div>
+                <label for="service-pricing-type" class="block text-sm font-medium text-gray-700">Pricing Type</label>
+                <select id="service-pricing-type" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md" required>
+                    <option value="per hour">Per Hour</option>
+                    <option value="per project">Per Project</option>
+                    <option value="per day">Per Day</option>
+                    <option value="per week">Per Week</option>
+                    <option value="per month">Per Month</option>
+                </select>
+            </div>
+            
+            <input type="hidden" id="service-index" value="-1">
+            
+            <div class="mt-6 flex justify-end space-x-3">
+                <button type="button" id="service-cancel" class="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const availabilityForm = document.querySelector('form[action="/api/consultants/availability"]');
+        
+        if (availabilityForm) {
+            availabilityForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(availabilityForm);
+                const formObject = {};
+                formData.forEach((value, key) => {
+                    formObject[key] = value;
+                });
+                
+                fetch('/api/consultants/availability', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(formObject)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Availability settings saved successfully!');
+                        // Optionally redirect or refresh
+                    } else {
+                        alert('Error: ' + (data.message || 'Failed to save settings'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error saving settings:', error);
+                    alert('An error occurred while saving settings');
+                });
+            });
+        }
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab switching functionality
+        const tabs = document.querySelectorAll('[id$="-tab"]');
+        const tabContents = document.querySelectorAll('.tab-pane');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Get the tab's target content ID
+                const targetId = tab.getAttribute('href').substring(1);
+                const targetContent = document.getElementById(`${targetId}-content`);
+                
+                // Remove active class from all tabs and hide all tab contents
+                tabs.forEach(t => {
+                    t.classList.remove('border-primary', 'text-primary-dark');
+                    t.classList.add('border-transparent', 'hover:text-gray-600', 'hover:border-gray-300');
+                });
+                
+                tabContents.forEach(content => {
+                    content.classList.add('hidden');
+                });
+                
+                // Activate the selected tab and show its content
+                tab.classList.remove('border-transparent', 'hover:text-gray-600', 'hover:border-gray-300');
+                tab.classList.add('border-primary', 'text-primary-dark');
+                targetContent.classList.remove('hidden');
+            });
+        });
+        
+        // Weekly schedule day availability toggle
+        const dayAvailabilityCheckboxes = document.querySelectorAll('input[name^="availability[workSchedule]"][name$="[available]"]');
+        dayAvailabilityCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const dayId = this.id.replace('-available', '');
+                const hoursInput = document.querySelector(`input[name="availability[workSchedule][${dayId}][hours]"]`);
+                
+                if (hoursInput) {
+                    hoursInput.disabled = !this.checked;
+                    if (this.checked && !hoursInput.value) {
+                        hoursInput.value = '9:00 AM - 5:00 PM';
+                    }
+                }
+            });
+        });
+        
+        // Service offerings management
+        const addServiceBtn = document.getElementById('add-service-btn');
+        const serviceModal = document.getElementById('service-modal');
+        const serviceForm = document.getElementById('service-form');
+        const serviceCancel = document.getElementById('service-cancel');
+        const serviceOfferings = document.getElementById('service-offerings-container');
+        const serviceIndex = document.getElementById('service-index');
+        
+        // Add service button click
+        if (addServiceBtn) {
+            addServiceBtn.addEventListener('click', function() {
+                // Reset form
+                serviceForm.reset();
+                serviceIndex.value = '-1';
+                
+                // Show modal
+                serviceModal.classList.remove('hidden');
+            });
+        }
+        
+        // Cancel button click
+        if (serviceCancel) {
+            serviceCancel.addEventListener('click', function() {
+                serviceModal.classList.add('hidden');
+            });
+        }
+        
+        // Edit service click
+        if (serviceOfferings) {
+            serviceOfferings.addEventListener('click', function(e) {
+                if (e.target.closest('.edit-service')) {
+                    const index = e.target.closest('.edit-service').getAttribute('data-index');
+                    serviceIndex.value = index;
+                    
+                    // Get service item data
+                    const serviceItem = e.target.closest('.service-item');
+                    const titleInput = serviceItem.querySelector('input[name$="[title]"]');
+                    const descriptionInput = serviceItem.querySelector('input[name$="[description]"]');
+                    const priceInput = serviceItem.querySelector('input[name$="[price]"]');
+                    const typeInput = serviceItem.querySelector('input[name$="[pricingType]"]');
+                    
+                    // Populate modal form
+                    document.getElementById('service-title').value = titleInput.value;
+                    document.getElementById('service-description').value = descriptionInput.value;
+                    document.getElementById('service-price').value = priceInput.value;
+                    document.getElementById('service-pricing-type').value = typeInput.value;
+                    
+                    // Show modal
+                    serviceModal.classList.remove('hidden');
+                }
+                
+                if (e.target.closest('.remove-service')) {
+                    const serviceItem = e.target.closest('.service-item');
+                    serviceItem.remove();
+                }
+            });
+        }
+        
+        // Service form submission
+        if (serviceForm) {
+            serviceForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get form values
+                const title = document.getElementById('service-title').value;
+                const description = document.getElementById('service-description').value;
+                const price = document.getElementById('service-price').value;
+                const pricingType = document.getElementById('service-pricing-type').value;
+                
+                // Validate
+                if (!title || !description || !price || !pricingType) {
+                    alert('Please fill in all fields');
+                    return;
+                }
+                
+                // Get index (for editing)
+                const index = serviceIndex.value;
+                const isEditing = index !== '-1';
+                const newIndex = isEditing ? parseInt(index) : document.querySelectorAll('.service-item').length;
+                
+                // Create service item HTML
+                const serviceHTML = `
+                    <div class="service-item border border-gray-200 rounded-md p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="text-sm font-medium text-gray-900">${title}</h4>
+                            <div class="flex space-x-2">
+                                <button type="button" class="text-gray-400 hover:text-gray-500 edit-service" data-index="${newIndex}">
+                                    <i data-lucide="edit-2" class="h-5 w-5"></i>
+                                </button>
+                                <button type="button" class="text-gray-400 hover:text-red-500 remove-service" data-index="${newIndex}">
+                                    <i data-lucide="trash-2" class="h-5 w-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-500 mb-2">${description}</p>
+                        <div class="text-sm text-gray-900 font-medium">
+                            $${price} ${pricingType}
+                        </div>
+                        
+                        <!-- Hidden fields for the form submission -->
+                        <input type="hidden" name="services[offerings][${newIndex}][title]" value="${title}">
+                        <input type="hidden" name="services[offerings][${newIndex}][description]" value="${description}">
+                        <input type="hidden" name="services[offerings][${newIndex}][price]" value="${price}">
+                        <input type="hidden" name="services[offerings][${newIndex}][pricingType]" value="${pricingType}">
+                    </div>
+                `;
+                
+                // Update or add service item
+                if (isEditing) {
+                    const oldItem = document.querySelector(`.service-item[data-index="${index}"]`);
+                    oldItem.outerHTML = serviceHTML;
+                } else {
+                    // If container is empty or only has placeholder, replace it
+                    if (serviceOfferings.children.length === 0 || serviceOfferings.firstElementChild.classList.contains('text-center')) {
+                        serviceOfferings.innerHTML = serviceHTML;
+                    } else {
+                        serviceOfferings.insertAdjacentHTML('beforeend', serviceHTML);
+                    }
+                }
+                
+                // Re-initialize Lucide icons
+                lucide.createIcons();
+                
+                // Close modal
+                serviceModal.classList.add('hidden');
+            });
+        }
+    });
+</script>

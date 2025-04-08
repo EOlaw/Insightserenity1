@@ -1,0 +1,527 @@
+<!-- views/clients/settings.ejs -->
+<% layout('layouts/dashboard') -%>
+<% block('title', 'Client Settings - InsightSerenity') -%>
+
+<div class="mb-6">
+  <h1 class="text-2xl font-bold mb-2">Account Settings</h1>
+  <p class="text-gray-600">Manage your account preferences and security settings</p>
+</div>
+
+<% if (success && success.length > 0) { %>
+  <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-6">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-green-700"><%= success %></p>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<% if (error && error.length > 0) { %>
+  <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-red-700"><%= error %></p>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Left column: Settings Tabs -->
+  <div class="lg:col-span-1">
+    <div class="card bg-white p-4">
+      <nav class="settings-nav" aria-label="Settings Navigation">
+        <ul>
+          <li>
+            <a href="#visibility-preferences" class="tab-link active flex items-center px-3 py-2 text-sm font-medium rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              Visibility & Preferences
+            </a>
+          </li>
+          <li>
+            <a href="#notification-settings" class="tab-link flex items-center px-3 py-2 text-sm font-medium rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              Notification Settings
+            </a>
+          </li>
+          <li>
+            <a href="#security" class="tab-link flex items-center px-3 py-2 text-sm font-medium rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              Security
+            </a>
+          </li>
+          <li>
+            <a href="#language-timezone" class="tab-link flex items-center px-3 py-2 text-sm font-medium rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+              </svg>
+              Language & Timezone
+            </a>
+          </li>
+          <li>
+            <a href="#account-management" class="tab-link flex items-center px-3 py-2 text-sm font-medium rounded-md">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Account Management
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Right column: Settings Content -->
+  <div class="lg:col-span-2">
+    <!-- Visibility & Preferences -->
+    <div id="visibility-preferences" class="tab-content card bg-white p-6 mb-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">Visibility & Preferences</h2>
+      
+      <form action="/api/clients/settings" method="POST" id="visibility-form">
+        <input type="hidden" name="_method" value="PUT">
+        
+        <div class="mb-6">
+          <h3 class="text-md font-medium text-gray-700 mb-3">Profile Visibility</h3>
+          
+          <div class="space-y-3">
+            <div class="flex items-start">
+              <div class="flex items-center h-5">
+                <input id="show-company" name="settings.visibility.showCompany" type="checkbox" 
+                  <%= profile.settings?.visibility?.showCompany ? 'checked' : '' %>
+                  class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+              </div>
+              <div class="ml-3 text-sm">
+                <label for="show-company" class="font-medium text-gray-700">Show my company information</label>
+                <p class="text-gray-500">Allow consultants to see your company name and industry</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start">
+              <div class="flex items-center h-5">
+                <input id="show-projects" name="settings.visibility.showProjects" type="checkbox" 
+                  <%= profile.settings?.visibility?.showProjects ? 'checked' : '' %>
+                  class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+              </div>
+              <div class="ml-3 text-sm">
+                <label for="show-projects" class="font-medium text-gray-700">Show my public projects</label>
+                <p class="text-gray-500">Allow consultants to see your public projects</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-6">
+          <h3 class="text-md font-medium text-gray-700 mb-3">Project Preferences</h3>
+          
+          <div class="space-y-4">
+            <div>
+              <label for="default-project-visibility" class="block text-sm font-medium text-gray-700 mb-1">Default Project Visibility</label>
+              <select id="default-project-visibility" name="settings.projectPreferences.defaultVisibility"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+                <option value="public" <%= profile.settings?.projectPreferences?.defaultVisibility === 'public' ? 'selected' : '' %>>Public - Anyone can view and apply</option>
+                <option value="invite_only" <%= profile.settings?.projectPreferences?.defaultVisibility === 'invite_only' ? 'selected' : '' %>>Invite Only - Only invited consultants can view and apply</option>
+              </select>
+            </div>
+            
+            <div>
+              <label for="default-project-duration" class="block text-sm font-medium text-gray-700 mb-1">Preferred Project Duration</label>
+              <select id="default-project-duration" name="settings.projectPreferences.defaultDuration"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+                <option value="less_than_week" <%= profile.settings?.projectPreferences?.defaultDuration === 'less_than_week' ? 'selected' : '' %>>Less than a week</option>
+                <option value="1_2_weeks" <%= profile.settings?.projectPreferences?.defaultDuration === '1_2_weeks' ? 'selected' : '' %>>1-2 weeks</option>
+                <option value="2_4_weeks" <%= profile.settings?.projectPreferences?.defaultDuration === '2_4_weeks' ? 'selected' : '' %>>2-4 weeks</option>
+                <option value="1_3_months" <%= profile.settings?.projectPreferences?.defaultDuration === '1_3_months' ? 'selected' : '' %>>1-3 months</option>
+                <option value="3_6_months" <%= profile.settings?.projectPreferences?.defaultDuration === '3_6_months' ? 'selected' : '' %>>3-6 months</option>
+                <option value="over_6_months" <%= profile.settings?.projectPreferences?.defaultDuration === 'over_6_months' ? 'selected' : '' %>>Over 6 months</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-6">
+          <button type="submit" class="w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            Save Visibility & Preferences
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Notification Settings -->
+    <div id="notification-settings" class="tab-content card bg-white p-6 mb-6 hidden">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">Notification Settings</h2>
+      
+      <form action="/api/clients/settings" method="POST" id="notification-form">
+        <input type="hidden" name="_method" value="PUT">
+        
+        <div class="mb-6">
+          <h3 class="text-md font-medium text-gray-700 mb-3">Email Notifications</h3>
+          
+          <div class="space-y-3">
+            <div class="flex items-start">
+              <div class="flex items-center h-5">
+                <input id="proposal-notification" name="settings.notifications.proposalReceived" type="checkbox" 
+                  <%= profile.settings?.notifications?.proposalReceived ? 'checked' : '' %>
+                  class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+              </div>
+              <div class="ml-3 text-sm">
+                <label for="proposal-notification" class="font-medium text-gray-700">New Proposal Received</label>
+                <p class="text-gray-500">Get notified when a consultant submits a proposal for your project</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start">
+              <div class="flex items-center h-5">
+                <input id="message-notification" name="settings.notifications.consultantMessage" type="checkbox" 
+                  <%= profile.settings?.notifications?.consultantMessage ? 'checked' : '' %>
+                  class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+              </div>
+              <div class="ml-3 text-sm">
+                <label for="message-notification" class="font-medium text-gray-700">New Message from Consultant</label>
+                <p class="text-gray-500">Get notified when a consultant sends you a message</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start">
+              <div class="flex items-center h-5">
+                <input id="project-update-notification" name="settings.notifications.projectUpdate" type="checkbox" 
+                  <%= profile.settings?.notifications?.projectUpdate ? 'checked' : '' %>
+                  class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+              </div>
+              <div class="ml-3 text-sm">
+                <label for="project-update-notification" class="font-medium text-gray-700">Project Updates</label>
+                <p class="text-gray-500">Get notified about important updates to your projects</p>
+              </div>
+            </div>
+            
+            <div class="flex items-start">
+              <div class="flex items-center h-5">
+                <input id="billing-notification" name="settings.notifications.billingAlert" type="checkbox" 
+                  <%= profile.settings?.notifications?.billingAlert ? 'checked' : '' %>
+                  class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+              </div>
+              <div class="ml-3 text-sm">
+                <label for="billing-notification" class="font-medium text-gray-700">Billing Alerts</label>
+                <p class="text-gray-500">Get notified about payment processing and billing alerts</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-6">
+          <h3 class="text-md font-medium text-gray-700 mb-3">Communication Preferences</h3>
+          
+          <div>
+            <label for="communication-frequency" class="block text-sm font-medium text-gray-700 mb-1">Update Frequency</label>
+            <select id="communication-frequency" name="clientProfile.preferences.communicationFrequency"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+              <option value="daily" <%= profile.clientProfile?.preferences?.communicationFrequency === 'daily' ? 'selected' : '' %>>Daily</option>
+              <option value="weekly" <%= profile.clientProfile?.preferences?.communicationFrequency === 'weekly' ? 'selected' : '' %>>Weekly</option>
+              <option value="biweekly" <%= profile.clientProfile?.preferences?.communicationFrequency === 'biweekly' ? 'selected' : '' %>>Bi-weekly</option>
+              <option value="monthly" <%= profile.clientProfile?.preferences?.communicationFrequency === 'monthly' ? 'selected' : '' %>>Monthly</option>
+              <option value="as_needed" <%= profile.clientProfile?.preferences?.communicationFrequency === 'as_needed' ? 'selected' : '' %>>As needed</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="mt-6">
+          <button type="submit" class="w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            Save Notification Settings
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Security Settings -->
+    <div id="security" class="tab-content card bg-white p-6 mb-6 hidden">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">Security Settings</h2>
+      
+      <form action="/api/auth/change-password" method="POST" id="password-form">
+        <div class="mb-6">
+          <h3 class="text-md font-medium text-gray-700 mb-3">Change Password</h3>
+          
+          <div class="space-y-4">
+            <div>
+              <label for="current-password" class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+              <input type="password" id="current-password" name="currentPassword" required 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+            </div>
+            
+            <div>
+              <label for="new-password" class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+              <input type="password" id="new-password" name="newPassword" required 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+              <p class="mt-1 text-xs text-gray-500">Password must be at least 8 characters with uppercase, lowercase, number, and special character</p>
+            </div>
+            
+            <div>
+              <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+              <input type="password" id="confirm-password" required 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-6">
+          <button type="submit" class="w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            Update Password
+          </button>
+        </div>
+      </form>
+      
+      <div class="border-t border-gray-200 my-6 pt-6">
+        <h3 class="text-md font-medium text-gray-700 mb-3">Sessions & Devices</h3>
+        
+        <div class="mb-4">
+          <p class="text-sm text-gray-600">These are the devices that are currently logged into your account. You can revoke access from devices you don't recognize.</p>
+        </div>
+        
+        <div class="border border-gray-200 rounded-md overflow-hidden">
+          <div class="bg-gray-50 p-3 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            <span class="text-sm font-medium text-gray-700">Current Device</span>
+            <span class="ml-auto text-xs text-green-600 font-medium">Active Now</span>
+          </div>
+          <div class="p-3">
+            <div class="text-sm text-gray-900 mb-1">Device information will be shown here</div>
+            <div class="text-xs text-gray-500">Location information will be shown here</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Language & Timezone -->
+    <div id="language-timezone" class="tab-content card bg-white p-6 mb-6 hidden">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">Language & Timezone</h2>
+      
+      <form action="/api/users/profile" method="POST">
+        <input type="hidden" name="_method" value="PUT">
+        
+        <div class="mb-6">
+          <div class="mb-4">
+            <label for="language" class="block text-sm font-medium text-gray-700 mb-1">Language</label>
+            <select id="language" name="preferences.language"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+              <option value="en" <%= user.preferences.language === 'en' ? 'selected' : '' %>>English</option>
+              <option value="es" <%= user.preferences.language === 'es' ? 'selected' : '' %>>Español (Spanish)</option>
+              <option value="fr" <%= user.preferences.language === 'fr' ? 'selected' : '' %>>Français (French)</option>
+              <option value="de" <%= user.preferences.language === 'de' ? 'selected' : '' %>>Deutsch (German)</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="timezone" class="block text-sm font-medium text-gray-700 mb-1">Timezone</label>
+            <select id="timezone" name="preferences.timezone"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+              <option value="UTC" <%= user.preferences.timezone === 'UTC' ? 'selected' : '' %>>UTC (Coordinated Universal Time)</option>
+              <option value="America/New_York" <%= user.preferences.timezone === 'America/New_York' ? 'selected' : '' %>>Eastern Time (US & Canada)</option>
+              <option value="America/Chicago" <%= user.preferences.timezone === 'America/Chicago' ? 'selected' : '' %>>Central Time (US & Canada)</option>
+              <option value="America/Denver" <%= user.preferences.timezone === 'America/Denver' ? 'selected' : '' %>>Mountain Time (US & Canada)</option>
+              <option value="America/Los_Angeles" <%= user.preferences.timezone === 'America/Los_Angeles' ? 'selected' : '' %>>Pacific Time (US & Canada)</option>
+              <option value="Europe/London" <%= user.preferences.timezone === 'Europe/London' ? 'selected' : '' %>>London</option>
+              <option value="Europe/Paris" <%= user.preferences.timezone === 'Europe/Paris' ? 'selected' : '' %>>Paris</option>
+              <option value="Asia/Tokyo" <%= user.preferences.timezone === 'Asia/Tokyo' ? 'selected' : '' %>>Tokyo</option>
+              <option value="Australia/Sydney" <%= user.preferences.timezone === 'Australia/Sydney' ? 'selected' : '' %>>Sydney</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="mt-6">
+          <button type="submit" class="w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            Save Language & Timezone
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Account Management -->
+    <div id="account-management" class="tab-content card bg-white p-6 mb-6 hidden">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">Account Management</h2>
+      
+      <div class="mb-6">
+        <h3 class="text-md font-medium text-gray-700 mb-3">Account Status</h3>
+        
+        <div class="flex items-center bg-green-50 rounded-md p-3 mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          <span class="text-sm font-medium text-green-700">Your account is active</span>
+        </div>
+        
+        <div class="mb-4">
+          <p class="text-sm text-gray-600">You are currently on the <span class="font-medium">Free Plan</span></p>
+          <a href="/pricing" class="text-sm text-blue-600 hover:text-blue-800">View Plan Options</a>
+        </div>
+      </div>
+      
+      <div class="mb-6 border-t border-gray-200 pt-6">
+        <h3 class="text-md font-medium text-gray-700 mb-3">Export Data</h3>
+        
+        <p class="text-sm text-gray-600 mb-4">You can request a full export of all your data including projects, messages, and account information.</p>
+        
+        <button type="button" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+          Request Data Export
+        </button>
+      </div>
+      
+      <div class="border-t border-gray-200 pt-6">
+        <h3 class="text-md font-medium text-red-600 mb-3">Danger Zone</h3>
+        
+        <p class="text-sm text-gray-600 mb-4">Once you deactivate your account, you will lose access to all your data and projects.</p>
+        
+        <button type="button" data-modal-target="deactivate-modal" class="px-4 py-2 border border-red-300 rounded-md shadow-sm text-sm font-medium text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+          Deactivate Account
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Deactivate Account Modal -->
+<div id="deactivate-modal" class="fixed inset-0 hidden overflow-y-auto z-50">
+  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    </div>
+
+    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+      <form action="/api/users/deactivate" method="POST">
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+              <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                Deactivate Account
+              </h3>
+              <div class="mt-2">
+                <p class="text-sm text-gray-500">
+                  Are you sure you want to deactivate your account? All of your data will be permanently removed. This action cannot be undone.
+                </p>
+                <div class="mt-4">
+                  <label for="deactivation-reason" class="block text-sm font-medium text-gray-700 mb-1">Please tell us why you're leaving</label>
+                  <select id="deactivation-reason" name="reason" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+                    <option value="" disabled selected>Select a reason</option>
+                    <option value="found_another_platform">Found another platform</option>
+                    <option value="too_expensive">Too expensive</option>
+                    <option value="not_enough_features">Not enough features</option>
+                    <option value="poor_experience">Had a poor experience</option>
+                    <option value="not_using">Not using the service</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+            Deactivate
+          </button>
+          <button type="button" data-modal-close class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Tab handling
+    const tabLinks = document.querySelectorAll('.tab-link');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Remove active class from all links
+        tabLinks.forEach(link => link.classList.remove('active', 'bg-gray-100', 'text-gray-900'));
+        
+        // Add active class to current link
+        this.classList.add('active', 'bg-gray-100', 'text-gray-900');
+        
+        // Hide all tab contents
+        tabContents.forEach(content => content.classList.add('hidden'));
+        
+        // Show the selected tab content
+        const target = this.getAttribute('href').substring(1);
+        document.getElementById(target).classList.remove('hidden');
+      });
+    });
+    
+    // Password confirmation validation
+    const passwordForm = document.getElementById('password-form');
+    const newPassword = document.getElementById('new-password');
+    const confirmPassword = document.getElementById('confirm-password');
+    
+    if (passwordForm) {
+      passwordForm.addEventListener('submit', function(e) {
+        if (newPassword.value !== confirmPassword.value) {
+          e.preventDefault();
+          alert('Passwords do not match!');
+        }
+      });
+    }
+    
+    // Modal handling
+    const modalTriggers = document.querySelectorAll('[data-modal-target]');
+    const modalCloses = document.querySelectorAll('[data-modal-close]');
+    
+    modalTriggers.forEach(trigger => {
+      trigger.addEventListener('click', function() {
+        const modalId = this.getAttribute('data-modal-target');
+        const modal = document.getElementById(modalId);
+        modal.classList.remove('hidden');
+      });
+    });
+    
+    modalCloses.forEach(close => {
+      close.addEventListener('click', function() {
+        const modal = this.closest('[id$="-modal"]');
+        modal.classList.add('hidden');
+      });
+    });
+    
+    // Close modals when clicking outside
+    document.addEventListener('click', function(event) {
+      if (event.target.classList.contains('fixed') && event.target.classList.contains('inset-0')) {
+        event.target.classList.add('hidden');
+      }
+    });
+    
+    // Check for hash in URL to open specific tab
+    const hash = window.location.hash;
+    if (hash) {
+      const targetTab = document.querySelector('.tab-link[href="' + hash + '"]');
+      if (targetTab) {
+        targetTab.click();
+      }
+    }
+  });
+</script>

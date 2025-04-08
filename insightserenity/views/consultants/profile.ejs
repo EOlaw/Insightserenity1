@@ -1,0 +1,1408 @@
+<!-- views/consultants/profile.ejs -->
+<% layout('layouts/dashboard') -%>
+<% block('title', 'My Profile - InsightSerenity') -%>
+
+<!-- Page header -->
+<div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold mb-1">My Profile</h1>
+        <p class="text-gray-600">Manage your professional profile and expertise</p>
+    </div>
+    <div class="mt-4 md:mt-0 flex items-center">
+        <div class="mr-4 text-sm">
+            <span>Profile Completion:</span>
+            <span class="font-semibold text-gray-900"><%= profileCompletionPercentage %>%</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <button type="button" id="previewProfileBtn" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                <i data-lucide="eye" class="h-4 w-4 mr-2"></i>
+                Preview Profile
+            </button>
+            <button type="submit" form="profile-form" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                <i data-lucide="save" class="h-4 w-4 mr-2"></i>
+                Save Changes
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Profile completion bar -->
+<div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+    <div class="flex items-center">
+        <div class="w-full bg-gray-200 rounded-full h-2.5 mr-4">
+            <div class="bg-primary h-2.5 rounded-full" style="width: <%= profileCompletionPercentage %>%"></div>
+        </div>
+        <span class="text-sm font-medium text-gray-500 whitespace-nowrap"><%= profileCompletionPercentage %>% Complete</span>
+    </div>
+    
+    <% if (profileCompletionPercentage < 100) { %>
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <% if (!profile.professional || !profile.professional.summary) { %>
+                <div class="bg-blue-50 p-3 rounded-md flex items-start">
+                    <i data-lucide="alert-circle" class="h-5 w-5 text-blue-500 mr-2 mt-0.5"></i>
+                    <span class="text-sm text-blue-700">Add a professional summary</span>
+                </div>
+            <% } %>
+            
+            <% if (!profile.expertise || !profile.expertise.skills || profile.expertise.skills.length < 3) { %>
+                <div class="bg-blue-50 p-3 rounded-md flex items-start">
+                    <i data-lucide="alert-circle" class="h-5 w-5 text-blue-500 mr-2 mt-0.5"></i>
+                    <span class="text-sm text-blue-700">Add at least 3 skills</span>
+                </div>
+            <% } %>
+            
+            <% if (!profile.workExperience || profile.workExperience.length === 0) { %>
+                <div class="bg-blue-50 p-3 rounded-md flex items-start">
+                    <i data-lucide="alert-circle" class="h-5 w-5 text-blue-500 mr-2 mt-0.5"></i>
+                    <span class="text-sm text-blue-700">Add work experience</span>
+                </div>
+            <% } %>
+            
+            <% if (!profile.professional || !profile.professional.education || profile.professional.education.length === 0) { %>
+                <div class="bg-blue-50 p-3 rounded-md flex items-start">
+                    <i data-lucide="alert-circle" class="h-5 w-5 text-blue-500 mr-2 mt-0.5"></i>
+                    <span class="text-sm text-blue-700">Add education details</span>
+                </div>
+            <% } %>
+            
+            <% if (!user.profile || !user.profile.avatarUrl) { %>
+                <div class="bg-blue-50 p-3 rounded-md flex items-start">
+                    <i data-lucide="alert-circle" class="h-5 w-5 text-blue-500 mr-2 mt-0.5"></i>
+                    <span class="text-sm text-blue-700">Upload a profile photo</span>
+                </div>
+            <% } %>
+        </div>
+    <% } %>
+</div>
+
+<!-- Profile form -->
+<form id="profile-form" class="space-y-6" method="POST" action="/api/consultants/profile" enctype="multipart/form-data">
+    <!-- Basic Information -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Basic Information</h2>
+        </div>
+        <div class="px-6 py-5 space-y-6">
+            <div class="flex items-center space-x-6">
+                <div class="flex-shrink-0">
+                    <% if (user.profile && user.profile.avatarUrl) { %>
+                        <img class="h-32 w-32 rounded-full object-cover" src="<%= user.profile.avatarUrl %>" alt="<%= user.profile.firstName %>">
+                    <% } else { %>
+                        <div class="h-32 w-32 rounded-full bg-primary flex items-center justify-center text-dark font-bold text-4xl">
+                            <%= user.profile.firstName.charAt(0) %><%= user.profile.lastName.charAt(0) %>
+                        </div>
+                    <% } %>
+                </div>
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900"><%= user.profile.firstName %> <%= user.profile.lastName %></h3>
+                    <p class="text-sm text-gray-500"><%= user.email %></p>
+                    <div class="mt-4">
+                        <label for="photo-upload" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            <i data-lucide="upload" class="h-4 w-4 mr-2"></i>
+                            Change Photo
+                        </label>
+                        <input id="photo-upload" name="profilePhoto" type="file" accept="image/*" class="sr-only">
+                    </div>
+                    <p class="mt-2 text-xs text-gray-500">JPG or PNG. Max 2MB. Recommended size: 400x400px</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div>
+                    <label for="professional-title" class="block text-sm font-medium text-gray-700">Professional Title</label>
+                    <input type="text" name="professional[title]" id="professional-title" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" 
+                        value="<%= profile.professional && profile.professional.title || '' %>" 
+                        placeholder="e.g. Senior Software Engineer">
+                </div>
+                
+                <div>
+                    <label for="experience-years" class="block text-sm font-medium text-gray-700">Years of Experience</label>
+                    <input type="number" name="professional[yearsOfExperience]" id="experience-years" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" 
+                        value="<%= profile.professional && profile.professional.yearsOfExperience || '' %>" 
+                        min="0" max="50">
+                </div>
+            </div>
+            
+            <div>
+                <label for="professional-summary" class="block text-sm font-medium text-gray-700">Professional Summary</label>
+                <textarea name="professional[summary]" id="professional-summary" rows="4" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" 
+                    placeholder="Write a brief summary of your professional experience and expertise"><%= profile.professional && profile.professional.summary || '' %></textarea>
+                <p class="mt-1 text-sm text-gray-500">Briefly describe your professional background, expertise, and what makes you unique.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div>
+                    <label for="location-country" class="block text-sm font-medium text-gray-700">Country</label>
+                    <select id="location-country" name="location[country]" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                        <option value="">Select a country</option>
+                        <option value="US" <%= user.profile && user.profile.location && user.profile.location.country === 'US' ? 'selected' : '' %>>United States</option>
+                        <option value="UK" <%= user.profile && user.profile.location && user.profile.location.country === 'UK' ? 'selected' : '' %>>United Kingdom</option>
+                        <option value="CA" <%= user.profile && user.profile.location && user.profile.location.country === 'CA' ? 'selected' : '' %>>Canada</option>
+                        <option value="AU" <%= user.profile && user.profile.location && user.profile.location.country === 'AU' ? 'selected' : '' %>>Australia</option>
+                        <!-- Add more countries as needed -->
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="location-city" class="block text-sm font-medium text-gray-700">City</label>
+                    <input type="text" name="location[city]" id="location-city" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" 
+                        value="<%= user.profile && user.profile.location && user.profile.location.city || '' %>">
+                </div>
+            </div>
+            
+            <div>
+                <label for="phone-number" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                <input type="tel" name="phoneNumber" id="phone-number" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" 
+                    value="<%= user.profile && user.profile.phoneNumber || '' %>" 
+                    placeholder="+1 (123) 456-7890">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Expertise and Skills -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-200">
+            <h2 class="text-lg font-medium text-gray-900">Expertise & Skills</h2>
+        </div>
+        <div class="px-6 py-5 space-y-6">
+            <div>
+                <label for="primary-specialty" class="block text-sm font-medium text-gray-700">Primary Specialty</label>
+                <select id="primary-specialty" name="expertise[primarySpecialty]" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                    <option value="">Select your primary specialty</option>
+                    <option value="software_development" <%= profile.expertise && profile.expertise.primarySpecialty === 'software_development' ? 'selected' : '' %>>Software Development</option>
+                    <option value="web_development" <%= profile.expertise && profile.expertise.primarySpecialty === 'web_development' ? 'selected' : '' %>>Web Development</option>
+                    <option value="mobile_development" <%= profile.expertise && profile.expertise.primarySpecialty === 'mobile_development' ? 'selected' : '' %>>Mobile Development</option>
+                    <option value="data_science" <%= profile.expertise && profile.expertise.primarySpecialty === 'data_science' ? 'selected' : '' %>>Data Science</option>
+                    <option value="ui_ux_design" <%= profile.expertise && profile.expertise.primarySpecialty === 'ui_ux_design' ? 'selected' : '' %>>UI/UX Design</option>
+                    <option value="project_management" <%= profile.expertise && profile.expertise.primarySpecialty === 'project_management' ? 'selected' : '' %>>Project Management</option>
+                    <option value="devops" <%= profile.expertise && profile.expertise.primarySpecialty === 'devops' ? 'selected' : '' %>>DevOps</option>
+                    <option value="cybersecurity" <%= profile.expertise && profile.expertise.primarySpecialty === 'cybersecurity' ? 'selected' : '' %>>Cybersecurity</option>
+                    <!-- Add more specialties as needed -->
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Skills</label>
+                <div id="skills-container" class="flex flex-wrap gap-2 mb-2">
+                    <% if (profile.expertise && profile.expertise.skills && profile.expertise.skills.length > 0) { %>
+                        <% profile.expertise.skills.forEach((skill, index) => { %>
+                            <div class="skill-tag bg-primary-light text-dark px-3 py-1 rounded-full text-sm flex items-center" data-name="<%= skill.name %>" data-level="<%= skill.level || 'intermediate' %>" data-years="<%= skill.yearsOfExperience || 1 %>" data-featured="<%= skill.featured || false %>">
+                                <%= skill.name %>
+                                <button type="button" class="ml-2 text-dark hover:text-dark focus:outline-none edit-skill">
+                                    <i data-lucide="pencil" class="h-3 w-3"></i>
+                                </button>
+                                <button type="button" class="ml-1 text-dark hover:text-dark focus:outline-none remove-skill">
+                                    <i data-lucide="x" class="h-4 w-4"></i>
+                                </button>
+                            </div>
+                        <% }); %>
+                    <% } %>
+                </div>
+                
+                <div class="flex items-center">
+                    <input type="text" id="skill-input" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" placeholder="Add a skill...">
+                    <button type="button" id="add-skill-btn" class="ml-2 inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                        <i data-lucide="plus" class="h-4 w-4"></i>
+                    </button>
+                </div>
+                
+                <!-- Hidden inputs to store skills data -->
+                <div id="skills-data-container">
+                    <% if (profile.expertise && profile.expertise.skills && profile.expertise.skills.length > 0) { %>
+                        <% profile.expertise.skills.forEach((skill, index) => { %>
+                            <input type="hidden" name="expertise[skills][<%= index %>][name]" value="<%= skill.name %>">
+                            <input type="hidden" name="expertise[skills][<%= index %>][level]" value="<%= skill.level || 'intermediate' %>">
+                            <input type="hidden" name="expertise[skills][<%= index %>][yearsOfExperience]" value="<%= skill.yearsOfExperience || 1 %>">
+                            <input type="hidden" name="expertise[skills][<%= index %>][featured]" value="<%= skill.featured || false %>">
+                        <% }); %>
+                    <% } %>
+                </div>
+                
+                <!-- Skill edit modal (hidden by default) -->
+                <div id="skill-modal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Edit Skill</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="modal-skill-name" class="block text-sm font-medium text-gray-700">Skill Name</label>
+                                <input type="text" id="modal-skill-name" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm">
+                            </div>
+                            
+                            <div>
+                                <label for="modal-skill-level" class="block text-sm font-medium text-gray-700">Proficiency Level</label>
+                                <select id="modal-skill-level" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                                    <option value="beginner">Beginner</option>
+                                    <option value="intermediate">Intermediate</option>
+                                    <option value="advanced">Advanced</option>
+                                    <option value="expert">Expert</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="modal-skill-years" class="block text-sm font-medium text-gray-700">Years of Experience</label>
+                                <input type="number" id="modal-skill-years" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" min="0" max="50">
+                            </div>
+                            
+                            <div class="flex items-center">
+                                <input type="checkbox" id="modal-skill-featured" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded">
+                                <label for="modal-skill-featured" class="ml-2 block text-sm text-gray-700">
+                                    Feature this skill on your profile
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 flex justify-end space-x-3">
+                            <button type="button" id="modal-cancel" class="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button type="button" id="modal-save" class="px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Industries</label>
+                <div id="industries-container" class="flex flex-wrap gap-2 mb-2">
+                    <% if (profile.expertise && profile.expertise.industries && profile.expertise.industries.length > 0) { %>
+                        <% profile.expertise.industries.forEach((industry, index) => { %>
+                            <div class="industry-tag bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm flex items-center">
+                                <%= industry %>
+                                <button type="button" class="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none remove-industry">
+                                    <i data-lucide="x" class="h-4 w-4"></i>
+                                </button>
+                                <input type="hidden" name="expertise[industries][]" value="<%= industry %>">
+                            </div>
+                        <% }); %>
+                    <% } %>
+                </div>
+                
+                <div class="flex items-center">
+                    <select id="industry-select" class="block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                        <option value="">Select an industry</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Healthcare">Healthcare</option>
+                        <option value="Education">Education</option>
+                        <option value="E-commerce">E-commerce</option>
+                        <option value="Manufacturing">Manufacturing</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Real Estate">Real Estate</option>
+                        <!-- Add more industries as needed -->
+                    </select>
+                    <button type="button" id="add-industry-btn" class="ml-2 inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                        <i data-lucide="plus" class="h-4 w-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Work Experience -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-200 flex justify-between items-center">
+            <h2 class="text-lg font-medium text-gray-900">Work Experience</h2>
+            <button type="button" id="add-experience-btn" class="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                <i data-lucide="plus" class="h-4 w-4 mr-1"></i>
+                Add Experience
+            </button>
+        </div>
+        <div id="experience-container" class="px-6 py-5 space-y-6">
+            <% if (profile.workExperience && profile.workExperience.length > 0) { %>
+                <% profile.workExperience.forEach((experience, index) => { %>
+                    <div class="experience-item border border-gray-200 rounded-md p-4" data-index="<%= index %>">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-base font-medium text-gray-900"><%= experience.position %></h3>
+                                <p class="text-sm text-gray-600"><%= experience.company %></p>
+                                <p class="text-sm text-gray-500">
+                                    <%= new Date(experience.startDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) %> - 
+                                    <%= experience.current ? 'Present' : new Date(experience.endDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) %>
+                                </p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button type="button" class="text-gray-400 hover:text-gray-500 edit-experience">
+                                    <i data-lucide="edit-2" class="h-5 w-5"></i>
+                                </button>
+                                <button type="button" class="text-gray-400 hover:text-red-500 remove-experience">
+                                    <i data-lucide="trash-2" class="h-5 w-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden fields for the form submission -->
+                        <input type="hidden" name="workExperience[<%= index %>][company]" value="<%= experience.company %>">
+                        <input type="hidden" name="workExperience[<%= index %>][position]" value="<%= experience.position %>">
+                        <input type="hidden" name="workExperience[<%= index %>][location]" value="<%= experience.location %>">
+                        <input type="hidden" name="workExperience[<%= index %>][startDate]" value="<%= experience.startDate %>">
+                        <input type="hidden" name="workExperience[<%= index %>][endDate]" value="<%= experience.endDate %>">
+                        <input type="hidden" name="workExperience[<%= index %>][current]" value="<%= experience.current %>">
+                        <input type="hidden" name="workExperience[<%= index %>][description]" value="<%= experience.description %>">
+                        
+                        <% if (experience.achievements && experience.achievements.length > 0) { %>
+                            <% experience.achievements.forEach((achievement, achIndex) => { %>
+                                <input type="hidden" name="workExperience[<%= index %>][achievements][<%= achIndex %>]" value="<%= achievement %>">
+                            <% }); %>
+                        <% } %>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="text-center py-6">
+                    <div class="mb-4">
+                        <i data-lucide="briefcase" class="h-12 w-12 mx-auto text-gray-400"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-1">No work experience added yet</h3>
+                    <p class="text-gray-500 mb-4">Add your professional experience to showcase your expertise</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+    
+    <!-- Education -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-200 flex justify-between items-center">
+            <h2 class="text-lg font-medium text-gray-900">Education</h2>
+            <button type="button" id="add-education-btn" class="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                <i data-lucide="plus" class="h-4 w-4 mr-1"></i>
+                Add Education
+            </button>
+        </div>
+        <div id="education-container" class="px-6 py-5 space-y-6">
+            <% if (profile.professional && profile.professional.education && profile.professional.education.length > 0) { %>
+                <% profile.professional.education.forEach((education, index) => { %>
+                    <div class="education-item border border-gray-200 rounded-md p-4" data-index="<%= index %>">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-base font-medium text-gray-900"><%= education.degree %></h3>
+                                <p class="text-sm text-gray-600"><%= education.institution %></p>
+                                <p class="text-sm text-gray-500">
+                                    <%= education.field %> • 
+                                    <%= education.startYear %> - <%= education.current ? 'Present' : education.endYear %>
+                                </p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button type="button" class="text-gray-400 hover:text-gray-500 edit-education">
+                                    <i data-lucide="edit-2" class="h-5 w-5"></i>
+                                </button>
+                                <button type="button" class="text-gray-400 hover:text-red-500 remove-education">
+                                    <i data-lucide="trash-2" class="h-5 w-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden fields for the form submission -->
+                        <input type="hidden" name="professional[education][<%= index %>][institution]" value="<%= education.institution %>">
+                        <input type="hidden" name="professional[education][<%= index %>][degree]" value="<%= education.degree %>">
+                        <input type="hidden" name="professional[education][<%= index %>][field]" value="<%= education.field %>">
+                        <input type="hidden" name="professional[education][<%= index %>][startYear]" value="<%= education.startYear %>">
+                        <input type="hidden" name="professional[education][<%= index %>][endYear]" value="<%= education.endYear %>">
+                        <input type="hidden" name="professional[education][<%= index %>][current]" value="<%= education.current %>">
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="text-center py-6">
+                    <div class="mb-4">
+                        <i data-lucide="graduation-cap" class="h-12 w-12 mx-auto text-gray-400"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-1">No education added yet</h3>
+                    <p class="text-gray-500 mb-4">Add your educational background to enhance your profile</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+    
+    <!-- Certifications -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-200 flex justify-between items-center">
+            <h2 class="text-lg font-medium text-gray-900">Certifications</h2>
+            <button type="button" id="add-certification-btn" class="inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                <i data-lucide="plus" class="h-4 w-4 mr-1"></i>
+                Add Certification
+            </button>
+        </div>
+        <div id="certification-container" class="px-6 py-5 space-y-6">
+            <% if (profile.professional && profile.professional.certifications && profile.professional.certifications.length > 0) { %>
+                <% profile.professional.certifications.forEach((certification, index) => { %>
+                    <div class="certification-item border border-gray-200 rounded-md p-4" data-index="<%= index %>">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-base font-medium text-gray-900"><%= certification.name %></h3>
+                                <p class="text-sm text-gray-600"><%= certification.issuer %></p>
+                                <p class="text-sm text-gray-500">
+                                    Issued: <%= certification.year %>
+                                    <% if (certification.credentialId) { %>
+                                        • Credential ID: <%= certification.credentialId %>
+                                    <% } %>
+                                </p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button type="button" class="text-gray-400 hover:text-gray-500 edit-certification">
+                                    <i data-lucide="edit-2" class="h-5 w-5"></i>
+                                </button>
+                                <button type="button" class="text-gray-400 hover:text-red-500 remove-certification">
+                                    <i data-lucide="trash-2" class="h-5 w-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden fields for the form submission -->
+                        <input type="hidden" name="professional[certifications][<%= index %>][name]" value="<%= certification.name %>">
+                        <input type="hidden" name="professional[certifications][<%= index %>][issuer]" value="<%= certification.issuer %>">
+                        <input type="hidden" name="professional[certifications][<%= index %>][year]" value="<%= certification.year %>">
+                        <input type="hidden" name="professional[certifications][<%= index %>][credentialId]" value="<%= certification.credentialId %>">
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="text-center py-6">
+                    <div class="mb-4">
+                        <i data-lucide="award" class="h-12 w-12 mx-auto text-gray-400"></i>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-1">No certifications added yet</h3>
+                    <p class="text-gray-500 mb-4">Add your professional certifications to stand out</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</form>
+
+<!-- Experience modal (hidden by default) -->
+<div id="experience-modal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-lg w-full p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Add Work Experience</h3>
+        <form id="experience-form" class="space-y-4">
+            <div>
+                <label for="experience-company" class="block text-sm font-medium text-gray-700">Company</label>
+                <input type="text" id="experience-company" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" required>
+            </div>
+            
+            <div>
+                <label for="experience-position" class="block text-sm font-medium text-gray-700">Position</label>
+                <input type="text" id="experience-position" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" required>
+            </div>
+            
+            <div>
+                <label for="experience-location" class="block text-sm font-medium text-gray-700">Location</label>
+                <input type="text" id="experience-location" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="experience-start-date" class="block text-sm font-medium text-gray-700">Start Date</label>
+                    <input type="month" id="experience-start-date" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" required>
+                </div>
+                
+                <div>
+                    <label for="experience-end-date" class="block text-sm font-medium text-gray-700">End Date</label>
+                    <input type="month" id="experience-end-date" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" required>
+                </div>
+            </div>
+            
+            <div class="flex items-center">
+                <input type="checkbox" id="experience-current" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded">
+                <label for="experience-current" class="ml-2 block text-sm text-gray-700">
+                    I currently work here
+                </label>
+            </div>
+            
+            <div>
+                <label for="experience-description" class="block text-sm font-medium text-gray-700">Description</label>
+                <textarea id="experience-description" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm"></textarea>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Key Achievements</label>
+                <div id="achievements-container" class="mt-2 space-y-2"></div>
+                <div class="flex mt-2">
+                    <input type="text" id="achievement-input" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" placeholder="Add an achievement...">
+                    <button type="button" id="add-achievement-btn" class="ml-2 inline-flex items-center px-3 py-2 border border-transparent shadow-sm text-sm leading-4 font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                        <i data-lucide="plus" class="h-4 w-4"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <input type="hidden" id="experience-index" value="-1">
+            
+            <div class="mt-6 flex justify-end space-x-3">
+                <button type="button" id="experience-cancel" class="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Education modal (hidden by default) -->
+<div id="education-modal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Add Education</h3>
+        <form id="education-form" class="space-y-4">
+            <div>
+                <label for="education-institution" class="block text-sm font-medium text-gray-700">Institution</label>
+                <input type="text" id="education-institution" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" required>
+            </div>
+            
+            <div>
+                <label for="education-degree" class="block text-sm font-medium text-gray-700">Degree</label>
+                <input type="text" id="education-degree" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" required>
+            </div>
+            
+            <div>
+                <label for="education-field" class="block text-sm font-medium text-gray-700">Field of Study</label>
+                <input type="text" id="education-field" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" required>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="education-start-year" class="block text-sm font-medium text-gray-700">Start Year</label>
+                    <input type="number" id="education-start-year" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" min="1950" max="<%= new Date().getFullYear() %>" required>
+                </div>
+                
+                <div>
+                    <label for="education-end-year" class="block text-sm font-medium text-gray-700">End Year</label>
+                    <input type="number" id="education-end-year" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" min="1950" max="<%= new Date().getFullYear() + 10 %>" required>
+                </div>
+            </div>
+            
+            <div class="flex items-center">
+                <input type="checkbox" id="education-current" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded">
+                <label for="education-current" class="ml-2 block text-sm text-gray-700">
+                    I'm currently studying here
+                </label>
+            </div>
+            
+            <input type="hidden" id="education-index" value="-1">
+            
+            <div class="mt-6 flex justify-end space-x-3">
+                <button type="button" id="education-cancel" class="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Certification modal (hidden by default) -->
+<div id="certification-modal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Add Certification</h3>
+        <form id="certification-form" class="space-y-4">
+            <div>
+                <label for="certification-name" class="block text-sm font-medium text-gray-700">Certification Name</label>
+                <input type="text" id="certification-name" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" required>
+            </div>
+            
+            <div>
+                <label for="certification-issuer" class="block text-sm font-medium text-gray-700">Issuing Organization</label>
+                <input type="text" id="certification-issuer" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" required>
+            </div>
+            
+            <div>
+                <label for="certification-year" class="block text-sm font-medium text-gray-700">Issue Year</label>
+                <input type="number" id="certification-year" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" min="1950" max="<%= new Date().getFullYear() %>" required>
+            </div>
+            
+            <div>
+                <label for="certification-id" class="block text-sm font-medium text-gray-700">Credential ID</label>
+                <input type="text" id="certification-id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm">
+            </div>
+            
+            <input type="hidden" id="certification-index" value="-1">
+            
+            <div class="mt-6 flex justify-end space-x-3">
+                <button type="button" id="certification-cancel" class="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Cancel
+                </button>
+                <button type="submit" class="px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                    Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize modals
+        initSkillsManager();
+        initIndustriesManager();
+        initExperienceManager();
+        initEducationManager();
+        initCertificationManager();
+        
+        // File upload preview for profile photo
+        const photoUpload = document.getElementById('photo-upload');
+        if (photoUpload) {
+            photoUpload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        // Find the profile photo element
+                        const profilePhoto = document.querySelector('.h-32.w-32.rounded-full');
+                        if (profilePhoto.tagName === 'IMG') {
+                            // Update existing image
+                            profilePhoto.src = e.target.result;
+                        } else {
+                            // Replace div placeholder with image
+                            const parent = profilePhoto.parentNode;
+                            const newImg = document.createElement('img');
+                            newImg.src = e.target.result;
+                            newImg.className = 'h-32 w-32 rounded-full object-cover';
+                            newImg.alt = 'Profile Photo';
+                            parent.replaceChild(newImg, profilePhoto);
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+        
+        // Preview profile button
+        document.getElementById('previewProfileBtn').addEventListener('click', function() {
+            // Open profile preview in a new tab/window
+            window.open('/consultants/profile/preview', '_blank');
+        });
+        
+        // Skills management functions
+        function initSkillsManager() {
+            const skillInput = document.getElementById('skill-input');
+            const addSkillBtn = document.getElementById('add-skill-btn');
+            const skillsContainer = document.getElementById('skills-container');
+            const skillsDataContainer = document.getElementById('skills-data-container');
+            const skillModal = document.getElementById('skill-modal');
+            const modalSkillName = document.getElementById('modal-skill-name');
+            const modalSkillLevel = document.getElementById('modal-skill-level');
+            const modalSkillYears = document.getElementById('modal-skill-years');
+            const modalSkillFeatured = document.getElementById('modal-skill-featured');
+            const modalSave = document.getElementById('modal-save');
+            const modalCancel = document.getElementById('modal-cancel');
+            
+            let currentSkillElement = null;
+            let isEditing = false;
+            
+            // Add skill button click
+            addSkillBtn.addEventListener('click', function() {
+                const skillName = skillInput.value.trim();
+                if (skillName) {
+                    addSkill(skillName, 'intermediate', 1, false);
+                    skillInput.value = '';
+                }
+            });
+            
+            // Enter key in skill input
+            skillInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addSkillBtn.click();
+                }
+            });
+            
+            // Open modal for skill editing
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.edit-skill')) {
+                    const skillTag = e.target.closest('.skill-tag');
+                    currentSkillElement = skillTag;
+                    isEditing = true;
+                    
+                    // Populate modal with skill data
+                    modalSkillName.value = skillTag.getAttribute('data-name');
+                    modalSkillLevel.value = skillTag.getAttribute('data-level');
+                    modalSkillYears.value = skillTag.getAttribute('data-years');
+                    modalSkillFeatured.checked = skillTag.getAttribute('data-featured') === 'true';
+                    
+                    // Show modal
+                    skillModal.classList.remove('hidden');
+                }
+                
+                if (e.target.closest('.remove-skill')) {
+                    const skillTag = e.target.closest('.skill-tag');
+                    skillTag.remove();
+                    updateSkillsData();
+                }
+            });
+            
+            // Close modal without saving
+            modalCancel.addEventListener('click', function() {
+                skillModal.classList.add('hidden');
+                currentSkillElement = null;
+                isEditing = false;
+            });
+            
+            // Save skill from modal
+            modalSave.addEventListener('click', function() {
+                const name = modalSkillName.value.trim();
+                const level = modalSkillLevel.value;
+                const years = modalSkillYears.value;
+                const featured = modalSkillFeatured.checked;
+                
+                if (name) {
+                    if (isEditing && currentSkillElement) {
+                        // Update existing skill
+                        currentSkillElement.setAttribute('data-name', name);
+                        currentSkillElement.setAttribute('data-level', level);
+                        currentSkillElement.setAttribute('data-years', years);
+                        currentSkillElement.setAttribute('data-featured', featured);
+                        currentSkillElement.childNodes[0].nodeValue = name;
+                    } else {
+                        // Add new skill
+                        addSkill(name, level, years, featured);
+                    }
+                    
+                    // Update hidden inputs
+                    updateSkillsData();
+                    
+                    // Hide modal
+                    skillModal.classList.add('hidden');
+                    currentSkillElement = null;
+                    isEditing = false;
+                }
+            });
+            
+            // Function to add a new skill
+            function addSkill(name, level, years, featured) {
+                // Create skill tag element
+                const skillTag = document.createElement('div');
+                skillTag.className = 'skill-tag bg-primary-light text-dark px-3 py-1 rounded-full text-sm flex items-center';
+                skillTag.setAttribute('data-name', name);
+                skillTag.setAttribute('data-level', level);
+                skillTag.setAttribute('data-years', years);
+                skillTag.setAttribute('data-featured', featured);
+                skillTag.innerHTML = `
+                    ${name}
+                    <button type="button" class="ml-2 text-dark hover:text-dark focus:outline-none edit-skill">
+                        <i data-lucide="pencil" class="h-3 w-3"></i>
+                    </button>
+                    <button type="button" class="ml-1 text-dark hover:text-dark focus:outline-none remove-skill">
+                        <i data-lucide="x" class="h-4 w-4"></i>
+                    </button>
+                `;
+                
+                // Add to container
+                skillsContainer.appendChild(skillTag);
+                
+                // Re-initialize Lucide icons
+                lucide.createIcons();
+                
+                // Update hidden inputs
+                updateSkillsData();
+            }
+            
+            // Function to update hidden inputs for skills
+            function updateSkillsData() {
+                // Clear existing inputs
+                skillsDataContainer.innerHTML = '';
+                
+                // Get all skill tags
+                const skillTags = skillsContainer.querySelectorAll('.skill-tag');
+                
+                // Create hidden inputs for each skill
+                skillTags.forEach((tag, index) => {
+                    const name = tag.getAttribute('data-name');
+                    const level = tag.getAttribute('data-level');
+                    const years = tag.getAttribute('data-years');
+                    const featured = tag.getAttribute('data-featured');
+                    
+                    const nameInput = document.createElement('input');
+                    nameInput.type = 'hidden';
+                    nameInput.name = `expertise[skills][${index}][name]`;
+                    nameInput.value = name;
+                    
+                    const levelInput = document.createElement('input');
+                    levelInput.type = 'hidden';
+                    levelInput.name = `expertise[skills][${index}][level]`;
+                    levelInput.value = level;
+                    
+                    const yearsInput = document.createElement('input');
+                    yearsInput.type = 'hidden';
+                    yearsInput.name = `expertise[skills][${index}][yearsOfExperience]`;
+                    yearsInput.value = years;
+                    
+                    const featuredInput = document.createElement('input');
+                    featuredInput.type = 'hidden';
+                    featuredInput.name = `expertise[skills][${index}][featured]`;
+                    featuredInput.value = featured;
+                    
+                    skillsDataContainer.appendChild(nameInput);
+                    skillsDataContainer.appendChild(levelInput);
+                    skillsDataContainer.appendChild(yearsInput);
+                    skillsDataContainer.appendChild(featuredInput);
+                });
+            }
+        }
+        
+        // Industries management functions
+        function initIndustriesManager() {
+            const industrySelect = document.getElementById('industry-select');
+            const addIndustryBtn = document.getElementById('add-industry-btn');
+            const industriesContainer = document.getElementById('industries-container');
+            
+            // Add industry button click
+            addIndustryBtn.addEventListener('click', function() {
+                const industryName = industrySelect.value;
+                if (industryName) {
+                    // Check if industry already exists
+                    const existingIndustries = Array.from(industriesContainer.querySelectorAll('input[type="hidden"]')).map(input => input.value);
+                    if (!existingIndustries.includes(industryName)) {
+                        addIndustry(industryName);
+                    }
+                    industrySelect.value = '';
+                }
+            });
+            
+            // Remove industry click
+            industriesContainer.addEventListener('click', function(e) {
+                if (e.target.closest('.remove-industry')) {
+                    e.target.closest('.industry-tag').remove();
+                }
+            });
+            
+            // Function to add a new industry
+            function addIndustry(name) {
+                // Create industry tag element
+                const industryTag = document.createElement('div');
+                industryTag.className = 'industry-tag bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm flex items-center';
+                industryTag.innerHTML = `
+                    ${name}
+                    <button type="button" class="ml-2 text-gray-500 hover:text-gray-700 focus:outline-none remove-industry">
+                        <i data-lucide="x" class="h-4 w-4"></i>
+                    </button>
+                    <input type="hidden" name="expertise[industries][]" value="${name}">
+                `;
+                
+                // Add to container
+                industriesContainer.appendChild(industryTag);
+                
+                // Re-initialize Lucide icons
+                lucide.createIcons();
+            }
+        }
+        
+        // Experience management functions
+        function initExperienceManager() {
+            const addExperienceBtn = document.getElementById('add-experience-btn');
+            const experienceModal = document.getElementById('experience-modal');
+            const experienceForm = document.getElementById('experience-form');
+            const experienceCancel = document.getElementById('experience-cancel');
+            const experienceContainer = document.getElementById('experience-container');
+            const experienceIndex = document.getElementById('experience-index');
+            const experienceCurrent = document.getElementById('experience-current');
+            const experienceEndDate = document.getElementById('experience-end-date');
+            
+            // Add achievements
+            const achievementInput = document.getElementById('achievement-input');
+            const addAchievementBtn = document.getElementById('add-achievement-btn');
+            const achievementsContainer = document.getElementById('achievements-container');
+            let achievements = [];
+            
+            // "Current" checkbox changes end date visibility
+            experienceCurrent.addEventListener('change', function() {
+                experienceEndDate.disabled = experienceCurrent.checked;
+                if (experienceCurrent.checked) {
+                    experienceEndDate.value = '';
+                }
+            });
+            
+            // Add experience button click
+            addExperienceBtn.addEventListener('click', function() {
+                // Reset form
+                experienceForm.reset();
+                experienceIndex.value = '-1';
+                achievements = [];
+                achievementsContainer.innerHTML = '';
+                experienceEndDate.disabled = false;
+                
+                // Show modal
+                experienceModal.classList.remove('hidden');
+            });
+            
+            // Cancel button click
+            experienceCancel.addEventListener('click', function() {
+                experienceModal.classList.add('hidden');
+            });
+            
+            // Add achievement button click
+            addAchievementBtn.addEventListener('click', function() {
+                const achievement = achievementInput.value.trim();
+                if (achievement) {
+                    addAchievement(achievement);
+                    achievementInput.value = '';
+                }
+            });
+            
+            // Enter key in achievement input
+            achievementInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addAchievementBtn.click();
+                }
+            });
+            
+            // Function to add achievement
+            function addAchievement(text) {
+                achievements.push(text);
+                
+                // Create achievement element
+                const achievementEl = document.createElement('div');
+                achievementEl.className = 'flex items-center';
+                achievementEl.innerHTML = `
+                    <span class="flex-grow text-sm">${text}</span>
+                    <button type="button" class="text-gray-400 hover:text-gray-500 ml-2 remove-achievement" data-index="${achievements.length - 1}">
+                        <i data-lucide="x" class="h-4 w-4"></i>
+                    </button>
+                `;
+                
+                // Add to container
+                achievementsContainer.appendChild(achievementEl);
+                
+                // Re-initialize Lucide icons
+                lucide.createIcons();
+            }
+            
+            // Remove achievement click
+            achievementsContainer.addEventListener('click', function(e) {
+                if (e.target.closest('.remove-achievement')) {
+                    const index = parseInt(e.target.closest('.remove-achievement').getAttribute('data-index'));
+                    achievements.splice(index, 1);
+                    e.target.closest('.flex').remove();
+                    
+                    // Update data-index attributes
+                    const removeButtons = achievementsContainer.querySelectorAll('.remove-achievement');
+                    removeButtons.forEach((btn, i) => {
+                        btn.setAttribute('data-index', i);
+                    });
+                }
+            });
+            
+            // Edit experience click
+            experienceContainer.addEventListener('click', function(e) {
+                if (e.target.closest('.edit-experience')) {
+                    const experienceItem = e.target.closest('.experience-item');
+                    const index = experienceItem.getAttribute('data-index');
+                    experienceIndex.value = index;
+                    
+                    // Get experience data
+                    const companyInput = experienceItem.querySelector('input[name^="workExperience"][name$="[company]"]');
+                    const positionInput = experienceItem.querySelector('input[name^="workExperience"][name$="[position]"]');
+                    const locationInput = experienceItem.querySelector('input[name^="workExperience"][name$="[location]"]');
+                    const startDateInput = experienceItem.querySelector('input[name^="workExperience"][name$="[startDate]"]');
+                    const endDateInput = experienceItem.querySelector('input[name^="workExperience"][name$="[endDate]"]');
+                    const currentInput = experienceItem.querySelector('input[name^="workExperience"][name$="[current]"]');
+                    const descriptionInput = experienceItem.querySelector('input[name^="workExperience"][name$="[description]"]');
+                    
+                    // Set form values
+                    document.getElementById('experience-company').value = companyInput.value;
+                    document.getElementById('experience-position').value = positionInput.value;
+                    document.getElementById('experience-location').value = locationInput.value;
+                    
+                    // Format date inputs (YYYY-MM from full date)
+                    const startDate = new Date(startDateInput.value);
+                    document.getElementById('experience-start-date').value = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}`;
+                    
+                    const isCurrent = currentInput.value === 'true';
+                    experienceCurrent.checked = isCurrent;
+                    experienceEndDate.disabled = isCurrent;
+                    
+                    if (!isCurrent) {
+                        const endDate = new Date(endDateInput.value);
+                        document.getElementById('experience-end-date').value = `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}`;
+                    } else {
+                        document.getElementById('experience-end-date').value = '';
+                    }
+                    
+                    document.getElementById('experience-description').value = descriptionInput.value;
+                    
+                    // Get achievements
+                    achievements = [];
+                    achievementsContainer.innerHTML = '';
+                    const achievementInputs = experienceItem.querySelectorAll('input[name^="workExperience"][name$="]"]');
+                    achievementInputs.forEach((input) => {
+                        if (input.name.includes('achievements')) {
+                            addAchievement(input.value);
+                        }
+                    });
+                    
+                    // Show modal
+                    experienceModal.classList.remove('hidden');
+                }
+                
+                if (e.target.closest('.remove-experience')) {
+                    e.target.closest('.experience-item').remove();
+                }
+            });
+            
+            // Form submission
+            experienceForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get form values
+                const company = document.getElementById('experience-company').value;
+                const position = document.getElementById('experience-position').value;
+                const location = document.getElementById('experience-location').value;
+                const startDate = document.getElementById('experience-start-date').value;
+                const endDate = document.getElementById('experience-end-date').value;
+                const current = experienceCurrent.checked;
+                const description = document.getElementById('experience-description').value;
+                
+                // Validate
+                if (!company || !position || !startDate || (!endDate && !current)) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                
+                // Format dates
+                const formattedStartDate = new Date(startDate);
+                let formattedEndDate = null;
+                if (!current) {
+                    formattedEndDate = new Date(endDate);
+                }
+                
+                // Get index (for editing)
+                const index = experienceIndex.value;
+                const isEditing = index !== '-1';
+                const newIndex = isEditing ? parseInt(index) : document.querySelectorAll('.experience-item').length;
+                
+                // Create experience item HTML
+                const experienceHTML = `
+                    <div class="experience-item border border-gray-200 rounded-md p-4" data-index="${newIndex}">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-base font-medium text-gray-900">${position}</h3>
+                                <p class="text-sm text-gray-600">${company}</p>
+                                <p class="text-sm text-gray-500">
+                                    ${formattedStartDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short' })} - 
+                                    ${current ? 'Present' : formattedEndDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}
+                                </p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button type="button" class="text-gray-400 hover:text-gray-500 edit-experience">
+                                    <i data-lucide="edit-2" class="h-5 w-5"></i>
+                                </button>
+                                <button type="button" class="text-gray-400 hover:text-red-500 remove-experience">
+                                    <i data-lucide="trash-2" class="h-5 w-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden fields for the form submission -->
+                        <input type="hidden" name="workExperience[${newIndex}][company]" value="${company}">
+                        <input type="hidden" name="workExperience[${newIndex}][position]" value="${position}">
+                        <input type="hidden" name="workExperience[${newIndex}][location]" value="${location}">
+                        <input type="hidden" name="workExperience[${newIndex}][startDate]" value="${formattedStartDate.toISOString()}">
+                        <input type="hidden" name="workExperience[${newIndex}][endDate]" value="${current ? '' : formattedEndDate.toISOString()}">
+                        <input type="hidden" name="workExperience[${newIndex}][current]" value="${current}">
+                        <input type="hidden" name="workExperience[${newIndex}][description]" value="${description}">
+                        
+                        ${achievements.map((achievement, i) => `
+                            <input type="hidden" name="workExperience[${newIndex}][achievements][${i}]" value="${achievement}">
+                        `).join('')}
+                    </div>
+                `;
+                
+                // Update or add experience item
+                if (isEditing) {
+                    const oldItem = document.querySelector(`.experience-item[data-index="${index}"]`);
+                    oldItem.outerHTML = experienceHTML;
+                } else {
+                    // Check if there's a placeholder and remove it
+                    const placeholder = experienceContainer.querySelector('.text-center.py-6');
+                    if (placeholder) {
+                        placeholder.remove();
+                    }
+                    
+                    experienceContainer.insertAdjacentHTML('beforeend', experienceHTML);
+                }
+                
+                // Re-initialize Lucide icons
+                lucide.createIcons();
+                
+                // Close modal
+                experienceModal.classList.add('hidden');
+            });
+        }
+        
+        // Education management functions
+        function initEducationManager() {
+            const addEducationBtn = document.getElementById('add-education-btn');
+            const educationModal = document.getElementById('education-modal');
+            const educationForm = document.getElementById('education-form');
+            const educationCancel = document.getElementById('education-cancel');
+            const educationContainer = document.getElementById('education-container');
+            const educationIndex = document.getElementById('education-index');
+            const educationCurrent = document.getElementById('education-current');
+            const educationEndYear = document.getElementById('education-end-year');
+            
+            // "Current" checkbox changes end year visibility
+            educationCurrent.addEventListener('change', function() {
+                educationEndYear.disabled = educationCurrent.checked;
+                if (educationCurrent.checked) {
+                    educationEndYear.value = '';
+                }
+            });
+            
+            // Add education button click
+            addEducationBtn.addEventListener('click', function() {
+                // Reset form
+                educationForm.reset();
+                educationIndex.value = '-1';
+                educationEndYear.disabled = false;
+                
+                // Show modal
+                educationModal.classList.remove('hidden');
+            });
+            
+            // Cancel button click
+            educationCancel.addEventListener('click', function() {
+                educationModal.classList.add('hidden');
+            });
+            
+            // Edit education click
+            educationContainer.addEventListener('click', function(e) {
+                if (e.target.closest('.edit-education')) {
+                    const educationItem = e.target.closest('.education-item');
+                    const index = educationItem.getAttribute('data-index');
+                    educationIndex.value = index;
+                    
+                    // Get education data
+                    const institutionInput = educationItem.querySelector('input[name$="[institution]"]');
+                    const degreeInput = educationItem.querySelector('input[name$="[degree]"]');
+                    const fieldInput = educationItem.querySelector('input[name$="[field]"]');
+                    const startYearInput = educationItem.querySelector('input[name$="[startYear]"]');
+                    const endYearInput = educationItem.querySelector('input[name$="[endYear]"]');
+                    const currentInput = educationItem.querySelector('input[name$="[current]"]');
+                    
+                    // Set form values
+                    document.getElementById('education-institution').value = institutionInput.value;
+                    document.getElementById('education-degree').value = degreeInput.value;
+                    document.getElementById('education-field').value = fieldInput.value;
+                    document.getElementById('education-start-year').value = startYearInput.value;
+                    
+                    const isCurrent = currentInput.value === 'true';
+                    educationCurrent.checked = isCurrent;
+                    educationEndYear.disabled = isCurrent;
+                    
+                    if (!isCurrent) {
+                        document.getElementById('education-end-year').value = endYearInput.value;
+                    } else {
+                        document.getElementById('education-end-year').value = '';
+                    }
+                    
+                    // Show modal
+                    educationModal.classList.remove('hidden');
+                }
+                
+                if (e.target.closest('.remove-education')) {
+                    e.target.closest('.education-item').remove();
+                }
+            });
+            
+            // Form submission
+            educationForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get form values
+                const institution = document.getElementById('education-institution').value;
+                const degree = document.getElementById('education-degree').value;
+                const field = document.getElementById('education-field').value;
+                const startYear = document.getElementById('education-start-year').value;
+                const endYear = document.getElementById('education-end-year').value;
+                const current = educationCurrent.checked;
+                
+                // Validate
+                if (!institution || !degree || !field || !startYear || (!endYear && !current)) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                
+                // Get index (for editing)
+                const index = educationIndex.value;
+                const isEditing = index !== '-1';
+                const newIndex = isEditing ? parseInt(index) : document.querySelectorAll('.education-item').length;
+                
+                // Create education item HTML
+                const educationHTML = `
+                    <div class="education-item border border-gray-200 rounded-md p-4" data-index="${newIndex}">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-base font-medium text-gray-900">${degree}</h3>
+                                <p class="text-sm text-gray-600">${institution}</p>
+                                <p class="text-sm text-gray-500">
+                                    ${field} • 
+                                    ${startYear} - ${current ? 'Present' : endYear}
+                                </p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button type="button" class="text-gray-400 hover:text-gray-500 edit-education">
+                                    <i data-lucide="edit-2" class="h-5 w-5"></i>
+                                </button>
+                                <button type="button" class="text-gray-400 hover:text-red-500 remove-education">
+                                    <i data-lucide="trash-2" class="h-5 w-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden fields for the form submission -->
+                        <input type="hidden" name="professional[education][${newIndex}][institution]" value="${institution}">
+                        <input type="hidden" name="professional[education][${newIndex}][degree]" value="${degree}">
+                        <input type="hidden" name="professional[education][${newIndex}][field]" value="${field}">
+                        <input type="hidden" name="professional[education][${newIndex}][startYear]" value="${startYear}">
+                        <input type="hidden" name="professional[education][${newIndex}][endYear]" value="${current ? '' : endYear}">
+                        <input type="hidden" name="professional[education][${newIndex}][current]" value="${current}">
+                    </div>
+                `;
+                
+                // Update or add education item
+                if (isEditing) {
+                    const oldItem = document.querySelector(`.education-item[data-index="${index}"]`);
+                    oldItem.outerHTML = educationHTML;
+                } else {
+                    // Check if there's a placeholder and remove it
+                    const placeholder = educationContainer.querySelector('.text-center.py-6');
+                    if (placeholder) {
+                        placeholder.remove();
+                    }
+                    
+                    educationContainer.insertAdjacentHTML('beforeend', educationHTML);
+                }
+                
+                // Re-initialize Lucide icons
+                lucide.createIcons();
+                
+                // Close modal
+                educationModal.classList.add('hidden');
+            });
+        }
+        
+        // Certification management functions
+        function initCertificationManager() {
+            const addCertificationBtn = document.getElementById('add-certification-btn');
+            const certificationModal = document.getElementById('certification-modal');
+            const certificationForm = document.getElementById('certification-form');
+            const certificationCancel = document.getElementById('certification-cancel');
+            const certificationContainer = document.getElementById('certification-container');
+            const certificationIndex = document.getElementById('certification-index');
+            
+            // Add certification button click
+            addCertificationBtn.addEventListener('click', function() {
+                // Reset form
+                certificationForm.reset();
+                certificationIndex.value = '-1';
+                
+                // Show modal
+                certificationModal.classList.remove('hidden');
+            });
+            
+            // Cancel button click
+            certificationCancel.addEventListener('click', function() {
+                certificationModal.classList.add('hidden');
+            });
+            
+            // Edit certification click
+            certificationContainer.addEventListener('click', function(e) {
+                if (e.target.closest('.edit-certification')) {
+                    const certificationItem = e.target.closest('.certification-item');
+                    const index = certificationItem.getAttribute('data-index');
+                    certificationIndex.value = index;
+                    
+                    // Get certification data
+                    const nameInput = certificationItem.querySelector('input[name$="[name]"]');
+                    const issuerInput = certificationItem.querySelector('input[name$="[issuer]"]');
+                    const yearInput = certificationItem.querySelector('input[name$="[year]"]');
+                    const idInput = certificationItem.querySelector('input[name$="[credentialId]"]');
+                    
+                    // Set form values
+                    document.getElementById('certification-name').value = nameInput.value;
+                    document.getElementById('certification-issuer').value = issuerInput.value;
+                    document.getElementById('certification-year').value = yearInput.value;
+                    document.getElementById('certification-id').value = idInput.value;
+                    
+                    // Show modal
+                    certificationModal.classList.remove('hidden');
+                }
+                
+                if (e.target.closest('.remove-certification')) {
+                    e.target.closest('.certification-item').remove();
+                }
+            });
+            
+            // Form submission
+            certificationForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get form values
+                const name = document.getElementById('certification-name').value;
+                const issuer = document.getElementById('certification-issuer').value;
+                const year = document.getElementById('certification-year').value;
+                const credentialId = document.getElementById('certification-id').value;
+                
+                // Validate
+                if (!name || !issuer || !year) {
+                    alert('Please fill in all required fields');
+                    return;
+                }
+                
+                // Get index (for editing)
+                const index = certificationIndex.value;
+                const isEditing = index !== '-1';
+                const newIndex = isEditing ? parseInt(index) : document.querySelectorAll('.certification-item').length;
+                
+                // Create certification item HTML
+                const certificationHTML = `
+                    <div class="certification-item border border-gray-200 rounded-md p-4" data-index="${newIndex}">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-base font-medium text-gray-900">${name}</h3>
+                                <p class="text-sm text-gray-600">${issuer}</p>
+                                <p class="text-sm text-gray-500">
+                                    Issued: ${year}
+                                    ${credentialId ? `• Credential ID: ${credentialId}` : ''}
+                                </p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button type="button" class="text-gray-400 hover:text-gray-500 edit-certification">
+                                    <i data-lucide="edit-2" class="h-5 w-5"></i>
+                                </button>
+                                <button type="button" class="text-gray-400 hover:text-red-500 remove-certification">
+                                    <i data-lucide="trash-2" class="h-5 w-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden fields for the form submission -->
+                        <input type="hidden" name="professional[certifications][${newIndex}][name]" value="${name}">
+                        <input type="hidden" name="professional[certifications][${newIndex}][issuer]" value="${issuer}">
+                        <input type="hidden" name="professional[certifications][${newIndex}][year]" value="${year}">
+                        <input type="hidden" name="professional[certifications][${newIndex}][credentialId]" value="${credentialId}">
+                    </div>
+                `;
+                
+                // Update or add certification item
+                if (isEditing) {
+                    const oldItem = document.querySelector(`.certification-item[data-index="${index}"]`);
+                    oldItem.outerHTML = certificationHTML;
+                } else {
+                    // Check if there's a placeholder and remove it
+                    const placeholder = certificationContainer.querySelector('.text-center.py-6');
+                    if (placeholder) {
+                        placeholder.remove();
+                    }
+                    
+                    certificationContainer.insertAdjacentHTML('beforeend', certificationHTML);
+                }
+                
+                // Re-initialize Lucide icons
+                lucide.createIcons();
+                
+                // Close modal
+                certificationModal.classList.add('hidden');
+            });
+        }
+    });
+</script>

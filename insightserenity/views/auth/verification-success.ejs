@@ -1,0 +1,40 @@
+<!-- views/auth/verification-success.ejs -->
+<% layout('layouts/auth') -%>
+<% block('title', 'Email Verified Successfully - InsightSerenity') -%>
+<div class="text-center py-4">
+    <div class="mb-6">
+        <div class="inline-flex items-center justify-center w-20 h-20 bg-green-500 rounded-full mb-4">
+            <i data-lucide="check" class="w-10 h-10 text-white"></i>
+        </div>
+        <h2 class="text-2xl font-bold mb-2">Email Verification Successful!</h2>
+        <p class="text-gray-600 mb-4">Thank you for verifying your email address. Your account is now active.</p>
+        <p class="text-gray-600">You can now log in and access all features of our platform.</p>
+    </div>
+
+    <div class="mt-8">
+        <a href="/api/auth/login" class="btn btn-primary px-5 py-2">Proceed to Login</a>
+        
+        <p class="text-sm text-gray-500 mt-4">
+            You will be automatically redirected to the login page in 
+            <span class="font-bold text-primary" id="countdown">10</span> seconds.
+        </p>
+    </div>
+</div>
+
+<script>
+    // Automatic redirect countdown
+    document.addEventListener('DOMContentLoaded', function() {
+        let secondsLeft = 10;
+        const countdownElement = document.getElementById('countdown');
+        
+        const countdownInterval = setInterval(() => {
+            secondsLeft--;
+            countdownElement.textContent = secondsLeft;
+            
+            if (secondsLeft <= 0) {
+                clearInterval(countdownInterval);
+                window.location.href = '/api/auth/login';
+            }
+        }, 1000);
+    });
+</script>

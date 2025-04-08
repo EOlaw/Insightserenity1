@@ -1,0 +1,420 @@
+<% layout('../layouts/auth') -%>
+<% block('title', 'Register - InsightSerenity') -%>
+
+<div class="text-center md:text-left">
+    <h1 class="text-2xl font-bold text-gray-800 mb-1">Create an Account</h1>
+    <p class="text-gray-600 mb-6">Join our platform to access all features</p>
+</div>
+
+<!-- Progress bar for multi-step form -->
+<div class="mb-8">
+    <div class="flex justify-between text-sm font-medium text-gray-500 mb-2">
+        <span class="step-indicator" data-step="1">Basic Info</span>
+        <span class="step-indicator" data-step="2">Profile</span>
+        <span class="step-indicator" data-step="3">Account Type</span>
+    </div>
+    <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div id="progress-bar" class="h-full bg-primary transition-all duration-300" style="width: 33.33%;"></div>
+    </div>
+</div>
+
+<!-- Registration Form -->
+<form action="/api/auth/register" method="POST" class="space-y-6" id="registrationForm" enctype="multipart/form-data">
+    <!-- Step 1: Basic Information -->
+    <div class="step" id="step1">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                <input type="text" id="firstName" name="firstName" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                    placeholder="Enter your first name">
+            </div>
+            
+            <div>
+                <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <input type="text" id="lastName" name="lastName" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                    placeholder="Enter your last name">
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i data-lucide="mail" class="h-5 w-5 text-gray-400"></i>
+                </div>
+                <input type="email" id="email" name="email" required
+                    class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                    placeholder="you@example.com">
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i data-lucide="lock" class="h-5 w-5 text-gray-400"></i>
+                </div>
+                <input type="password" id="password" name="password" required minlength="8"
+                    class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                    placeholder="Create a strong password">
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer" id="togglePassword">
+                    <i data-lucide="eye" class="h-5 w-5 text-gray-400"></i>
+                </div>
+            </div>
+            <div class="mt-2">
+                <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div id="passwordStrength" class="h-full bg-red-500 transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <p id="passwordFeedback" class="text-xs text-gray-500 mt-1">Password strength: too weak</p>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i data-lucide="check-circle" class="h-5 w-5 text-gray-400"></i>
+                </div>
+                <input type="password" id="confirmPassword" name="confirmPassword" required
+                    class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                    placeholder="Confirm your password">
+            </div>
+            <p id="passwordMatchFeedback" class="text-xs text-red-500 mt-1 hidden">Passwords do not match</p>
+        </div>
+        
+        <div class="mt-6 flex justify-end">
+            <button type="button" class="next-step px-6 py-2 bg-primary text-dark rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                Next <i data-lucide="chevron-right" class="inline h-4 w-4 ml-1"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Step 2: Profile Information -->
+    <div class="step hidden" id="step2">
+        <div class="mb-4">
+            <label for="phoneNumber" class="block text-sm font-medium text-gray-700 mb-1">Phone Number (Optional)</label>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i data-lucide="phone" class="h-5 w-5 text-gray-400"></i>
+                </div>
+                <input type="tel" id="phoneNumber" name="phoneNumber"
+                    class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                    placeholder="Enter your phone number">
+            </div>
+        </div>
+        
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Profile Picture (Optional)</label>
+            <div class="flex items-center">
+                <div id="avatarPreview" class="h-20 w-20 rounded-full bg-gray-200 flex items-center justify-center mr-4">
+                    <i data-lucide="user" class="h-10 w-10 text-gray-400"></i>
+                </div>
+                <div>
+                    <label for="profilePicture" class="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        <i data-lucide="upload-cloud" class="inline h-4 w-4 mr-1"></i> Upload Photo
+                    </label>
+                    <input id="profilePicture" name="profilePicture" type="file" accept="image/*" class="sr-only">
+                    <p class="mt-1 text-xs text-gray-500">JPG, PNG or GIF up to 5MB</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mb-4">
+            <label for="bio" class="block text-sm font-medium text-gray-700 mb-1">Short Bio (Optional)</label>
+            <textarea id="bio" name="bio" rows="3"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                placeholder="Tell us a bit about yourself"></textarea>
+        </div>
+        
+        <div class="mb-4">
+            <label for="country" class="block text-sm font-medium text-gray-700 mb-1">Country (Optional)</label>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i data-lucide="globe" class="h-5 w-5 text-gray-400"></i>
+                </div>
+                <select id="country" name="country"
+                    class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+                    <option value="">Select your country</option>
+                    <option value="US">United States</option>
+                    <option value="CA">Canada</option>
+                    <option value="UK">United Kingdom</option>
+                    <option value="AU">Australia</option>
+                    <!-- More countries would be added here -->
+                </select>
+            </div>
+        </div>
+        
+        <div class="mt-6 flex justify-between">
+            <button type="button" class="prev-step px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                <i data-lucide="chevron-left" class="inline h-4 w-4 mr-1"></i> Back
+            </button>
+            <button type="button" class="next-step px-6 py-2 bg-primary text-dark rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                Next <i data-lucide="chevron-right" class="inline h-4 w-4 ml-1"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Step 3: Account Type -->
+    <div class="step hidden" id="step3">
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-3">Select Account Type</label>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="relative">
+                    <input type="radio" name="role" id="clientRole" value="client" class="sr-only" checked>
+                    <label for="clientRole" class="cursor-pointer block p-4 border-2 rounded-lg hover:border-primary transition-colors">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-primary-light flex items-center justify-center">
+                                <i data-lucide="briefcase" class="h-5 w-5 text-dark"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="font-medium text-gray-900">Client</h3>
+                                <p class="text-sm text-gray-500">Hire experts and manage projects</p>
+                            </div>
+                        </div>
+                    </label>
+                    <div class="absolute top-2 right-2 h-5 w-5 text-primary client-check hidden">
+                        <i data-lucide="check-circle" class="h-5 w-5 fill-primary text-white"></i>
+                    </div>
+                </div>
+                
+                <div class="relative">
+                    <input type="radio" name="role" id="consultantRole" value="consultant" class="sr-only">
+                    <label for="consultantRole" class="cursor-pointer block p-4 border-2 rounded-lg hover:border-primary transition-colors">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10 rounded-full bg-primary-light flex items-center justify-center">
+                                <i data-lucide="award" class="h-5 w-5 text-dark"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="font-medium text-gray-900">Consultant</h3>
+                                <p class="text-sm text-gray-500">Offer your expertise and services</p>
+                            </div>
+                        </div>
+                    </label>
+                    <div class="absolute top-2 right-2 h-5 w-5 text-primary consultant-check hidden">
+                        <i data-lucide="check-circle" class="h-5 w-5 fill-primary text-white"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mb-4">
+            <div class="flex items-center">
+                <input type="checkbox" id="termsCheck" name="termsCheck" required
+                    class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                <label for="termsCheck" class="ml-2 block text-sm text-gray-700">
+                    I agree to the <a href="/terms" class="text-primary-dark hover:text-primary">Terms of Service</a> and <a href="/privacy" class="text-primary-dark hover:text-primary">Privacy Policy</a>
+                </label>
+            </div>
+        </div>
+        
+        <div class="mb-4">
+            <div class="flex items-center">
+                <input type="checkbox" id="marketingCheck" name="marketingCheck"
+                    class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                <label for="marketingCheck" class="ml-2 block text-sm text-gray-700">
+                    I'd like to receive updates about products, features, and more.
+                </label>
+            </div>
+        </div>
+        
+        <div class="mt-6 flex justify-between">
+            <button type="button" class="prev-step px-6 py-2 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                <i data-lucide="chevron-left" class="inline h-4 w-4 mr-1"></i> Back
+            </button>
+            <button type="submit" class="px-6 py-2 bg-primary text-dark rounded-md hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                Create Account <i data-lucide="check" class="inline h-4 w-4 ml-1"></i>
+            </button>
+        </div>
+    </div>
+</form>
+
+<div class="text-center mt-6">
+    <p class="text-sm text-gray-600">
+        Already have an account?
+        <a href="/auth/login" class="font-medium text-primary-dark hover:text-primary">
+            Sign in instead
+        </a>
+    </p>
+</div>
+
+<% block('additionalJS', `
+<script>
+    // Multi-step form handling
+    document.addEventListener('DOMContentLoaded', function() {
+        const steps = document.querySelectorAll('.step');
+        const nextButtons = document.querySelectorAll('.next-step');
+        const prevButtons = document.querySelectorAll('.prev-step');
+        const progressBar = document.getElementById('progress-bar');
+        const stepIndicators = document.querySelectorAll('.step-indicator');
+        let currentStep = 1;
+        
+        // Functions to navigate between steps
+        function showStep(stepNumber) {
+            steps.forEach((step, index) => {
+                if (index + 1 === stepNumber) {
+                    step.classList.remove('hidden');
+                } else {
+                    step.classList.add('hidden');
+                }
+            });
+            
+            // Update progress bar
+            progressBar.style.width = ((stepNumber / steps.length) * 100) + '%';
+            
+            // Update step indicators
+            stepIndicators.forEach((indicator, index) => {
+                if (index + 1 < stepNumber) {
+                    indicator.classList.add('text-primary', 'font-semibold');
+                } else if (index + 1 === stepNumber) {
+                    indicator.classList.add('text-primary', 'font-semibold');
+                } else {
+                    indicator.classList.remove('text-primary', 'font-semibold');
+                }
+            });
+            
+            currentStep = stepNumber;
+        }
+        
+        // Validate current step
+        function validateStep(step) {
+            if (step === 1) {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                const firstName = document.getElementById('firstName').value;
+                const lastName = document.getElementById('lastName').value;
+                
+                if (!firstName || !lastName || !email || !password || !confirmPassword) {
+                    alert('Please fill in all required fields');
+                    return false;
+                }
+                
+                if (password !== confirmPassword) {
+                    document.getElementById('passwordMatchFeedback').classList.remove('hidden');
+                    return false;
+                }
+                
+                document.getElementById('passwordMatchFeedback').classList.add('hidden');
+                return true;
+            }
+            
+            return true;
+        }
+        
+        // Event listeners for navigation buttons
+        nextButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                if (validateStep(currentStep)) {
+                    showStep(currentStep + 1);
+                }
+            });
+        });
+        
+        prevButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                showStep(currentStep - 1);
+            });
+        });
+        
+        // Account type selection
+        const clientRole = document.getElementById('clientRole');
+        const consultantRole = document.getElementById('consultantRole');
+        const clientCheck = document.querySelector('.client-check');
+        const consultantCheck = document.querySelector('.consultant-check');
+        
+        clientRole.addEventListener('change', function() {
+            if (this.checked) {
+                clientCheck.classList.remove('hidden');
+                consultantCheck.classList.add('hidden');
+            }
+        });
+        
+        consultantRole.addEventListener('change', function() {
+            if (this.checked) {
+                consultantCheck.classList.remove('hidden');
+                clientCheck.classList.add('hidden');
+            }
+        });
+        
+        // Initialize selected role
+        if (clientRole.checked) {
+            clientCheck.classList.remove('hidden');
+        } else if (consultantRole.checked) {
+            consultantCheck.classList.remove('hidden');
+        }
+        
+        // Password toggle visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                passwordInput.type = 'password';
+                icon.setAttribute('data-lucide', 'eye');
+            }
+            
+            lucide.createIcons();
+        });
+        
+        // Password strength meter
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthBar = document.getElementById('passwordStrength');
+            const feedback = document.getElementById('passwordFeedback');
+            
+            // Calculate strength score
+            let strength = 0;
+            
+            // Length
+            if (password.length >= 8) strength += 25;
+            
+            // Contains lowercase letters
+            if (/[a-z]/.test(password)) strength += 25;
+            
+            // Contains uppercase letters
+            if (/[A-Z]/.test(password)) strength += 25;
+            
+            // Contains numbers or special characters
+            if (/[0-9!@#$%^&*(),.?":{}|<>]/.test(password)) strength += 25;
+            
+            // Update strength bar
+            strengthBar.style.width = strength + '%';
+            
+            // Update color and feedback text
+            if (strength < 50) {
+                strengthBar.className = 'h-full bg-red-500 transition-all duration-300';
+                feedback.textContent = 'Password strength: too weak';
+            } else if (strength < 75) {
+                strengthBar.className = 'h-full bg-yellow-500 transition-all duration-300';
+                feedback.textContent = 'Password strength: medium';
+            } else {
+                strengthBar.className = 'h-full bg-green-500 transition-all duration-300';
+                feedback.textContent = 'Password strength: strong';
+            }
+        });
+        
+        // Profile picture preview
+        document.getElementById('profilePicture').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('avatarPreview');
+                    preview.innerHTML = '';
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'h-full w-full object-cover rounded-full';
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+</script>
+`) -%>

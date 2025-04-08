@@ -1,0 +1,560 @@
+<!-- views/clients/billing.ejs -->
+<% layout('layouts/dashboard') -%>
+<% block('title', 'Billing & Payments - InsightSerenity') -%>
+
+<div class="mb-6">
+  <h1 class="text-2xl font-bold mb-2">Billing & Payments</h1>
+  <p class="text-gray-600">Manage your payment methods and view billing history</p>
+</div>
+
+<% if (success && success.length > 0) { %>
+  <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-6">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-green-700"><%= success %></p>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<% if (error && error.length > 0) { %>
+  <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm text-red-700"><%= error %></p>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Left column: Payment Methods -->
+  <div class="lg:col-span-1">
+    <div class="card bg-white p-6 mb-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-800">Payment Methods</h2>
+        <button type="button" id="add-payment-btn" class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Add New
+        </button>
+      </div>
+      
+      <% if (paymentMethods && paymentMethods.length > 0) { %>
+        <div class="space-y-4">
+          <% paymentMethods.forEach((method, index) => { %>
+            <div class="border rounded-md p-4 <%= method.isDefault ? 'border-primary' : 'border-gray-200' %> relative">
+              <% if (method.isDefault) { %>
+                <span class="absolute top-2 right-2 px-2 py-1 bg-primary-light text-dark text-xs font-medium rounded-full">Default</span>
+              <% } %>
+              
+              <div class="flex items-center mb-2">
+                <% if (method.type === 'credit_card') { %>
+                  <% if (method.cardType === 'visa') { %>
+                    <div class="w-10 h-6 mr-3 bg-blue-600 rounded px-1 flex items-center">
+                      <span class="text-white font-bold text-xs">VISA</span>
+                    </div>
+                  <% } else if (method.cardType === 'mastercard') { %>
+                    <div class="w-10 h-6 mr-3 bg-red-500 rounded px-1 flex items-center">
+                      <span class="text-white font-bold text-xs">MC</span>
+                    </div>
+                  <% } else if (method.cardType === 'amex') { %>
+                    <div class="w-10 h-6 mr-3 bg-blue-400 rounded px-1 flex items-center">
+                      <span class="text-white font-bold text-xs">AMEX</span>
+                    </div>
+                  <% } else { %>
+                    <div class="w-10 h-6 mr-3 bg-gray-600 rounded px-1 flex items-center">
+                      <span class="text-white font-bold text-xs">CARD</span>
+                    </div>
+                  <% } %>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900">•••• •••• •••• <%= method.lastFour %></p>
+                    <p class="text-xs text-gray-500">Expires <%= method.expiryDate %></p>
+                  </div>
+                <% } else if (method.type === 'bank_transfer') { %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                  </svg>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900">Bank Account</p>
+                    <p class="text-xs text-gray-500">•••• <%= method.lastFour %></p>
+                  </div>
+                <% } else if (method.type === 'paypal') { %>
+                  <div class="w-10 h-6 mr-3 bg-blue-500 rounded px-1 flex items-center">
+                    <span class="text-white font-bold text-xs">PayPal</span>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900">PayPal Account</p>
+                    <p class="text-xs text-gray-500"><%= method.billingName %></p>
+                  </div>
+                <% } %>
+              </div>
+              
+              <div class="flex justify-end space-x-2 mt-2">
+                <% if (!method.isDefault) { %>
+                  <form action="/api/billing/payment-methods/set-default" method="POST" class="inline">
+                    <input type="hidden" name="methodId" value="<%= method._id %>">
+                    <button type="submit" class="text-xs text-primary hover:text-primary-dark">
+                      Set as Default
+                    </button>
+                  </form>
+                <% } %>
+                <button type="button" class="text-xs text-gray-600 hover:text-gray-800" data-modal-target="edit-payment-modal" data-payment-id="<%= method._id %>">
+                  Edit
+                </button>
+                <button type="button" class="text-xs text-red-600 hover:text-red-800" data-modal-target="delete-payment-modal" data-payment-id="<%= method._id %>">
+                  Remove
+                </button>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="text-center py-6">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+          </svg>
+          <h3 class="text-base font-medium text-gray-900 mb-1">No payment methods</h3>
+          <p class="text-sm text-gray-500 mb-4">Add a payment method to pay for projects</p>
+          <button type="button" id="no-payment-methods-btn" class="inline-flex items-center px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            Add Payment Method
+          </button>
+        </div>
+      <% } %>
+    </div>
+    
+    <div class="card bg-white p-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">Billing Details</h2>
+      
+      <form action="/api/users/client" method="POST" id="billing-form">
+        <input type="hidden" name="_method" value="PUT">
+        
+        <div class="space-y-4">
+          <div class="mb-4">
+            <label for="billing-name" class="block text-sm font-medium text-gray-700 mb-1">Billing Name</label>
+            <input type="text" id="billing-name" name="billing.name" value="<%= profile.billing?.name || '' %>" 
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+          </div>
+          
+          <div class="mb-4">
+            <label for="billing-street" class="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+            <input type="text" id="billing-street" name="billing.address.street" value="<%= profile.billing?.address?.street || '' %>" 
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label for="billing-city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
+              <input type="text" id="billing-city" name="billing.address.city" value="<%= profile.billing?.address?.city || '' %>" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+            </div>
+            <div>
+              <label for="billing-state" class="block text-sm font-medium text-gray-700 mb-1">State/Province</label>
+              <input type="text" id="billing-state" name="billing.address.state" value="<%= profile.billing?.address?.state || '' %>" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label for="billing-zip" class="block text-sm font-medium text-gray-700 mb-1">ZIP/Postal Code</label>
+              <input type="text" id="billing-zip" name="billing.address.zipCode" value="<%= profile.billing?.address?.zipCode || '' %>" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+            </div>
+            <div>
+              <label for="billing-country" class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+              <input type="text" id="billing-country" name="billing.address.country" value="<%= profile.billing?.address?.country || '' %>" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+            </div>
+          </div>
+          
+          <div class="mb-4">
+            <label for="billing-taxid" class="block text-sm font-medium text-gray-700 mb-1">Tax ID (Optional)</label>
+            <input type="text" id="billing-taxid" name="billing.taxId" value="<%= profile.billing?.taxId || '' %>" 
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+          </div>
+        </div>
+        
+        <div class="mt-6">
+          <button type="submit" class="w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            Save Billing Details
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Right column: Billing History -->
+  <div class="lg:col-span-2">
+    <div class="card bg-white p-6 mb-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">Billing Summary</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <div class="text-lg font-semibold text-gray-900">$0.00</div>
+          <div class="text-sm text-gray-600">Current Balance</div>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <div class="text-lg font-semibold text-gray-900">$0.00</div>
+          <div class="text-sm text-gray-600">Pending</div>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <div class="text-lg font-semibold text-gray-900">$0.00</div>
+          <div class="text-sm text-gray-600">Total Paid</div>
+        </div>
+      </div>
+      
+      <div class="mb-4">
+        <h3 class="font-medium text-gray-700 mb-2">Account Standing</h3>
+        <div class="flex items-center">
+          <div class="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
+          <span class="text-sm text-gray-600">Your account is in good standing</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card bg-white p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-800">Billing History</h2>
+        <button type="button" class="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Export CSV
+        </button>
+      </div>
+      
+      <div class="mb-4">
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <input type="text" id="search-history" placeholder="Search invoices..." class="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+        </div>
+      </div>
+      
+      <% if (billingHistory && billingHistory.length > 0) { %>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice #</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <% billingHistory.forEach(invoice => { %>
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= invoice.number %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= new Date(invoice.date).toLocaleDateString() %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= invoice.project ? invoice.project.title : 'N/A' %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$<%= invoice.amount.toFixed(2) %></td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <% if (invoice.status === 'paid') { %>
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Paid</span>
+                    <% } else if (invoice.status === 'pending') { %>
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+                    <% } else if (invoice.status === 'overdue') { %>
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Overdue</span>
+                    <% } else if (invoice.status === 'cancelled') { %>
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Cancelled</span>
+                    <% } %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <a href="/api/billing/invoices/<%= invoice._id %>" class="text-primary hover:text-primary-dark">View</a>
+                    <% if (invoice.status === 'pending' || invoice.status === 'overdue') { %>
+                      <a href="/api/billing/pay/<%= invoice._id %>" class="ml-3 text-primary hover:text-primary-dark">Pay</a>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } else { %>
+        <div class="text-center py-8">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z" />
+          </svg>
+          <h3 class="text-base font-medium text-gray-900 mb-1">No billing history</h3>
+          <p class="text-sm text-gray-500">Your billing history will appear here once you start paying for projects</p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<!-- Add Payment Method Modal -->
+<div id="add-payment-modal" class="fixed inset-0 hidden overflow-y-auto z-50">
+  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    </div>
+
+    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+      <form action="/api/billing/payment-methods" method="POST" id="add-payment-form">
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+              <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                Add Payment Method
+              </h3>
+              <div class="mt-4">
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Payment Type</label>
+                  <div class="flex space-x-4">
+                    <div class="flex items-center">
+                      <input id="payment-type-card" name="type" type="radio" value="credit_card" checked class="h-4 w-4 text-primary focus:ring-primary border-gray-300">
+                      <label for="payment-type-card" class="ml-2 block text-sm text-gray-700">Credit/Debit Card</label>
+                    </div>
+                    <div class="flex items-center">
+                      <input id="payment-type-paypal" name="type" type="radio" value="paypal" class="h-4 w-4 text-primary focus:ring-primary border-gray-300">
+                      <label for="payment-type-paypal" class="ml-2 block text-sm text-gray-700">PayPal</label>
+                    </div>
+                  </div>
+                </div>
+                
+                <div id="card-payment-fields">
+                  <div class="mb-4">
+                    <label for="card-number" class="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+                    <input type="text" id="card-number" name="cardNumber" placeholder="4242 4242 4242 4242" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+                  </div>
+                  
+                  <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label for="card-expiry" class="block text-sm font-medium text-gray-700 mb-1">Expiration Date</label>
+                      <input type="text" id="card-expiry" name="cardExpiry" placeholder="MM/YY" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+                    </div>
+                    <div>
+                      <label for="card-cvc" class="block text-sm font-medium text-gray-700 mb-1">CVC</label>
+                      <input type="text" id="card-cvc" name="cardCvc" placeholder="123" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+                    </div>
+                  </div>
+                  
+                  <div class="mb-4">
+                    <label for="card-name" class="block text-sm font-medium text-gray-700 mb-1">Name on Card</label>
+                    <input type="text" id="card-name" name="cardName" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+                  </div>
+                </div>
+                
+                <div id="paypal-payment-fields" class="hidden">
+                  <p class="text-sm text-gray-600 mb-4">You will be redirected to PayPal to complete the setup.</p>
+                </div>
+                
+                <div class="flex items-center mb-4">
+                  <input id="set-default" name="setDefault" type="checkbox" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+                  <label for="set-default" class="ml-2 block text-sm text-gray-700">
+                    Set as default payment method
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-base font-medium text-dark hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:ml-3 sm:w-auto sm:text-sm">
+            Add Payment Method
+          </button>
+          <button type="button" data-modal-close class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Payment Method Modal -->
+<div id="delete-payment-modal" class="fixed inset-0 hidden overflow-y-auto z-50">
+  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    </div>
+
+    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+      <form id="delete-payment-form" action="/api/billing/payment-methods/" method="POST">
+        <input type="hidden" name="_method" value="DELETE">
+        <input type="hidden" id="delete-payment-id" name="methodId" value="">
+        
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+              <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                Delete Payment Method
+              </h3>
+              <div class="mt-2">
+                <p class="text-sm text-gray-500">
+                  Are you sure you want to remove this payment method? This action cannot be undone.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+            Delete
+          </button>
+          <button type="button" data-modal-close class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<% block('additionalJS', `
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Payment type toggle
+    const paymentTypeRadios = document.querySelectorAll('input[name="type"]');
+    const cardFields = document.getElementById('card-payment-fields');
+    const paypalFields = document.getElementById('paypal-payment-fields');
+    
+    paymentTypeRadios.forEach(radio => {
+      radio.addEventListener('change', function() {
+        if (this.value === 'credit_card') {
+          cardFields.classList.remove('hidden');
+          paypalFields.classList.add('hidden');
+        } else if (this.value === 'paypal') {
+          cardFields.classList.add('hidden');
+          paypalFields.classList.remove('hidden');
+        }
+      });
+    });
+    
+    // Modal handling
+    const addPaymentBtns = document.querySelectorAll('#add-payment-btn, #no-payment-methods-btn');
+    const addPaymentModal = document.getElementById('add-payment-modal');
+    const deletePaymentModal = document.getElementById('delete-payment-modal');
+    const modalCloses = document.querySelectorAll('[data-modal-close]');
+    
+    addPaymentBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        addPaymentModal.classList.remove('hidden');
+      });
+    });
+    
+    // Delete payment method handling
+    const deleteButtons = document.querySelectorAll('[data-modal-target="delete-payment-modal"]');
+    const deleteForm = document.getElementById('delete-payment-form');
+    const deletePaymentIdInput = document.getElementById('delete-payment-id');
+    
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const paymentId = this.getAttribute('data-payment-id');
+        deletePaymentIdInput.value = paymentId;
+        deletePaymentModal.classList.remove('hidden');
+      });
+    });
+    
+    modalCloses.forEach(close => {
+      close.addEventListener('click', function() {
+        const modal = this.closest('[id$="-modal"]');
+        modal.classList.add('hidden');
+      });
+    });
+    
+    // Close modals when clicking outside
+    document.addEventListener('click', function(event) {
+      if (event.target.classList.contains('fixed') && event.target.classList.contains('inset-0')) {
+        event.target.classList.add('hidden');
+      }
+    });
+    
+    // Credit card formatting
+    const cardNumberInput = document.getElementById('card-number');
+    if (cardNumberInput) {
+      cardNumberInput.addEventListener('input', function(e) {
+        let value = this.value.replace(/\\D/g, '');
+        if (value.length > 16) {
+          value = value.slice(0, 16);
+        }
+        
+        // Add spaces every 4 digits
+        let formattedValue = '';
+        for (let i = 0; i < value.length; i++) {
+          if (i > 0 && i % 4 === 0) {
+            formattedValue += ' ';
+          }
+          formattedValue += value[i];
+        }
+        
+        this.value = formattedValue;
+      });
+    }
+    
+    // Expiry date formatting
+    const expiryInput = document.getElementById('card-expiry');
+    if (expiryInput) {
+      expiryInput.addEventListener('input', function(e) {
+        let value = this.value.replace(/\\D/g, '');
+        if (value.length > 4) {
+          value = value.slice(0, 4);
+        }
+        
+        // Format as MM/YY
+        if (value.length > 2) {
+          this.value = value.slice(0, 2) + '/' + value.slice(2);
+        } else {
+          this.value = value;
+        }
+      });
+    }
+    
+    // CVC formatting
+    const cvcInput = document.getElementById('card-cvc');
+    if (cvcInput) {
+      cvcInput.addEventListener('input', function(e) {
+        let value = this.value.replace(/\\D/g, '');
+        if (value.length > 4) {
+          value = value.slice(0, 4);
+        }
+        this.value = value;
+      });
+    }
+    
+    // Search billing history
+    const searchInput = document.getElementById('search-history');
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        const tableRows = document.querySelectorAll('tbody tr');
+        
+        tableRows.forEach(row => {
+          const invoiceNumber = row.querySelector('td:first-child').textContent.toLowerCase();
+          const project = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+          
+          if (invoiceNumber.includes(searchTerm) || project.includes(searchTerm)) {
+            row.classList.remove('hidden');
+          } else {
+            row.classList.add('hidden');
+          }
+        });
+      });
+    }
+  });
+</script>
+`) -%>

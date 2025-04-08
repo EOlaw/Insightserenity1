@@ -1,0 +1,454 @@
+<% layout('layouts/auth') -%>
+<% block('title', 'Register as Consultant - InsightSerenity') -%>
+
+<div class="text-center md:text-left">
+    <h1 class="text-2xl font-bold text-gray-800 mb-1">Join Our Consultant Network</h1>
+    <p class="text-gray-600 mb-6">Create your professional profile and connect with clients</p>
+</div>
+
+<!-- Registration Form -->
+<form action="/api/auth/register/consultant" method="POST" class="space-y-4">
+    <!-- Registration Method Toggle -->
+    <div class="mb-6">
+        <div class="flex justify-center space-x-4 bg-gray-100 p-2 rounded-md">
+            <label class="inline-flex items-center cursor-pointer">
+                <input type="radio" name="registrationType" value="direct" class="hidden peer/direct" checked>
+                <span class="py-2 px-4 rounded-md peer-checked/direct:bg-white peer-checked/direct:shadow-sm">Direct Registration</span>
+            </label>
+            <label class="inline-flex items-center cursor-pointer">
+                <input type="radio" name="registrationType" value="api" class="hidden peer/api">
+                <span class="py-2 px-4 rounded-md peer-checked/api:bg-white peer-checked/api:shadow-sm">API Integration</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Direct Registration Fields -->
+    <div id="directRegistrationForm" class="space-y-6">
+        <!-- Personal Information Section -->
+        <div class="space-y-4 mb-6">
+            <h2 class="text-lg font-semibold text-gray-700 border-b pb-2">Personal Information</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- First Name -->
+                <div>
+                    <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="user" class="h-5 w-5 text-gray-400"></i>
+                        </div>
+                        <input type="text" id="firstName" name="firstName" required
+                            class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                            placeholder="Your first name"
+                            value="<%= typeof formData !== 'undefined' && formData.firstName ? formData.firstName : '' %>">
+                    </div>
+                </div>
+                
+                <!-- Last Name -->
+                <div>
+                    <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="user" class="h-5 w-5 text-gray-400"></i>
+                        </div>
+                        <input type="text" id="lastName" name="lastName" required
+                            class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                            placeholder="Your last name"
+                            value="<%= typeof formData !== 'undefined' && formData.lastName ? formData.lastName : '' %>">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Email Address -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="mail" class="h-5 w-5 text-gray-400"></i>
+                    </div>
+                    <input type="email" id="email" name="email" required
+                        class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                        placeholder="Your email address"
+                        value="<%= typeof formData !== 'undefined' && formData.email ? formData.email : '' %>">
+                </div>
+            </div>
+            
+            <!-- Phone Number -->
+            <div>
+                <label for="phoneNumber" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="phone" class="h-5 w-5 text-gray-400"></i>
+                    </div>
+                    <input type="tel" id="phoneNumber" name="phoneNumber" required
+                        class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                        placeholder="Your phone number"
+                        value="<%= typeof formData !== 'undefined' && formData.phoneNumber ? formData.phoneNumber : '' %>">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Password Section -->
+        <div class="space-y-4 mb-6">
+            <h2 class="text-lg font-semibold text-gray-700 border-b pb-2">Create Password</h2>
+            
+            <!-- Password -->
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="lock" class="h-5 w-5 text-gray-400"></i>
+                    </div>
+                    <input type="password" id="password" name="password" required
+                        class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                        placeholder="Create a strong password">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer" id="togglePassword">
+                        <i data-lucide="eye" class="h-5 w-5 text-gray-400"></i>
+                    </div>
+                </div>
+                <p class="mt-1 text-xs text-gray-500">
+                    Must be at least 8 characters with uppercase, lowercase, number and special character.
+                </p>
+            </div>
+        </div>
+        
+        <!-- Professional Information Section -->
+        <div class="space-y-4 mb-6">
+            <h2 class="text-lg font-semibold text-gray-700 border-b pb-2">Professional Information</h2>
+            
+            <!-- Expertise Areas -->
+            <div>
+                <label for="expertise_primary" class="block text-sm font-medium text-gray-700 mb-1">Areas of Expertise</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="check-square" class="h-5 w-5 text-gray-400"></i>
+                    </div>
+                    <select id="expertise_primary" name="expertise[primarySpecialty]" required
+                        class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary appearance-none">
+                        <option value="" disabled selected>Select your primary expertise</option>
+                        <option value="business_strategy">Business Strategy</option>
+                        <option value="financial_consulting">Financial Advisory</option>
+                        <option value="digital_marketing">Marketing & Sales</option>
+                        <option value="project_management">Operations Management</option>
+                        <option value="software_development">Technology Solutions</option>
+                        <option value="human_resources">Human Resources</option>
+                        <option value="legal_consulting">Legal Services</option>
+                        <option value="other">Other Specialization</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <i data-lucide="chevron-down" class="h-5 w-5 text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Professional Title -->
+            <div>
+                <label for="professional_title" class="block text-sm font-medium text-gray-700 mb-1">Professional Title</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="briefcase" class="h-5 w-5 text-gray-400"></i>
+                    </div>
+                    <input type="text" id="professional_title" name="professional[title]" required
+                        class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                        placeholder="e.g. Financial Consultant, Marketing Strategist"
+                        value="<%= typeof formData !== 'undefined' && formData.professional && formData.professional.title ? formData.professional.title : '' %>">
+                </div>
+            </div>
+            
+            <!-- Professional Summary -->
+            <div>
+                <label for="professional_summary" class="block text-sm font-medium text-gray-700 mb-1">Professional Summary</label>
+                <div class="relative">
+                    <textarea id="professional_summary" name="professional[summary]" required
+                        class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                        rows="3" placeholder="Brief description of your professional background and expertise"></textarea>
+                </div>
+            </div>
+            
+            <!-- Years of Experience -->
+            <div>
+                <label for="professional_experience" class="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="clock" class="h-5 w-5 text-gray-400"></i>
+                    </div>
+                    <input type="number" id="professional_experience" name="professional[yearsOfExperience]" required min="0" max="70"
+                        class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                        placeholder="Number of years of professional experience">
+                </div>
+            </div>
+            
+            <!-- Hourly Rate -->
+            <div>
+                <label for="services_hourlyRate" class="block text-sm font-medium text-gray-700 mb-1">Hourly Rate (USD)</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="dollar-sign" class="h-5 w-5 text-gray-400"></i>
+                    </div>
+                    <input type="number" id="services_hourlyRate" name="services[rateInfo][hourlyRate]" required min="1"
+                        class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                        placeholder="Your hourly rate">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- API Integration Form -->
+    <div id="apiIntegrationForm" class="space-y-6 hidden">
+        <div class="space-y-4 mb-6">
+            <h2 class="text-lg font-semibold text-gray-700 border-b pb-2">API Integration</h2>
+            <p class="text-sm text-gray-600 mb-4">
+                Connect your existing consultant profile from our partner platforms.
+            </p>
+            
+            <!-- API Key -->
+            <div>
+                <label for="apiKey" class="block text-sm font-medium text-gray-700 mb-1">API Key</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="key" class="h-5 w-5 text-gray-400"></i>
+                    </div>
+                    <input type="text" id="apiKey" name="apiKey"
+                        class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                        placeholder="Enter your API key">
+                </div>
+            </div>
+            
+            <!-- Consultant ID -->
+            <div>
+                <label for="consultantId" class="block text-sm font-medium text-gray-700 mb-1">Consultant ID</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="hash" class="h-5 w-5 text-gray-400"></i>
+                    </div>
+                    <input type="text" id="consultantId" name="consultantId"
+                        class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"
+                        placeholder="Enter your consultant ID">
+                </div>
+            </div>
+            
+            <!-- Hidden field to indicate API usage -->
+            <input type="hidden" id="useApi" name="useApi" value="false">
+        </div>
+    </div>
+    
+    <!-- Terms and Privacy Policy -->
+    <div class="flex items-start mb-6">
+        <div class="flex items-center h-5">
+            <input id="terms" name="terms" type="checkbox" required
+                class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
+        </div>
+        <div class="ml-3 text-sm">
+            <label for="terms" class="font-medium text-gray-700">
+                I agree to the <a href="/terms" class="text-primary-dark hover:text-primary">Terms of Service</a> and <a href="/privacy" class="text-primary-dark hover:text-primary">Privacy Policy</a>
+            </label>
+        </div>
+    </div>
+    
+    <!-- Registration Button -->
+    <div>
+        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            Create Consultant Account
+        </button>
+    </div>
+    
+    <!-- Sign in link -->
+    <div class="text-center mt-6">
+        <p class="text-sm text-gray-600">
+            Already have an account?
+            <a href="/api/auth/login" class="font-medium text-primary-dark hover:text-primary">
+                Sign in now
+            </a>
+        </p>
+    </div>
+</form>
+
+
+<style>
+  /* Ensure this style is included at the top of the script section */
+  .form-section-hidden {
+    display: none !important;
+  }
+</style>
+
+<script>
+    // Execute after DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM fully loaded");
+        
+        // Toggle password visibility
+        const togglePassword = document.getElementById('togglePassword');
+        if (togglePassword) {
+            togglePassword.addEventListener('click', function() {
+                const passwordInput = document.getElementById('password');
+                const icon = this.querySelector('i');
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    icon.setAttribute('data-lucide', 'eye-off');
+                } else {
+                    passwordInput.type = 'password';
+                    icon.setAttribute('data-lucide', 'eye');
+                }
+                
+                if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                    lucide.createIcons();
+                }
+            });
+        }
+        
+        // Form toggling functionality
+        const directRadio = document.querySelector('input[value="direct"]');
+        const apiRadio = document.querySelector('input[value="api"]');
+        const directForm = document.getElementById('directRegistrationForm');
+        const apiForm = document.getElementById('apiIntegrationForm');
+        const useApiField = document.getElementById('useApi');
+        const form = document.querySelector('form');
+        
+        console.log("Form elements:", {
+            directRadio: directRadio ? "Found" : "Not found",
+            apiRadio: apiRadio ? "Found" : "Not found",
+            directForm: directForm ? "Found" : "Not found",
+            apiForm: apiForm ? "Found" : "Not found",
+            useApiField: useApiField ? "Found" : "Not found"
+        });
+        
+        if (directRadio && apiRadio && directForm && apiForm && useApiField && form) {
+            // Function to switch to direct registration
+            function showDirectForm() {
+                console.log("Showing direct form");
+                directForm.style.display = "block";
+                apiForm.style.display = "none"; 
+                useApiField.value = "false";
+                
+                // Handle form field requirements
+                const directRequiredFields = directForm.querySelectorAll('[data-required="true"], [required]');
+                directRequiredFields.forEach(field => {
+                    field.setAttribute('required', '');
+                });
+                
+                const apiFields = apiForm.querySelectorAll('[data-required="true"], [required]');
+                apiFields.forEach(field => {
+                    field.removeAttribute('required');
+                });
+            }
+            
+            // Function to switch to API registration
+            function showApiForm() {
+                console.log("Showing API form");
+                directForm.style.display = "none";
+                apiForm.style.display = "block";
+                useApiField.value = "true";
+                
+                // Handle form field requirements
+                const directRequiredFields = directForm.querySelectorAll('[data-required="true"], [required]');
+                directRequiredFields.forEach(field => {
+                    field.removeAttribute('required');
+                });
+                
+                document.getElementById('apiKey').setAttribute('required', '');
+                document.getElementById('consultantId').setAttribute('required', '');
+            }
+            
+            // Set up event listeners
+            directRadio.addEventListener('change', function() {
+                if (this.checked) {
+                    showDirectForm();
+                }
+            });
+            
+            apiRadio.addEventListener('change', function() {
+                if (this.checked) {
+                    showApiForm();
+                }
+            });
+            
+            // Initial setup based on which radio is checked
+            if (apiRadio.checked) {
+                showApiForm();
+            } else {
+                showDirectForm();
+            }
+            
+            // Additional check for radio button changes
+            const radioButtons = document.querySelectorAll('input[name="registrationType"]');
+            radioButtons.forEach(radio => {
+                radio.addEventListener('click', function() {
+                    console.log("Radio clicked:", this.value);
+                    if (this.value === 'direct' && this.checked) {
+                        showDirectForm();
+                    } else if (this.value === 'api' && this.checked) {
+                        showApiForm();
+                    }
+                });
+            });
+            
+            // Handle form submission
+            form.addEventListener('submit', function(e) {
+                // Prevent default submission
+                e.preventDefault();
+                
+                // Get the selected registration type
+                const isApiRegistration = apiRadio.checked;
+                
+                // Create a FormData object from the form
+                const formData = new FormData(this);
+                
+                // Set the useApi value based on the selected registration type
+                formData.set('useApi', isApiRegistration ? 'true' : 'false');
+                
+                // If direct registration, remove API fields
+                if (!isApiRegistration) {
+                    formData.delete('apiKey');
+                    formData.delete('consultantId');
+                }
+                
+                // Convert FormData to URLSearchParams for fetch
+                const formParams = new URLSearchParams();
+                for (const pair of formData) {
+                    formParams.append(pair[0], pair[1]);
+                }
+                
+                console.log("Submitting form with useApi =", formData.get('useApi'));
+                
+                // Submit the form via fetch
+                fetch('/api/auth/register/consultant', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formParams.toString()
+                })
+                .then(response => {
+                    // Check if the response is JSON
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        return response.json().then(data => {
+                            if (data.success) {
+                                console.log("Registration successful:", data);
+                                window.location.href = '/api/auth/registration-success';
+                            } else {
+                                console.error("Registration failed:", data);
+                                alert('Registration failed: ' + (data.message || 'Unknown error'));
+                            }
+                        });
+                    } else {
+                        // If not JSON, it's probably a redirect to a success page
+                        console.log("Registration successful - redirecting");
+                        // Check the response URL to see if we've been redirected to success page
+                        if (response.url.includes('success')) {
+                            window.location.href = response.url;
+                        } else {
+                            window.location.href = '/api/auth/registration-success';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred during registration. Please try again.');
+                });
+            });
+        } else {
+            console.error("Could not find all required form elements");
+        }
+    });
+</script>

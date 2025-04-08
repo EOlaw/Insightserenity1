@@ -1,0 +1,753 @@
+<!-- views/dashboard/account-settings.ejs -->
+<% layout('layouts/dashboard') -%>
+<% block('title', 'Account Settings - InsightSerenity') -%>
+
+<!-- Page header -->
+<div class="mb-6">
+    <h1 class="text-2xl font-bold mb-2">Account Settings</h1>
+    <p class="text-gray-600">Manage your account preferences and security settings</p>
+</div>
+
+<!-- Tabs -->
+<div class="mb-6 border-b border-gray-200">
+    <ul class="flex flex-wrap -mb-px text-sm font-medium text-center">
+        <li class="mr-2">
+            <a href="#profile" class="inline-block p-4 border-b-2 border-primary text-primary-dark rounded-t-lg active" aria-current="page" id="profile-tab">
+                Profile Information
+            </a>
+        </li>
+        <li class="mr-2">
+            <a href="#security" class="inline-block p-4 border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 rounded-t-lg" id="security-tab">
+                Security
+            </a>
+        </li>
+        <li class="mr-2">
+            <a href="#notifications" class="inline-block p-4 border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 rounded-t-lg" id="notifications-tab">
+                Notifications
+            </a>
+        </li>
+        <li class="mr-2">
+            <a href="#billing" class="inline-block p-4 border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 rounded-t-lg" id="billing-tab">
+                Billing
+            </a>
+        </li>
+        <li>
+            <a href="#account" class="inline-block p-4 border-b-2 border-transparent hover:text-gray-600 hover:border-gray-300 rounded-t-lg" id="account-tab">
+                Account
+            </a>
+        </li>
+    </ul>
+</div>
+
+<!-- Tab content -->
+<div id="tab-content">
+    <!-- Profile Information tab -->
+    <div id="profile-content" class="tab-pane">
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold">Profile Information</h2>
+                <p class="text-sm text-gray-500">Update your personal information and profile settings</p>
+            </div>
+            
+            <form class="p-6 space-y-6">
+                <!-- Profile photo -->
+                <div class="flex items-center space-x-6">
+                    <div class="flex-shrink-0">
+                        <% if (user.profile && user.profile.avatarUrl) { %>
+                            <img class="h-24 w-24 rounded-full" src="<%= user.profile.avatarUrl %>" alt="<%= user.profile.firstName %>">
+                        <% } else { %>
+                            <div class="h-24 w-24 rounded-full bg-primary flex items-center justify-center text-dark font-bold text-xl">
+                                <%= user.profile.firstName.charAt(0) %><%= user.profile.lastName.charAt(0) %>
+                            </div>
+                        <% } %>
+                    </div>
+                    <div>
+                        <label for="photo-upload" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            <i data-lucide="upload" class="h-4 w-4 mr-2"></i>
+                            Change photo
+                        </label>
+                        <input id="photo-upload" name="photo" type="file" accept="image/*" class="sr-only">
+                        <p class="mt-2 text-xs text-gray-500">JPG or PNG. Maximum 2MB</p>
+                    </div>
+                </div>
+                
+                <!-- Basic Information -->
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div>
+                        <label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label>
+                        <input type="text" name="firstName" id="firstName" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" value="<%= user.profile.firstName %>">
+                    </div>
+                    
+                    <div>
+                        <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label>
+                        <input type="text" name="lastName" id="lastName" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" value="<%= user.profile.lastName %>">
+                    </div>
+                    
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                        <input type="email" name="email" id="email" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" value="<%= user.email %>" disabled>
+                        <p class="mt-1 text-xs text-gray-500">To change your email, please contact support</p>
+                    </div>
+                    
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                        <input type="tel" name="phone" id="phone" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" value="<%= user.profile.phoneNumber || '' %>">
+                    </div>
+                </div>
+                
+                <!-- Additional Information -->
+                <div>
+                    <label for="bio" class="block text-sm font-medium text-gray-700">Bio</label>
+                    <div class="mt-1">
+                        <textarea id="bio" name="bio" rows="4" class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" placeholder="Write a short bio about yourself"><%= user.profile.bio || '' %></textarea>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500">Brief description for your profile.</p>
+                </div>
+                
+                <!-- Location -->
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div>
+                        <label for="country" class="block text-sm font-medium text-gray-700">Country</label>
+                        <select id="country" name="country" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                            <option value="US" <%= user.profile.location && user.profile.location.country === 'US' ? 'selected' : '' %>>United States</option>
+                            <option value="CA" <%= user.profile.location && user.profile.location.country === 'CA' ? 'selected' : '' %>>Canada</option>
+                            <option value="UK" <%= user.profile.location && user.profile.location.country === 'UK' ? 'selected' : '' %>>United Kingdom</option>
+                            <option value="AU" <%= user.profile.location && user.profile.location.country === 'AU' ? 'selected' : '' %>>Australia</option>
+                            <!-- Add more countries as needed -->
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="timezone" class="block text-sm font-medium text-gray-700">Timezone</label>
+                        <select id="timezone" name="timezone" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                            <option value="America/New_York" <%= user.preferences && user.preferences.timezone === 'America/New_York' ? 'selected' : '' %>>Eastern Time (ET)</option>
+                            <option value="America/Chicago" <%= user.preferences && user.preferences.timezone === 'America/Chicago' ? 'selected' : '' %>>Central Time (CT)</option>
+                            <option value="America/Denver" <%= user.preferences && user.preferences.timezone === 'America/Denver' ? 'selected' : '' %>>Mountain Time (MT)</option>
+                            <option value="America/Los_Angeles" <%= user.preferences && user.preferences.timezone === 'America/Los_Angeles' ? 'selected' : '' %>>Pacific Time (PT)</option>
+                            <option value="Europe/London" <%= user.preferences && user.preferences.timezone === 'Europe/London' ? 'selected' : '' %>>London (GMT)</option>
+                            <!-- Add more timezones as needed -->
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Social Media Links -->
+                <div>
+                    <h3 class="text-sm font-medium text-gray-700 mb-3">Social Media Links</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 flex items-center justify-center mr-3">
+                                <i data-lucide="linkedin" class="h-5 w-5 text-blue-600"></i>
+                            </div>
+                            <input type="url" name="linkedin" class="flex-grow border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" placeholder="LinkedIn URL" value="<%= user.profile.socialMedia && user.profile.socialMedia.linkedin || '' %>">
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 flex items-center justify-center mr-3">
+                                <i data-lucide="github" class="h-5 w-5 text-gray-900"></i>
+                            </div>
+                            <input type="url" name="github" class="flex-grow border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" placeholder="GitHub URL" value="<%= user.profile.socialMedia && user.profile.socialMedia.github || '' %>">
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 flex items-center justify-center mr-3">
+                                <i data-lucide="twitter" class="h-5 w-5 text-blue-400"></i>
+                            </div>
+                            <input type="url" name="twitter" class="flex-grow border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm" placeholder="Twitter URL" value="<%= user.profile.socialMedia && user.profile.socialMedia.twitter || '' %>">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button type="button" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Security tab -->
+    <div id="security-content" class="tab-pane hidden">
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold">Security Settings</h2>
+                <p class="text-sm text-gray-500">Manage your password and security preferences</p>
+            </div>
+            
+            <div class="p-6">
+                <!-- Change Password -->
+                <div class="mb-8">
+                    <h3 class="text-base font-medium text-gray-900 mb-4">Change Password</h3>
+                    <form class="space-y-4">
+                        <div>
+                            <label for="current-password" class="block text-sm font-medium text-gray-700">Current Password</label>
+                            <input type="password" name="current-password" id="current-password" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm">
+                        </div>
+                        
+                        <div>
+                            <label for="new-password" class="block text-sm font-medium text-gray-700">New Password</label>
+                            <input type="password" name="new-password" id="new-password" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm">
+                        </div>
+                        
+                        <div>
+                            <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                            <input type="password" name="confirm-password" id="confirm-password" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm">
+                            <div class="mt-1 text-xs">
+                                <p class="text-gray-500">Password must:</p>
+                                <ul class="list-disc pl-5 space-y-1 text-gray-500">
+                                    <li>Be at least 8 characters long</li>
+                                    <li>Include at least one uppercase letter</li>
+                                    <li>Include at least one number</li>
+                                    <li>Include at least one special character</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end">
+                            <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark">
+                                Update Password
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Two-Factor Authentication -->
+                <div class="py-4 border-t border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-base font-medium text-gray-900">Two-Factor Authentication</h3>
+                            <p class="text-sm text-gray-500 mt-1">
+                                Add an extra layer of security to your account
+                            </p>
+                        </div>
+                        <button type="button" class="<%= user.security && user.security.twoFactorEnabled ? 'bg-red-100 text-red-800' : 'bg-primary text-dark' %> px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium">
+                            <%= user.security && user.security.twoFactorEnabled ? 'Disable' : 'Enable' %>
+                        </button>
+                    </div>
+                    
+                    <% if (user.security && user.security.twoFactorEnabled) { %>
+                        <div class="mt-4 p-4 bg-green-50 rounded-md">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <i data-lucide="check-circle" class="h-5 w-5 text-green-400"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-green-800">
+                                        Two-factor authentication is enabled
+                                    </p>
+                                    <div class="mt-2 text-sm text-green-700">
+                                        <p>
+                                            Your account is secured with two-factor authentication. You'll need to enter a verification code from your authenticator app when signing in.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+                
+                <!-- Login Sessions -->
+                <div class="py-4 border-t border-gray-200">
+                    <h3 class="text-base font-medium text-gray-900 mb-4">Active Sessions</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 p-4 rounded-md">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i data-lucide="monitor" class="h-8 w-8 text-gray-400 mr-3"></i>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Current Session</p>
+                                        <p class="text-xs text-gray-500">
+                                            <%= new Date().toLocaleDateString() %> at <%= new Date().toLocaleTimeString() %>
+                                        </p>
+                                        <p class="text-xs text-gray-500">
+                                            IP: 192.168.1.1 • Chrome on Windows
+                                        </p>
+                                    </div>
+                                </div>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    Active
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-4 rounded-md">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i data-lucide="smartphone" class="h-8 w-8 text-gray-400 mr-3"></i>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Mobile Session</p>
+                                        <p class="text-xs text-gray-500">
+                                            <%= new Date(Date.now() - 86400000).toLocaleDateString() %> at <%= new Date(Date.now() - 86400000).toLocaleTimeString() %>
+                                        </p>
+                                        <p class="text-xs text-gray-500">
+                                            IP: 203.0.113.42 • Safari on iOS
+                                        </p>
+                                    </div>
+                                </div>
+                                <button type="button" class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-red-700 bg-red-100 hover:bg-red-200">
+                                    Revoke
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button type="button" class="inline-flex items-center px-4 py-2 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50">
+                            <i data-lucide="log-out" class="h-4 w-4 mr-2"></i>
+                            Sign Out All Devices
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notifications tab -->
+    <div id="notifications-content" class="tab-pane hidden">
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold">Notification Preferences</h2>
+                <p class="text-sm text-gray-500">Manage how and when you receive notifications</p>
+            </div>
+            
+            <form class="p-6">
+                <div class="space-y-6">
+                    <!-- Email Notifications -->
+                    <div>
+                        <h3 class="text-base font-medium text-gray-900 mb-4">Email Notifications</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="email-messages" name="email-messages" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded" 
+                                        <%= user.preferences && user.preferences.notifications && user.preferences.notifications.email ? 'checked' : '' %>>
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="email-messages" class="font-medium text-gray-700">Messages</label>
+                                    <p class="text-gray-500">Receive email notifications when you get new messages</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="email-projects" name="email-projects" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded" checked>
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="email-projects" class="font-medium text-gray-700">Project Updates</label>
+                                    <p class="text-gray-500">Receive email notifications for project milestones and updates</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="email-marketing" name="email-marketing" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded">
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="email-marketing" class="font-medium text-gray-700">Marketing</label>
+                                    <p class="text-gray-500">Receive emails about new features, promotions, and platform updates</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Browser Notifications -->
+                    <div class="pt-6 border-t border-gray-200">
+                        <h3 class="text-base font-medium text-gray-900 mb-4">Browser Notifications</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="browser-messages" name="browser-messages" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded" 
+                                        <%= user.preferences && user.preferences.notifications && user.preferences.notifications.browser ? 'checked' : '' %>>
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="browser-messages" class="font-medium text-gray-700">Messages</label>
+                                    <p class="text-gray-500">Show browser notifications when you get new messages</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="browser-projects" name="browser-projects" type="checkbox" class="focus:ring-primary h-4 w-4 text-primary border-gray-300 rounded" checked>
+                                </div>
+                                <div class="ml-3 text-sm">
+                                    <label for="browser-projects" class="font-medium text-gray-700">Project Updates</label>
+                                    <p class="text-gray-500">Show browser notifications for project milestones and updates</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- SMS Notifications -->
+                    <div class="pt-6 border-t border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-base font-medium text-gray-900">SMS Notifications</h3>
+                            <div class="flex items-center">
+                                <button type="button" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-dark bg-primary-light hover:bg-primary">
+                                    Verify Phone
+                                </button>
+                            </div>
+                        </div>
+                        <p class="mt-1 text-sm text-gray-500">
+                            Verify your phone number to receive important notifications via SMS
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="mt-6 flex justify-end">
+                    <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark">
+                        Save Preferences
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Billing tab -->
+    <div id="billing-content" class="tab-pane hidden">
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold">Billing & Payment</h2>
+                <p class="text-sm text-gray-500">Manage your billing information and payment methods</p>
+            </div>
+            
+            <div class="p-6">
+                <!-- Billing Information -->
+                <div class="mb-8">
+                    <h3 class="text-base font-medium text-gray-900 mb-4">Billing Information</h3>
+                    <form class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <div>
+                            <label for="billing-name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                            <input type="text" name="billing-name" id="billing-name" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm">
+                        </div>
+                        
+                        <div>
+                            <label for="billing-email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                            <input type="email" name="billing-email" id="billing-email" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm">
+                        </div>
+                        
+                        <div>
+                            <label for="billing-company" class="block text-sm font-medium text-gray-700">Company Name</label>
+                            <input type="text" name="billing-company" id="billing-company" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm">
+                        </div>
+                        
+                        <div>
+                            <label for="billing-address" class="block text-sm font-medium text-gray-700">Billing Address</label>
+                            <input type="text" name="billing-address" id="billing-address" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm">
+                        </div>
+                        
+                        <div>
+                            <label for="billing-city" class="block text-sm font-medium text-gray-700">City</label>
+                            <input type="text" name="billing-city" id="billing-city" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label for="billing-state" class="block text-sm font-medium text-gray-700">State / Province</label>
+                                <input type="text" name="billing-state" id="billing-state" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm">
+                            </div>
+                            <div>
+                                <label for="billing-zip" class="block text-sm font-medium text-gray-700">ZIP / Postal</label>
+                                <input type="text" name="billing-zip" id="billing-zip" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="billing-country" class="block text-sm font-medium text-gray-700">Country</label>
+                            <select id="billing-country" name="billing-country" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                                <option>United States</option>
+                                <option>Canada</option>
+                                <option>United Kingdom</option>
+                                <option>Australia</option>
+                                <!-- Add more countries as needed -->
+                            </select>
+                        </div>
+                        
+                        <div class="md:col-span-2 flex justify-end">
+                            <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark">
+                                Update Billing Information
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Payment Methods -->
+                <div class="pt-6 border-t border-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-base font-medium text-gray-900">Payment Methods</h3>
+                        <button type="button" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            <i data-lucide="plus" class="h-4 w-4 mr-2"></i>
+                            Add Payment Method
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 p-4 rounded-md">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i data-lucide="credit-card" class="h-8 w-8 text-gray-400 mr-3"></i>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Visa ending in 4242</p>
+                                        <p class="text-xs text-gray-500">
+                                            Expires 12/2023
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        Default
+                                    </span>
+                                    <button type="button" class="text-gray-500 hover:text-gray-700">
+                                        <i data-lucide="trash-2" class="h-5 w-5"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Billing History -->
+                <div class="pt-6 mt-6 border-t border-gray-200">
+                    <h3 class="text-base font-medium text-gray-900 mb-4">Billing History</h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Invoice
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Date
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Amount
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Status
+                                    </th>
+                                    <th scope="col" class="relative px-6 py-3">
+                                        <span class="sr-only">Download</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        INV-2023-001
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        March 1, 2023
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        $99.00
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            Paid
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <a href="#" class="text-primary-dark hover:text-primary">
+                                            <i data-lucide="download" class="h-5 w-5"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        INV-2023-002
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        February 1, 2023
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        $99.00
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                            Paid
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <a href="#" class="text-primary-dark hover:text-primary">
+                                            <i data-lucide="download" class="h-5 w-5"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Account tab -->
+    <div id="account-content" class="tab-pane hidden">
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold">Account Settings</h2>
+                <p class="text-sm text-gray-500">Manage your account preferences and subscription</p>
+            </div>
+            
+            <div class="p-6">
+                <!-- Language & Region -->
+                <div class="mb-8">
+                    <h3 class="text-base font-medium text-gray-900 mb-4">Language & Region</h3>
+                    <form class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <div>
+                            <label for="language" class="block text-sm font-medium text-gray-700">Language</label>
+                            <select id="language" name="language" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                                <option value="en" <%= user.preferences && user.preferences.language === 'en' ? 'selected' : '' %>>English</option>
+                                <option value="es" <%= user.preferences && user.preferences.language === 'es' ? 'selected' : '' %>>Spanish</option>
+                                <option value="fr" <%= user.preferences && user.preferences.language === 'fr' ? 'selected' : '' %>>French</option>
+                                <option value="de" <%= user.preferences && user.preferences.language === 'de' ? 'selected' : '' %>>German</option>
+                                <!-- Add more languages as needed -->
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="date-format" class="block text-sm font-medium text-gray-700">Date Format</label>
+                            <select id="date-format" name="date-format" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                                <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                                <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                                <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                            </select>
+                        </div>
+                        
+                        <div class="md:col-span-2 flex justify-end">
+                            <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark">
+                                Save Preferences
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Linked Accounts -->
+                <div class="pt-6 border-t border-gray-200 mb-8">
+                    <h3 class="text-base font-medium text-gray-900 mb-4">Linked Accounts</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <i data-lucide="github" class="h-8 w-8 text-gray-900 mr-3"></i>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">GitHub</p>
+                                    <p class="text-xs text-gray-500">
+                                        <%= user.integration && user.integration.githubId ? 'Connected' : 'Not connected' %>
+                                    </p>
+                                </div>
+                            </div>
+                            <button type="button" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                <%= user.integration && user.integration.githubId ? 'Disconnect' : 'Connect' %>
+                            </button>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <i data-lucide="linkedin" class="h-8 w-8 text-blue-600 mr-3"></i>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">LinkedIn</p>
+                                    <p class="text-xs text-gray-500">
+                                        Not connected
+                                    </p>
+                                </div>
+                            </div>
+                            <button type="button" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                Connect
+                            </button>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <i data-lucide="slack" class="h-8 w-8 text-purple-600 mr-3"></i>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">Slack</p>
+                                    <p class="text-xs text-gray-500">
+                                        Not connected
+                                    </p>
+                                </div>
+                            </div>
+                            <button type="button" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                Connect
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Delete Account -->
+                <div class="pt-6 border-t border-gray-200">
+                    <h3 class="text-base font-medium text-red-700 mb-4">Delete Account</h3>
+                    <p class="text-sm text-gray-500 mb-4">
+                        Permanently delete your account and all associated data. This action cannot be undone.
+                    </p>
+                    <button type="button" class="inline-flex items-center px-4 py-2 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50">
+                        <i data-lucide="trash-2" class="h-4 w-4 mr-2"></i>
+                        Delete Account
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab switching functionality
+        const tabs = document.querySelectorAll('[id$="-tab"]');
+        const tabContents = document.querySelectorAll('.tab-pane');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Get the tab's target content ID
+                const targetId = tab.getAttribute('href').substring(1);
+                const targetContent = document.getElementById(`${targetId}-content`);
+                
+                // Remove active class from all tabs and hide all tab contents
+                tabs.forEach(t => {
+                    t.classList.remove('border-primary', 'text-primary-dark');
+                    t.classList.add('border-transparent', 'hover:text-gray-600', 'hover:border-gray-300');
+                });
+                
+                tabContents.forEach(content => {
+                    content.classList.add('hidden');
+                });
+                
+                // Activate the selected tab and show its content
+                tab.classList.remove('border-transparent', 'hover:text-gray-600', 'hover:border-gray-300');
+                tab.classList.add('border-primary', 'text-primary-dark');
+                targetContent.classList.remove('hidden');
+            });
+        });
+        
+        // File upload preview for profile photo
+        const photoUpload = document.getElementById('photo-upload');
+        if (photoUpload) {
+            photoUpload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.querySelector('.h-24.w-24.rounded-full');
+                        if (img.tagName === 'IMG') {
+                            img.src = e.target.result;
+                        } else {
+                            // If it's the div placeholder, replace with an actual image
+                            const parent = img.parentNode;
+                            const newImg = document.createElement('img');
+                            newImg.src = e.target.result;
+                            newImg.className = 'h-24 w-24 rounded-full';
+                            newImg.alt = 'Profile photo';
+                            parent.replaceChild(newImg, img);
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    });
+</script>

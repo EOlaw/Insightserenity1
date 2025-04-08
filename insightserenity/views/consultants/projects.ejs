@@ -1,0 +1,342 @@
+<!-- views/consultants/projects.ejs -->
+<% layout('layouts/dashboard') -%>
+<% block('title', 'My Projects - InsightSerenity') -%>
+
+<!-- Page header -->
+<div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+    <div>
+        <h1 class="text-2xl font-bold mb-1">My Projects</h1>
+        <p class="text-gray-600">Manage your active and completed projects</p>
+    </div>
+    <div class="mt-4 md:mt-0 flex flex-col sm:flex-row gap-3">
+        <a href="/consultants/available-projects" class="inline-flex items-center justify-center px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50">
+            <i data-lucide="search" class="h-4 w-4 mr-2"></i>
+            Find New Projects
+        </a>
+    </div>
+</div>
+
+<!-- Filters and search -->
+<div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+    <div class="flex flex-col md:flex-row md:items-center gap-4">
+        <div class="relative flex-grow">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i data-lucide="search" class="h-5 w-5 text-gray-400"></i>
+            </div>
+            <input type="text" id="search-input" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm" placeholder="Search projects...">
+        </div>
+        
+        <div class="flex flex-wrap gap-2">
+            <select id="status-filter" class="block w-full md:w-auto pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                <option value="">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="in_progress">In Progress</option>
+                <option value="completed">Completed</option>
+                <option value="on_hold">On Hold</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+            
+            <select id="date-filter" class="block w-full md:w-auto pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                <option value="">All Time</option>
+                <option value="last_week">Last Week</option>
+                <option value="last_month">Last Month</option>
+                <option value="last_3_months">Last 3 Months</option>
+                <option value="last_year">Last Year</option>
+            </select>
+            
+            <button type="button" id="filter-button" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                <i data-lucide="sliders" class="h-4 w-4 mr-2"></i>
+                More Filters
+            </button>
+        </div>
+    </div>
+    
+    <!-- Advanced filter panel (hidden by default) -->
+    <div id="advanced-filters" class="hidden mt-4 pt-4 border-t border-gray-200">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label for="client-filter" class="block text-sm font-medium text-gray-700 mb-1">Client</label>
+                <select id="client-filter" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                    <option value="">All Clients</option>
+                    <!-- Client options would be populated dynamically -->
+                    <option value="client1">Acme Corporation</option>
+                    <option value="client2">Global Industries</option>
+                    <option value="client3">Tech Solutions Inc.</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="category-filter" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <select id="category-filter" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                    <option value="">All Categories</option>
+                    <option value="software_development">Software Development</option>
+                    <option value="web_development">Web Development</option>
+                    <option value="mobile_development">Mobile Development</option>
+                    <option value="ui_ux_design">UI/UX Design</option>
+                    <option value="data_science">Data Science</option>
+                    <option value="cloud_architecture">Cloud Architecture</option>
+                    <option value="cybersecurity">Cybersecurity</option>
+                    <option value="project_management">Project Management</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="sort-by" class="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+                <select id="sort-by" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                    <option value="updated_desc">Last Updated (Newest)</option>
+                    <option value="updated_asc">Last Updated (Oldest)</option>
+                    <option value="created_desc">Creation Date (Newest)</option>
+                    <option value="created_asc">Creation Date (Oldest)</option>
+                    <option value="budget_desc">Budget (Highest)</option>
+                    <option value="budget_asc">Budget (Lowest)</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="flex justify-end mt-4">
+            <button type="button" id="clear-filters" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 mr-3">
+                Clear Filters
+            </button>
+            <button type="button" id="apply-filters" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                Apply Filters
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Project list tabs -->
+<div class="mb-6 border-b border-gray-200">
+    <ul class="flex flex-wrap -mb-px" role="tablist">
+        <li class="mr-2" role="presentation">
+            <button class="inline-block py-4 px-4 text-sm font-medium text-center text-primary-dark border-b-2 border-primary rounded-t-lg active" 
+                   id="all-tab" 
+                   data-tabs-target="#all-projects" 
+                   type="button" 
+                   role="tab" 
+                   aria-controls="all-projects" 
+                   aria-selected="true">
+                All Projects
+            </button>
+        </li>
+        <li class="mr-2" role="presentation">
+            <button class="inline-block py-4 px-4 text-sm font-medium text-center text-gray-500 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" 
+                   id="active-tab" 
+                   data-tabs-target="#active-projects" 
+                   type="button" 
+                   role="tab" 
+                   aria-controls="active-projects" 
+                   aria-selected="false">
+                Active
+            </button>
+        </li>
+        <li class="mr-2" role="presentation">
+            <button class="inline-block py-4 px-4 text-sm font-medium text-center text-gray-500 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" 
+                   id="completed-tab" 
+                   data-tabs-target="#completed-projects" 
+                   type="button" 
+                   role="tab" 
+                   aria-controls="completed-projects" 
+                   aria-selected="false">
+                Completed
+            </button>
+        </li>
+    </ul>
+</div>
+
+<!-- Tab content -->
+<div id="tabContent">
+    <!-- All projects tab -->
+    <div class="block" id="all-projects" role="tabpanel" aria-labelledby="all-tab">
+        <% if (projects && projects.projects && projects.projects.length > 0) { %>
+            <div class="overflow-x-auto bg-white rounded-lg shadow">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timeline</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Budget</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <% projects.projects.forEach(project => { %>
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900"><%= project.title %></div>
+                                    <div class="text-xs text-gray-500"><%= project.category ? project.category.replace(/_/g, ' ') : 'Uncategorized' %></div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <% if (project.client && project.client.user) { %>
+                                            <% const client = project.client.user; %>
+                                            <% if (client.profile && client.profile.avatarUrl) { %>
+                                                <img class="h-8 w-8 rounded-full" src="<%= client.profile.avatarUrl %>" alt="<%= client.profile.firstName %>">
+                                            <% } else { %>
+                                                <div class="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-dark font-bold">
+                                                    <%= client.profile.firstName.charAt(0) %><%= client.profile.lastName.charAt(0) %>
+                                                </div>
+                                            <% } %>
+                                            <div class="ml-3">
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    <%= client.profile.firstName %> <%= client.profile.lastName %>
+                                                </div>
+                                                <% if (project.client.company && project.client.company.name) { %>
+                                                    <div class="text-xs text-gray-500"><%= project.client.company.name %></div>
+                                                <% } %>
+                                            </div>
+                                        <% } else { %>
+                                            <div class="text-sm text-gray-500">Unknown client</div>
+                                        <% } %>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        <% if(project.status === 'active') { %>
+                                            bg-green-100 text-green-800
+                                        <% } else if(project.status === 'in_progress') { %>
+                                            bg-blue-100 text-blue-800
+                                        <% } else if(project.status === 'completed') { %>
+                                            bg-gray-100 text-gray-800
+                                        <% } else if(project.status === 'on_hold') { %>
+                                            bg-yellow-100 text-yellow-800
+                                        <% } else if(project.status === 'cancelled') { %>
+                                            bg-red-100 text-red-800
+                                        <% } else { %>
+                                            bg-gray-100 text-gray-800
+                                        <% } %>">
+                                        <%= project.status.replace(/_/g, ' ').charAt(0).toUpperCase() + project.status.replace(/_/g, ' ').slice(1) %>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">
+                                        <% if (project.timeline && project.timeline.startDate) { %>
+                                            <%= new Date(project.timeline.startDate).toLocaleDateString() %>
+                                            <% if (project.timeline && project.timeline.endDate) { %>
+                                                - <%= new Date(project.timeline.endDate).toLocaleDateString() %>
+                                            <% } %>
+                                        <% } else if (project.timeline && project.timeline.duration) { %>
+                                            <%= project.timeline.duration %>
+                                        <% } else { %>
+                                            Not specified
+                                        <% } %>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">
+                                        <% if (project.budget) { %>
+                                            <% if (project.budget.min && project.budget.max) { %>
+                                                $<%= project.budget.min.toLocaleString() %> - $<%= project.budget.max.toLocaleString() %>
+                                            <% } else if (project.budget.min) { %>
+                                                From $<%= project.budget.min.toLocaleString() %>
+                                            <% } else if (project.budget.max) { %>
+                                                Up to $<%= project.budget.max.toLocaleString() %>
+                                            <% } else { %>
+                                                Not specified
+                                            <% } %>
+                                            <% if (project.budget.type) { %>
+                                                <span class="text-xs text-gray-500">(<%= project.budget.type %>)</span>
+                                            <% } %>
+                                        <% } else { %>
+                                            Not specified
+                                        <% } %>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <a href="/consultants/projects/<%= project._id %>" class="text-primary-dark hover:text-primary">View</a>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <% if (projects.pagination && projects.pagination.pages > 1) { %>
+                <%- include('../partials/pagination', { 
+                    pagination: projects.pagination,
+                    baseUrl: '/consultants/projects',
+                    query: {} 
+                }) %>
+            <% } %>
+        <% } else { %>
+            <div class="bg-white rounded-lg shadow p-6 text-center">
+                <div class="mb-4">
+                    <i data-lucide="folder" class="h-12 w-12 mx-auto text-gray-400"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-1">No projects found</h3>
+                <p class="text-gray-500 mb-4">You don't have any projects that match your filters.</p>
+                <a href="/consultants/available-projects" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                    <i data-lucide="search" class="h-4 w-4 mr-2"></i>
+                    Find New Projects
+                </a>
+            </div>
+        <% } %>
+    </div>
+    
+    <!-- Active projects tab (initially hidden) -->
+    <div class="hidden" id="active-projects" role="tabpanel" aria-labelledby="active-tab">
+        <!-- Content for active projects would be similar to the all projects tab -->
+        <div class="bg-white rounded-lg shadow p-6 text-center">
+            <p class="text-gray-500">Loading active projects...</p>
+        </div>
+    </div>
+    
+    <!-- Completed projects tab (initially hidden) -->
+    <div class="hidden" id="completed-projects" role="tabpanel" aria-labelledby="completed-tab">
+        <!-- Content for completed projects would be similar to the all projects tab -->
+        <div class="bg-white rounded-lg shadow p-6 text-center">
+            <p class="text-gray-500">Loading completed projects...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Filter toggle
+        const filterButton = document.getElementById('filter-button');
+        const advancedFilters = document.getElementById('advanced-filters');
+        
+        if (filterButton && advancedFilters) {
+            filterButton.addEventListener('click', function() {
+                advancedFilters.classList.toggle('hidden');
+            });
+        }
+        
+        // Tab switching
+        const tabButtons = document.querySelectorAll('[role="tab"]');
+        const tabContents = document.querySelectorAll('[role="tabpanel"]');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Deactivate all tabs
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('text-primary-dark', 'border-primary');
+                    btn.classList.add('text-gray-500', 'border-transparent');
+                    btn.setAttribute('aria-selected', 'false');
+                });
+                
+                // Hide all tab contents
+                tabContents.forEach(content => {
+                    content.classList.add('hidden');
+                });
+                
+                // Activate clicked tab
+                this.classList.remove('text-gray-500', 'border-transparent');
+                this.classList.add('text-primary-dark', 'border-primary');
+                this.setAttribute('aria-selected', 'true');
+                
+                // Show corresponding content
+                const tabId = this.getAttribute('data-tabs-target');
+                document.querySelector(tabId).classList.remove('hidden');
+                
+                // Here you would typically load the tab content via AJAX
+                // For this demo, we're just showing/hiding pre-loaded content
+            });
+        });
+        
+        // Handle filter form submission, clear filters, etc.
+        // This would typically involve AJAX calls to reload the projects list
+    });
+</script>

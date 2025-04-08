@@ -1,0 +1,19 @@
+<!-- views/partials/loading.ejs -->
+<div id="loading-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex justify-center items-center hidden">
+  <div class="bg-white p-5 rounded-lg shadow-lg text-center">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-3"></div>
+    <p class="text-gray-700 font-medium" id="loading-message">Processing your request...</p>
+  </div>
+</div>
+
+<script>
+  // Global loading functions
+  function showLoading(message = 'Processing your request...') {
+    document.getElementById('loading-message').textContent = message;
+    document.getElementById('loading-overlay').classList.remove('hidden');
+  }
+  
+  function hideLoading() {
+    document.getElementById('loading-overlay').classList.add('hidden');
+  }
+</script>

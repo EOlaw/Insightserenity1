@@ -1,0 +1,149 @@
+<% layout('layouts/auth') -%>
+<% block('title', 'Recovery Code Verification - InsightSerenity') -%>
+
+<div class="text-center md:text-left">
+    <h1 class="text-2xl font-bold text-gray-800 mb-1">Recovery Code Verification</h1>
+    <p class="text-gray-600 mb-6">Enter one of your recovery codes to access your account</p>
+</div>
+
+<!-- Recovery Code Form -->
+<form action="/api/auth/verify-recovery-code" method="POST" class="space-y-6">
+    <input type="hidden" name="sessionId" value="<%= typeof sessionId !== 'undefined' ? sessionId : '' %>">
+    
+    <div class="mb-6">
+        <div class="bg-amber-50 p-4 rounded-lg border-l-4 border-amber-500 mb-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i data-lucide="alert-triangle" class="h-5 w-5 text-amber-500"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-amber-700">
+                        <strong>Important:</strong> Each recovery code can only be used once. After using a recovery code, it will be invalidated, and you should generate new recovery codes.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <label for="recoveryCode" class="block text-sm font-medium text-gray-700 mb-1">Recovery Code</label>
+        <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i data-lucide="key" class="h-5 w-5 text-gray-400"></i>
+            </div>
+            <input type="text" id="recoveryCode" name="recoveryCode" required
+                class="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary uppercase tracking-wider"
+                placeholder="Enter recovery code (e.g., ABCD-EFGH-IJKL-MNOP)"
+                pattern="[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}"
+                title="Format: XXXX-XXXX-XXXX-XXXX">
+            <p class="mt-1 text-xs text-gray-500">
+                Format: XXXX-XXXX-XXXX-XXXX (letters and numbers only)
+            </p>
+        </div>
+    </div>
+    
+    <div>
+        <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            Verify
+        </button>
+    </div>
+    
+    <div class="text-center mt-4">
+        <a href="/api/auth/2fa" class="text-sm font-medium text-primary-dark hover:text-primary">
+            Back to verification options
+        </a>
+    </div>
+</form>
+
+<!-- Help Information -->
+<div class="mt-8 pt-6 border-t border-gray-200">
+    <h3 class="text-sm font-medium text-gray-700 mb-3">About Recovery Codes</h3>
+    
+    <div class="space-y-3 text-sm text-gray-600">
+        <div class="flex items-start">
+            <div class="flex-shrink-0 mt-0.5">
+                <i data-lucide="info" class="h-5 w-5 text-primary"></i>
+            </div>
+            <span class="ml-3">
+                Recovery codes are backup codes that you can use to access your account if you can't use your primary two-factor authentication method.
+            </span>
+        </div>
+        
+        <div class="flex items-start">
+            <div class="flex-shrink-0 mt-0.5">
+                <i data-lucide="check-circle" class="h-5 w-5 text-primary"></i>
+            </div>
+            <span class="ml-3">
+                Recovery codes are provided when you first set up two-factor authentication. Each code can only be used once.
+            </span>
+        </div>
+        
+        <div class="flex items-start">
+            <div class="flex-shrink-0 mt-0.5">
+                <i data-lucide="shield" class="h-5 w-5 text-primary"></i>
+            </div>
+            <span class="ml-3">
+                After using a recovery code, you'll need to generate new codes from your security settings page.
+            </span>
+        </div>
+        
+        <div class="flex items-start">
+            <div class="flex-shrink-0 mt-0.5">
+                <i data-lucide="help-circle" class="h-5 w-5 text-primary"></i>
+            </div>
+            <span class="ml-3">
+                If you don't have access to your recovery codes, please contact our support team for assistance with account recovery.
+            </span>
+        </div>
+    </div>
+    
+    <div class="mt-6">
+        <a href="/support" class="inline-flex items-center text-sm font-medium text-primary-dark hover:text-primary">
+            <i data-lucide="life-buoy" class="h-4 w-4 mr-2"></i>
+            Contact Support
+        </a>
+    </div>
+</div>
+
+<% block('additionalJS', `
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const recoveryCodeInput = document.getElementById('recoveryCode');
+        
+        // Auto-format recovery code input
+        recoveryCodeInput.addEventListener('input', function(e) {
+            // Remove all non-alphanumeric characters
+            let value = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+            
+            // Format with dashes
+            if (value.length > 4) {
+                value = value.slice(0, 4) + '-' + value.slice(4);
+            }
+            if (value.length > 9) {
+                value = value.slice(0, 9) + '-' + value.slice(9);
+            }
+            if (value.length > 14) {
+                value = value.slice(0, 14) + '-' + value.slice(14);
+            }
+            
+            // Limit to 19 characters (16 alphanumeric + 3 dashes)
+            if (value.length > 19) {
+                value = value.slice(0, 19);
+            }
+            
+            // Update the input value
+            this.value = value;
+        });
+        
+        // Handle form submission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const code = recoveryCodeInput.value;
+            const pattern = /^[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}$/;
+            
+            if (!pattern.test(code)) {
+                e.preventDefault();
+                alert('Please enter a valid recovery code in the format XXXX-XXXX-XXXX-XXXX.');
+                recoveryCodeInput.focus();
+            }
+        });
+    });
+</script>
+`) -%>

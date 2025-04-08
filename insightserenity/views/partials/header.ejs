@@ -1,0 +1,318 @@
+<!-- views/partials/header.ejs -->
+<header class="bg-secondary shadow-sm">
+    <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center py-4">
+            <!-- Logo and brand -->
+            <div class="flex items-center">
+                <a href="/" class="flex items-center">
+                    <div class="text-white font-bold text-2xl">
+                        Insight<span class="text-primary">Serenity</span>
+                    </div>
+                </a>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="/dashboard" class="text-gray-300 hover:text-primary transition-colors">
+                    Dashboard
+                </a>
+                <a href="/organizations" class="text-gray-300 hover:text-primary transition-colors">
+                    Organizations
+                </a>
+                <% if (currentUser && currentUser.role === 'consultant') { %>
+                <a href="/portfolio" class="text-gray-300 hover:text-primary transition-colors">
+                    Portfolio
+                </a>
+                <% } %>
+                <% if (currentUser && currentUser.role === 'client') { %>
+                <a href="/projects" class="text-gray-300 hover:text-primary transition-colors">
+                    Projects
+                </a>
+                <% } %>
+            </nav>
+            
+            <!-- User menu -->
+            <div class="flex items-center space-x-4">
+                <% if (currentUser) { %>
+                    <!-- Notifications dropdown -->
+                    <div class="relative">
+                        <button type="button" id="notification-button" class="p-1 text-gray-300 hover:text-primary focus:outline-none">
+                            <i data-lucide="bell" class="h-6 w-6"></i>
+                            <% 
+                            // This would come from your backend with actual notification count
+                            const hasUnreadNotifications = locals.unreadNotifications && locals.unreadNotifications > 0;
+                            %>
+                            <% if (hasUnreadNotifications) { %>
+                                <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-primary"></span>
+                            <% } %>
+                        </button>
+                        
+                        <!-- Notifications dropdown (hidden by default) -->
+                        <div id="notification-dropdown" class="hidden origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+                            <div class="py-2">
+                                <div class="px-4 py-2 border-b border-gray-200">
+                                    <div class="flex justify-between items-center">
+                                        <h3 class="text-sm font-semibold text-gray-900">Notifications</h3>
+                                        <a href="/dashboard/notifications" class="text-xs text-primary hover:text-primary-dark">View all</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Notification list with conditional check -->
+                                <div class="max-h-60 overflow-y-auto">
+                                    <% 
+                                    // This would be replaced with your actual notification data from the backend
+                                    const notifications = locals.notifications || [];
+                                    %>
+                                    
+                                    <% if (notifications.length > 0) { %>
+                                        <% notifications.forEach(notification => { %>
+                                            <a href="<%= notification.link || '#' %>" class="block px-4 py-3 hover:bg-gray-100 transition-colors">
+                                                <div class="flex">
+                                                    <div class="flex-shrink-0">
+                                                        <% if (notification.type === 'message') { %>
+                                                            <span class="inline-flex h-8 w-8 rounded-full bg-blue-100 items-center justify-center">
+                                                                <i data-lucide="message-square" class="h-4 w-4 text-blue-600"></i>
+                                                            </span>
+                                                        <% } else if (notification.type === 'success') { %>
+                                                            <span class="inline-flex h-8 w-8 rounded-full bg-green-100 items-center justify-center">
+                                                                <i data-lucide="check-circle" class="h-4 w-4 text-green-600"></i>
+                                                            </span>
+                                                        <% } else { %>
+                                                            <span class="inline-flex h-8 w-8 rounded-full bg-yellow-100 items-center justify-center">
+                                                                <i data-lucide="alert-circle" class="h-4 w-4 text-yellow-600"></i>
+                                                            </span>
+                                                        <% } %>
+                                                    </div>
+                                                    <div class="ml-3">
+                                                        <p class="text-sm font-medium text-gray-900"><%= notification.title %></p>
+                                                        <p class="text-xs text-gray-500"><%= notification.time %></p>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        <% }); %>
+                                    <% } else { %>
+                                        <!-- Empty state when no notifications -->
+                                        <div class="px-4 py-6 text-center">
+                                            <div class="flex justify-center mb-3">
+                                                <span class="inline-flex h-10 w-10 rounded-full bg-gray-100 items-center justify-center">
+                                                    <i data-lucide="bell-off" class="h-5 w-5 text-gray-400"></i>
+                                                </span>
+                                            </div>
+                                            <p class="text-sm font-medium text-gray-500">No notifications</p>
+                                            <p class="text-xs text-gray-400 mt-1">You're all caught up!</p>
+                                        </div>
+                                    <% } %>
+                                    
+                                    <!-- For demo purposes only - Remove in production -->
+                                    <% if (!notifications.length) { %>
+                                        <!-- Sample consultant notifications for demonstration -->
+                                        <% if (currentUser.role === 'consultant') { %>
+                                            <a href="#" class="block px-4 py-3 hover:bg-gray-100 transition-colors">
+                                                <div class="flex">
+                                                    <div class="flex-shrink-0">
+                                                        <span class="inline-flex h-8 w-8 rounded-full bg-blue-100 items-center justify-center">
+                                                            <i data-lucide="message-square" class="h-4 w-4 text-blue-600"></i>
+                                                        </span>
+                                                    </div>
+                                                    <div class="ml-3">
+                                                        <p class="text-sm font-medium text-gray-900">New message from Global Industries</p>
+                                                        <p class="text-xs text-gray-500">15 minutes ago</p>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            
+                                            <a href="#" class="block px-4 py-3 hover:bg-gray-100 transition-colors">
+                                                <div class="flex">
+                                                    <div class="flex-shrink-0">
+                                                        <span class="inline-flex h-8 w-8 rounded-full bg-green-100 items-center justify-center">
+                                                            <i data-lucide="check-circle" class="h-4 w-4 text-green-600"></i>
+                                                        </span>
+                                                    </div>
+                                                    <div class="ml-3">
+                                                        <p class="text-sm font-medium text-gray-900">Your proposal was accepted</p>
+                                                        <p class="text-xs text-gray-500">2 hours ago</p>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                            
+                                            <a href="#" class="block px-4 py-3 hover:bg-gray-100 transition-colors">
+                                                <div class="flex">
+                                                    <div class="flex-shrink-0">
+                                                        <span class="inline-flex h-8 w-8 rounded-full bg-yellow-100 items-center justify-center">
+                                                            <i data-lucide="alert-circle" class="h-4 w-4 text-yellow-600"></i>
+                                                        </span>
+                                                    </div>
+                                                    <div class="ml-3">
+                                                        <p class="text-sm font-medium text-gray-900">New project matching your skills</p>
+                                                        <p class="text-xs text-gray-500">1 day ago</p>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        <% } else { %>
+                                            <!-- No notifications state for non-consultants -->
+                                            <div class="px-4 py-6 text-center">
+                                                <div class="flex justify-center mb-3">
+                                                    <span class="inline-flex h-10 w-10 rounded-full bg-gray-100 items-center justify-center">
+                                                        <i data-lucide="bell-off" class="h-5 w-5 text-gray-400"></i>
+                                                    </span>
+                                                </div>
+                                                <p class="text-sm font-medium text-gray-500">No notifications</p>
+                                                <p class="text-xs text-gray-400 mt-1">You're all caught up!</p>
+                                            </div>
+                                        <% } %>
+                                    <% } %>
+                                </div>
+                                
+                                <% if (hasUnreadNotifications || (currentUser.role === 'consultant' && !locals.notifications)) { %>
+                                    <div class="border-t border-gray-200 py-2 px-4">
+                                        <button type="button" class="w-full text-xs text-center text-gray-500 hover:text-gray-700">
+                                            Mark all as read
+                                        </button>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- User dropdown -->
+                    <div class="relative">
+                        <button type="button" class="flex items-center focus:outline-none" id="user-menu-button">
+                            <% if (currentUser.profilePicture) { %>
+                                <img src="<%= currentUser.profilePicture %>" alt="<%= currentUser.profile.firstName %>" class="h-8 w-8 rounded-full">
+                            <% } else { %>
+                                <div class="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-dark font-bold">
+                                    <%= currentUser.profile.firstName.charAt(0) %><%= currentUser.profile.lastName.charAt(0) %>
+                                </div>
+                            <% } %>
+                            <span class="ml-2 text-gray-300"><%= currentUser.profile.firstName %></span>
+                            <i data-lucide="chevron-down" class="h-4 w-4 ml-1 text-gray-300"></i>
+                        </button>
+                        
+                        <!-- Dropdown menu (hidden by default) -->
+                        <div class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50" id="user-dropdown-menu" role="menu">
+                            <a href="/users/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i data-lucide="user" class="inline h-4 w-4 mr-2"></i> Profile
+                            </a>
+                            <a href="/users/settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i data-lucide="settings" class="inline h-4 w-4 mr-2"></i> Settings
+                            </a>
+                            <% if (currentUser.role === 'consultant') { %>
+                            <a href="/portfolio/edit" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i data-lucide="briefcase" class="inline h-4 w-4 mr-2"></i> Edit Portfolio
+                            </a>
+                            <% } %>
+                            <div class="border-t border-gray-100"></div>
+                            <form action="/api/auth/logout" method="POST">
+                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i data-lucide="log-out" class="inline h-4 w-4 mr-2"></i> Sign out
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <a href="/auth/login" class="text-gray-300 hover:text-primary transition-colors">Sign in</a>
+                    <a href="/auth/register" class="ml-4 bg-primary text-dark px-4 py-2 rounded-md hover:bg-primary-dark transition-colors">Sign up</a>
+                <% } %>
+                
+                <!-- Mobile menu button -->
+                <button type="button" class="md:hidden p-2 text-gray-300 hover:text-primary focus:outline-none" id="mobile-menu-button">
+                    <i data-lucide="menu" class="h-6 w-6"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="/dashboard" class="block px-3 py-2 rounded-md text-gray-300 hover:text-primary hover:bg-gray-700">
+                    Dashboard
+                </a>
+                <a href="/organizations" class="block px-3 py-2 rounded-md text-gray-300 hover:text-primary hover:bg-gray-700">
+                    Organizations
+                </a>
+                <% if (currentUser && currentUser.role === 'consultant') { %>
+                <a href="/portfolio" class="block px-3 py-2 rounded-md text-gray-300 hover:text-primary hover:bg-gray-700">
+                    Portfolio
+                </a>
+                <% } %>
+                <% if (currentUser && currentUser.role === 'client') { %>
+                <a href="/projects" class="block px-3 py-2 rounded-md text-gray-300 hover:text-primary hover:bg-gray-700">
+                    Projects
+                </a>
+                <% } %>
+                <% if (!currentUser) { %>
+                <a href="/auth/login" class="block px-3 py-2 rounded-md text-gray-300 hover:text-primary hover:bg-gray-700">
+                    Sign in
+                </a>
+                <a href="/auth/register" class="block px-3 py-2 rounded-md bg-primary text-dark hover:bg-primary-dark">
+                    Sign up
+                </a>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</header>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+        
+        // User dropdown toggle
+        const userMenuButton = document.getElementById('user-menu-button');
+        const userDropdownMenu = document.getElementById('user-dropdown-menu');
+        
+        if (userMenuButton && userDropdownMenu) {
+            userMenuButton.addEventListener('click', function(event) {
+                // Close notification dropdown if open
+                if (notificationDropdown && !notificationDropdown.classList.contains('hidden')) {
+                    notificationDropdown.classList.add('hidden');
+                }
+                
+                userDropdownMenu.classList.toggle('hidden');
+                event.stopPropagation();
+            });
+        }
+        
+        // Notification dropdown toggle
+        const notificationButton = document.getElementById('notification-button');
+        const notificationDropdown = document.getElementById('notification-dropdown');
+        
+        if (notificationButton && notificationDropdown) {
+            notificationButton.addEventListener('click', function(event) {
+                // Close user dropdown if open
+                if (userDropdownMenu && !userDropdownMenu.classList.contains('hidden')) {
+                    userDropdownMenu.classList.add('hidden');
+                }
+                
+                notificationDropdown.classList.toggle('hidden');
+                event.stopPropagation();
+            });
+        }
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            // Close user dropdown
+            if (userDropdownMenu && !userMenuButton.contains(event.target) && !userDropdownMenu.contains(event.target)) {
+                userDropdownMenu.classList.add('hidden');
+            }
+            
+            // Close notification dropdown
+            if (notificationDropdown && !notificationButton.contains(event.target) && !notificationDropdown.contains(event.target)) {
+                notificationDropdown.classList.add('hidden');
+            }
+        });
+        
+        // Initialize Lucide icons to ensure the newly added icons are rendered
+        if (typeof lucide !== 'undefined' && typeof lucide.createIcons === 'function') {
+            lucide.createIcons();
+        }
+    });
+</script>

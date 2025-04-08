@@ -1,0 +1,89 @@
+<% layout('layouts/auth') -%>
+<% block('title', 'Email Verification - InsightSerenity') -%>
+
+<div class="text-center py-6">
+    <% if (verified) { %>
+        <!-- Success State -->
+        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 mb-6">
+            <i data-lucide="check" class="h-10 w-10 text-green-600"></i>
+        </div>
+        
+        <h1 class="text-2xl font-bold text-gray-800 mb-3">Email Verified Successfully!</h1>
+        
+        <p class="text-gray-600 mb-8">
+            Your email address has been successfully verified. You can now access all features of your account.
+        </p>
+        
+        <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 justify-center">
+            <a href="/api/auth/login" class="inline-flex items-center justify-center py-2 px-6 border border-transparent rounded-md shadow-sm text-base font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <i data-lucide="log-in" class="h-5 w-5 mr-2"></i>
+                Sign In
+            </a>
+        </div>
+    <% } else { %>
+        <!-- Error State -->
+        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-red-100 mb-6">
+            <i data-lucide="alert-triangle" class="h-10 w-10 text-red-600"></i>
+        </div>
+        
+        <h1 class="text-2xl font-bold text-gray-800 mb-3">Verification Failed</h1>
+        
+        <% if (typeof error !== 'undefined' && error) { %>
+            <p class="text-gray-600 mb-6">
+                <%= error %>
+            </p>
+        <% } else { %>
+            <p class="text-gray-600 mb-6">
+                We couldn't verify your email address. The verification link may have expired or is invalid.
+            </p>
+        <% } %>
+        
+        <div class="bg-gray-50 p-6 rounded-lg text-left mb-8">
+            <h2 class="text-lg font-semibold text-gray-700 mb-3">What You Can Do</h2>
+            
+            <ul class="space-y-3">
+                <li class="flex items-start">
+                    <div class="flex-shrink-0 mt-1">
+                        <i data-lucide="refresh-cw" class="h-5 w-5 text-primary"></i>
+                    </div>
+                    <span class="ml-3 text-gray-600">
+                        <strong class="font-medium text-gray-700">Try again:</strong> 
+                        Sign in to your account to request a new verification email.
+                    </span>
+                </li>
+                
+                <li class="flex items-start">
+                    <div class="flex-shrink-0 mt-1">
+                        <i data-lucide="mail" class="h-5 w-5 text-primary"></i>
+                    </div>
+                    <span class="ml-3 text-gray-600">
+                        <strong class="font-medium text-gray-700">Check your email:</strong> 
+                        Make sure you're using the most recent verification link sent to your email.
+                    </span>
+                </li>
+                
+                <li class="flex items-start">
+                    <div class="flex-shrink-0 mt-1">
+                        <i data-lucide="help-circle" class="h-5 w-5 text-primary"></i>
+                    </div>
+                    <span class="ml-3 text-gray-600">
+                        <strong class="font-medium text-gray-700">Contact support:</strong> 
+                        If you continue to experience issues, please contact our support team for assistance.
+                    </span>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 justify-center">
+            <a href="/api/auth/login" class="inline-flex items-center justify-center py-2 px-6 border border-transparent rounded-md shadow-sm text-base font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                <i data-lucide="log-in" class="h-5 w-5 mr-2"></i>
+                Sign In
+            </a>
+            
+            <a href="/support" class="inline-flex items-center justify-center py-2 px-6 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                <i data-lucide="help-circle" class="h-5 w-5 mr-2"></i>
+                Contact Support
+            </a>
+        </div>
+    <% } %>
+</div>

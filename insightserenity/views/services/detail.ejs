@@ -1,0 +1,643 @@
+<!-- views/services/detail.ejs -->
+<% layout('layouts/service') %>
+
+<% 
+// Set page title and current section for navigation
+const title = service.name; 
+%>
+
+<!-- Hero Section with Service Image -->
+<div class="relative overflow-hidden bg-gradient-to-r from-gray-900 to-secondary">
+  <div class="absolute inset-0 z-0 opacity-10">
+    <% if (service.media && service.media.featuredImage) { %>
+      <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<%= service.media.featuredImage %>')"></div>
+    <% } else { %>
+      <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')] bg-cover bg-center"></div>
+    <% } %>
+  </div>
+  <div class="container mx-auto px-4 py-12 relative z-10">
+    <div class="flex flex-col max-w-3xl">
+      <div class="mb-2 flex items-center">
+        <span class="bg-primary text-dark text-xs py-1 px-2.5 rounded-full font-medium flex items-center">
+          <i data-lucide="tag" class="h-3 w-3 mr-1"></i>
+          <%= service.category.charAt(0).toUpperCase() + service.category.slice(1).replace('_', ' ') %>
+        </span>
+      </div>
+      <h1 class="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight">
+        <%= service.name %>
+      </h1>
+      <p class="text-base text-gray-200 mb-6 leading-relaxed">
+        <%= service.description.short %>
+      </p>
+      <div class="flex flex-wrap gap-2 mb-4">
+        <% if (service.industries && service.industries.length > 0) { %>
+          <% service.industries.forEach(industry => { %>
+            <span class="bg-white/20 text-white text-xs py-1 px-2.5 rounded-full flex items-center">
+              <i data-lucide="building" class="h-3 w-3 mr-1"></i>
+              <%= industry.charAt(0).toUpperCase() + industry.slice(1).replace('_', ' ') %>
+            </span>
+          <% }); %>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container mx-auto px-4 py-6">
+  <!-- Breadcrumbs -->
+  <nav class="text-xs mb-6">
+    <ol class="list-none p-0 inline-flex items-center">
+      <li class="flex items-center">
+        <a href="/" class="text-gray-500 hover:text-primary transition-colors flex items-center">
+          <i data-lucide="home" class="h-3 w-3 mr-1"></i>
+          Home
+        </a>
+      </li>
+      <li class="flex items-center mx-2">
+        <i data-lucide="chevron-right" class="h-3 w-3 text-gray-400"></i>
+      </li>
+      <li class="flex items-center">
+        <a href="/api/services" class="text-gray-500 hover:text-primary transition-colors">
+          Services
+        </a>
+      </li>
+      <li class="flex items-center mx-2">
+        <i data-lucide="chevron-right" class="h-3 w-3 text-gray-400"></i>
+      </li>
+      <li class="flex items-center text-gray-700 font-medium">
+        <%= service.name %>
+      </li>
+    </ol>
+  </nav>
+  
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <!-- Main content -->
+    <div class="lg:col-span-3">
+      <!-- Service detailed description -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-6">
+        <div class="p-5 border-b border-gray-100">
+          <h2 class="text-lg font-bold text-gray-800 flex items-center">
+            <i data-lucide="info" class="h-5 w-5 mr-2 text-primary"></i>
+            Service Overview
+          </h2>
+        </div>
+        <div class="p-5">
+          <div class="prose max-w-none text-sm text-gray-600 leading-relaxed">
+            <div class="whitespace-pre-line">
+              <%= service.description.detailed %>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Service benefits -->
+      <% if (service.benefits && service.benefits.length > 0) { %>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-6">
+          <div class="p-5 border-b border-gray-100">
+            <h2 class="text-lg font-bold text-gray-800 flex items-center">
+              <i data-lucide="trending-up" class="h-5 w-5 mr-2 text-primary"></i>
+              Key Benefits
+            </h2>
+          </div>
+          <div class="p-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <% service.benefits.forEach((benefit, index) => { %>
+                <div class="flex items-start">
+                  <div class="flex-shrink-0 flex items-center justify-center h-8 w-8 rounded-full bg-primary/10 text-primary text-sm font-medium">
+                    <%= index + 1 %>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm text-gray-700"><%= benefit %></p>
+                  </div>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+        </div>
+      <% } %>
+      
+      <!-- Service features -->
+      <% if (service.features && service.features.length > 0) { %>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-6">
+          <div class="p-5 border-b border-gray-100">
+            <h2 class="text-lg font-bold text-gray-800 flex items-center">
+              <i data-lucide="check-circle" class="h-5 w-5 mr-2 text-primary"></i>
+              Features
+            </h2>
+          </div>
+          <div class="p-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <% service.features.forEach(feature => { %>
+                <div class="flex items-start">
+                  <div class="flex-shrink-0 text-green-500">
+                    <i data-lucide="check" class="h-4 w-4"></i>
+                  </div>
+                  <p class="ml-2 text-sm text-gray-600"><%= feature %></p>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+        </div>
+      <% } %>
+      
+      <!-- Service process -->
+      <% if (service.process && service.process.length > 0) { %>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-6">
+          <div class="p-5 border-b border-gray-100">
+            <h2 class="text-lg font-bold text-gray-800 flex items-center">
+              <i data-lucide="git-branch" class="h-5 w-5 mr-2 text-primary"></i>
+              Our Process
+            </h2>
+          </div>
+          <div class="p-5">
+            <div class="space-y-6">
+              <% 
+              // Sort process steps by order
+              const sortedProcess = [...service.process].sort((a, b) => a.order - b.order);
+              
+              sortedProcess.forEach((step, index) => { 
+              %>
+                <div class="relative flex">
+                  <!-- Timeline line -->
+                  <% if (index < sortedProcess.length - 1) { %>
+                    <div class="absolute top-0 left-4 -ml-px h-full w-0.5 bg-gray-100"></div>
+                  <% } %>
+                  
+                  <div class="relative flex items-start">
+                    <div class="flex items-center justify-center h-8 w-8 rounded-full bg-primary/10 text-primary text-sm font-medium flex-shrink-0">
+                      <%= step.order %>
+                    </div>
+                    <div class="ml-4">
+                      <h3 class="text-sm font-medium text-gray-800 mb-1"><%= step.stage %></h3>
+                      <p class="text-xs text-gray-600 leading-relaxed"><%= step.description %></p>
+                    </div>
+                  </div>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+        </div>
+      <% } %>
+      
+      <!-- Deliverables -->
+      <% if (service.deliverables && service.deliverables.length > 0) { %>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-6">
+          <div class="p-5 border-b border-gray-100">
+            <h2 class="text-lg font-bold text-gray-800 flex items-center">
+              <i data-lucide="package" class="h-5 w-5 mr-2 text-primary"></i>
+              What You'll Receive
+            </h2>
+          </div>
+          <div class="p-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <% service.deliverables.forEach(deliverable => { %>
+                <div class="flex items-start">
+                  <div class="flex-shrink-0 text-primary">
+                    <i data-lucide="check-square" class="h-4 w-4"></i>
+                  </div>
+                  <span class="ml-2 text-sm text-gray-600"><%= deliverable %></span>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+        </div>
+      <% } %>
+      
+      <!-- FAQs -->
+      <% if (service.faqs && service.faqs.length > 0) { %>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-6">
+          <div class="p-5 border-b border-gray-100">
+            <h2 class="text-lg font-bold text-gray-800 flex items-center">
+              <i data-lucide="help-circle" class="h-5 w-5 mr-2 text-primary"></i>
+              Frequently Asked Questions
+            </h2>
+          </div>
+          <div class="p-5">
+            <div class="space-y-3" id="faqs-container">
+              <% service.faqs.forEach((faq, index) => { %>
+                <div class="border border-gray-100 rounded shadow-sm" data-faq-item>
+                  <button 
+                    type="button" 
+                    class="flex justify-between items-center w-full px-4 py-3 text-left bg-white hover:bg-gray-50 transition-colors"
+                    data-faq-toggle
+                  >
+                    <span class="font-medium text-sm text-gray-800"><%= faq.question %></span>
+                    <span class="text-gray-400">
+                      <i data-lucide="plus" class="h-4 w-4 faq-open-icon"></i>
+                      <i data-lucide="minus" class="h-4 w-4 faq-close-icon hidden"></i>
+                    </span>
+                  </button>
+                  <div 
+                    class="px-4 py-3 text-xs border-t border-gray-100 bg-gray-50 text-gray-600 leading-relaxed hidden"
+                    data-faq-content
+                  >
+                    <%= faq.answer %>
+                  </div>
+                </div>
+              <% }); %>
+            </div>
+          </div>
+        </div>
+      <% } %>
+      
+      <!-- Related services -->
+      <% if (relatedServices && relatedServices.length > 0) { %>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-6">
+          <div class="p-5 border-b border-gray-100">
+            <h2 class="text-lg font-bold text-gray-800 flex items-center">
+              <i data-lucide="grid" class="h-5 w-5 mr-2 text-primary"></i>
+              Related Services
+            </h2>
+          </div>
+          <div class="p-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <% relatedServices.forEach(relService => { %>
+                <a href="/api/services/<%= relService.slug %>" class="group block bg-gray-50 rounded-lg p-4 hover:shadow-md transition-all hover:-translate-y-0.5 border border-gray-100">
+                  <div class="mb-3 h-24 overflow-hidden rounded bg-gray-100">
+                    <% if (relService.media && relService.media.featuredImage) { %>
+                      <img 
+                        src="<%= relService.media.featuredImage %>" 
+                        alt="<%= relService.name %>" 
+                        class="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
+                      >
+                    <% } else { %>
+                      <div class="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                        <i data-lucide="briefcase" class="h-8 w-8 text-gray-400"></i>
+                      </div>
+                    <% } %>
+                  </div>
+                  <h3 class="text-sm font-medium text-gray-800 mb-1 group-hover:text-primary transition-colors line-clamp-1">
+                    <%= relService.name %>
+                  </h3>
+                  <% if (relService.description && relService.description.short) { %>
+                    <p class="text-xs text-gray-500 mb-2 line-clamp-2 leading-relaxed">
+                      <%= relService.description.short %>
+                    </p>
+                  <% } %>
+                  <div class="flex items-center text-primary text-xs font-medium">
+                    Learn more
+                    <i data-lucide="chevron-right" class="h-3 w-3 ml-1 group-hover:translate-x-0.5 transition-transform"></i>
+                  </div>
+                </a>
+              <% }); %>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="lg:col-span-1 sticky top-6">
+        <!-- Action card -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-6">
+            <div class="p-5 border-b border-gray-100">
+            <h3 class="text-base font-bold text-gray-800 flex items-center">
+                <i data-lucide="file-text" class="h-4 w-4 mr-2 text-primary"></i>
+                Service Details
+            </h3>
+            </div>
+            <div class="p-5">
+            <!-- Pricing info -->
+            <div class="space-y-4 mb-6">
+                <div class="flex items-center justify-between">
+                <p class="text-xs text-gray-500 flex items-center">
+                    <i data-lucide="credit-card" class="h-3 w-3 mr-1.5 text-gray-400"></i>
+                    Pricing Model
+                </p>
+                <p class="text-xs font-medium text-gray-700">
+                    <%= service.pricing.model.charAt(0).toUpperCase() + service.pricing.model.slice(1).replace('_', '-') %>
+                </p>
+                </div>
+                
+                <div class="flex items-center justify-between">
+                <p class="text-xs text-gray-500 flex items-center">
+                    <i data-lucide="dollar-sign" class="h-3 w-3 mr-1.5 text-gray-400"></i>
+                    Price Range
+                </p>
+                <p class="text-xs font-medium text-gray-700">
+                    <% if (service.pricing.customQuote) { %>
+                    Custom Quote Required
+                    <% } else if (service.pricing.priceRange && service.pricing.priceRange.min && service.pricing.priceRange.max) { %>
+                    <%= service.pricing.currency %> <%= service.pricing.priceRange.min.toLocaleString() %> - <%= service.pricing.priceRange.max.toLocaleString() %>
+                    <% } else if (service.pricing.startingFrom) { %>
+                    Starting from <%= service.pricing.currency %> <%= service.pricing.startingFrom.toLocaleString() %>
+                    <% } else { %>
+                    Contact for pricing details
+                    <% } %>
+                </p>
+                </div>
+                
+                <% if (service.pricing.paymentSchedule) { %>
+                <div class="flex items-center justify-between">
+                    <p class="text-xs text-gray-500 flex items-center">
+                    <i data-lucide="calendar" class="h-3 w-3 mr-1.5 text-gray-400"></i>
+                    Payment Schedule
+                    </p>
+                    <p class="text-xs font-medium text-gray-700"><%= service.pricing.paymentSchedule %></p>
+                </div>
+                <% } %>
+                
+                <% if (service.timeframes) { %>
+                <div class="flex items-center justify-between">
+                    <p class="text-xs text-gray-500 flex items-center">
+                    <i data-lucide="clock" class="h-3 w-3 mr-1.5 text-gray-400"></i>
+                    Typical Timeframe
+                    </p>
+                    <p class="text-xs font-medium text-gray-700"><%= service.timeframes.typical || 'Varies by project scope' %></p>
+                </div>
+                
+                <% if (service.timeframes.express) { %>
+                    <div class="flex items-center justify-between">
+                    <p class="text-xs text-gray-500 flex items-center">
+                        <i data-lucide="zap" class="h-3 w-3 mr-1.5 text-gray-400"></i>
+                        Express Option
+                    </p>
+                    <p class="text-xs font-medium text-gray-700"><%= service.timeframes.express %></p>
+                    </div>
+                <% } %>
+                <% } %>
+            </div>
+            
+            <div class="pt-4 border-t border-gray-100">
+                <a 
+                href="/api/contact?service=<%= service.slug %>" 
+                class="block w-full bg-primary text-dark text-center text-sm font-medium py-2.5 px-4 rounded hover:bg-primary-dark transition-colors shadow-sm"
+                onclick="recordServiceInquiry('<%= service._id %>')"
+                >
+                <i data-lucide="message-square" class="h-4 w-4 mr-1.5 inline-block"></i>
+                Request a Quote
+                </a>
+                
+                <a 
+                href="/api/services" 
+                class="block w-full text-center text-sm text-gray-600 font-medium mt-3 py-2 hover:text-gray-900 transition-colors"
+                >
+                <i data-lucide="arrow-left" class="h-3.5 w-3.5 mr-1 inline-block"></i>
+                Back to Services
+                </a>
+            </div>
+            </div>
+        </div>
+        
+        <!-- Expertise required -->
+        <% if (service.expertise) { %>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-6">
+            <div class="p-5 border-b border-gray-100">
+                <h3 class="text-base font-bold text-gray-800 flex items-center">
+                <i data-lucide="award" class="h-4 w-4 mr-2 text-primary"></i>
+                Expertise
+                </h3>
+            </div>
+            <div class="p-5">
+                <% if (service.expertise.requiredSkills && service.expertise.requiredSkills.length > 0) { %>
+                <div class="mb-4">
+                    <p class="text-xs text-gray-500 mb-2 flex items-center">
+                    <i data-lucide="check-square" class="h-3 w-3 mr-1.5 text-gray-400"></i>
+                    Required Skills
+                    </p>
+                    <div class="flex flex-wrap gap-1.5">
+                    <% service.expertise.requiredSkills.forEach(skill => { %>
+                        <span class="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded-full">
+                        <%= skill %>
+                        </span>
+                    <% }); %>
+                    </div>
+                </div>
+                <% } %>
+                
+                <% if (service.expertise.experience) { %>
+                <div class="mb-4">
+                    <p class="text-xs text-gray-500 mb-1 flex items-center">
+                    <i data-lucide="briefcase" class="h-3 w-3 mr-1.5 text-gray-400"></i>
+                    Experience Level
+                    </p>
+                    <p class="text-xs text-gray-700"><%= service.expertise.experience %></p>
+                </div>
+                <% } %>
+                
+                <% if (service.expertise.certifications && service.expertise.certifications.length > 0) { %>
+                <div>
+                    <p class="text-xs text-gray-500 mb-2 flex items-center">
+                    <i data-lucide="award" class="h-3 w-3 mr-1.5 text-gray-400"></i>
+                    Related Certifications
+                    </p>
+                    <ul class="space-y-1 text-xs text-gray-700">
+                    <% service.expertise.certifications.forEach(cert => { %>
+                        <li class="flex items-start">
+                        <i data-lucide="check" class="h-3 w-3 mr-1.5 text-gray-400 mt-0.5"></i>
+                        <%= cert %>
+                        </li>
+                    <% }); %>
+                    </ul>
+                </div>
+                <% } %>
+            </div>
+            </div>
+        <% } %>
+        
+        <!-- Consultants providing this service -->
+        <% if (service.consultants && service.consultants.length > 0) { %>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-6">
+            <div class="p-5 border-b border-gray-100">
+                <h3 class="text-base font-bold text-gray-800 flex items-center">
+                <i data-lucide="users" class="h-4 w-4 mr-2 text-primary"></i>
+                Consultants
+                </h3>
+            </div>
+            <div class="p-5">
+                <div class="space-y-3">
+                <% service.consultants.forEach(consultant => { %>
+                    <a href="/consultants/<%= consultant._id %>" class="flex items-center p-2 border border-gray-100 rounded hover:border-primary hover:bg-gray-50 transition-colors">
+                    <div class="flex-shrink-0">
+                        <% if (consultant.profile && consultant.profile.avatarUrl) { %>
+                        <img 
+                            src="<%= consultant.profile.avatarUrl %>" 
+                            alt="<%= consultant.profile.firstName %> <%= consultant.profile.lastName %>" 
+                            class="h-10 w-10 rounded-full object-cover"
+                        >
+                        <% } else { %>
+                        <div class="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+                            <%= consultant.profile.firstName.charAt(0) %><%= consultant.profile.lastName.charAt(0) %>
+                        </div>
+                        <% } %>
+                    </div>
+                    <div class="ml-3">
+                        <h4 class="text-xs font-medium text-gray-800">
+                        <%= consultant.profile.firstName %> <%= consultant.profile.lastName %>
+                        </h4>
+                        <p class="text-xs text-gray-500">
+                        <%= consultant.professional && consultant.professional.title || 'Consultant' %>
+                        </p>
+                    </div>
+                    </a>
+                <% }); %>
+                </div>
+                
+                <div class="mt-4">
+                <a href="/consultants?service=<%= service.slug %>" class="text-primary text-xs font-medium flex items-center hover:underline justify-center">
+                    View all consultants
+                    <i data-lucide="chevron-right" class="h-3 w-3 ml-1"></i>
+                </a>
+                </div>
+            </div>
+            </div>
+        <% } %>
+        
+        <!-- Case studies -->
+        <% if (service.caseStudies && service.caseStudies.length > 0) { %>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden mb-6">
+            <div class="p-5 border-b border-gray-100">
+                <h3 class="text-base font-bold text-gray-800 flex items-center">
+                <i data-lucide="file-text" class="h-4 w-4 mr-2 text-primary"></i>
+                Success Stories
+                </h3>
+            </div>
+            <div class="p-5">
+                <div class="space-y-3">
+                <% service.caseStudies.forEach(caseStudy => { %>
+                    <a href="/case-studies/<%= caseStudy._id %>" class="block border border-gray-100 rounded p-3 hover:border-primary hover:bg-gray-50 transition-colors">
+                    <h4 class="text-sm font-medium text-gray-800 mb-1">
+                        <%= caseStudy.title %>
+                    </h4>
+                    <p class="text-xs text-gray-600 mb-2 line-clamp-2">
+                        <%= caseStudy.summary %>
+                    </p>
+                    <span class="text-primary text-xs font-medium flex items-center">
+                        Read case study
+                        <i data-lucide="chevron-right" class="h-3 w-3 ml-1"></i>
+                    </span>
+                    </a>
+                <% }); %>
+                </div>
+            </div>
+            </div>
+        <% } %>
+        
+        <!-- Share widget -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-5 border-b border-gray-100">
+            <h3 class="text-base font-bold text-gray-800 flex items-center">
+                <i data-lucide="share-2" class="h-4 w-4 mr-2 text-primary"></i>
+                Share This Service
+            </h3>
+            </div>
+            <div class="p-5">
+            <div class="flex justify-between">
+                <a 
+                href="https://www.linkedin.com/sharing/share-offsite/?url=<%= encodeURIComponent(`${baseUrl}/api/services/${service.slug}`) %>" 
+                target="_blank" 
+                class="flex flex-col items-center justify-center w-12 h-12 rounded-lg bg-[#0077b5]/10 text-[#0077b5] hover:bg-[#0077b5]/20 transition-colors"
+                aria-label="Share on LinkedIn"
+                >
+                <i data-lucide="linkedin" class="h-5 w-5"></i>
+                <span class="text-[10px] mt-1">LinkedIn</span>
+                </a>
+                
+                <a 
+                href="https://twitter.com/intent/tweet?url=<%= encodeURIComponent(`${baseUrl}/api/services/${service.slug}`) %>&text=<%= encodeURIComponent(`Check out this service: ${service.name}`) %>" 
+                target="_blank" 
+                class="flex flex-col items-center justify-center w-12 h-12 rounded-lg bg-[#1da1f2]/10 text-[#1da1f2] hover:bg-[#1da1f2]/20 transition-colors"
+                aria-label="Share on Twitter"
+                >
+                <i data-lucide="twitter" class="h-5 w-5"></i>
+                <span class="text-[10px] mt-1">Twitter</span>
+                </a>
+                
+                <a 
+                href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent(`${baseUrl}/api/services/${service.slug}`) %>" 
+                target="_blank" 
+                class="flex flex-col items-center justify-center w-12 h-12 rounded-lg bg-[#3b5998]/10 text-[#3b5998] hover:bg-[#3b5998]/20 transition-colors"
+                aria-label="Share on Facebook"
+                >
+                <i data-lucide="facebook" class="h-5 w-5"></i>
+                <span class="text-[10px] mt-1">Facebook</span>
+                </a>
+                
+                <a 
+                href="mailto:?subject=<%= encodeURIComponent(`Check out this service: ${service.name}`) %>&body=<%= encodeURIComponent(`I thought you might be interested in this service: ${service.name}\n\n${baseUrl}/services/${service.slug}`) %>" 
+                target="_blank" 
+                class="flex flex-col items-center justify-center w-12 h-12 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                aria-label="Share via Email"
+                >
+                <i data-lucide="mail" class="h-5 w-5"></i>
+                <span class="text-[10px] mt-1">Email</span>
+                </a>
+            </div>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA Section -->
+<div class="bg-gray-50 py-12 mt-8">
+  <div class="container mx-auto px-4">
+    <div class="bg-gradient-to-r from-gray-900 to-secondary rounded-lg shadow-sm overflow-hidden">
+      <div class="md:flex items-center">
+        <div class="p-6 md:p-8 md:w-2/3">
+          <h2 class="text-xl font-bold text-white mb-3">Ready to Get Started?</h2>
+          <p class="text-sm text-gray-300 mb-5 leading-relaxed max-w-xl">
+            Our team of expert consultants is ready to discuss how this service can address your specific needs and drive meaningful results for your organization.
+          </p>
+          <div class="flex flex-wrap gap-3">
+            <a 
+              href="/api/contact?service=<%= service.slug %>" 
+              class="inline-flex items-center bg-primary text-dark text-sm font-medium px-4 py-2 rounded hover:bg-primary-dark transition-colors shadow-sm"
+              onclick="recordServiceInquiry('<%= service._id %>')"
+            >
+              <i data-lucide="mail" class="h-4 w-4 mr-1.5"></i>
+              Contact Us
+            </a>
+            <a href="/api/services" class="inline-flex items-center bg-white/10 text-white text-sm font-medium px-4 py-2 rounded hover:bg-white/20 transition-colors">
+              <i data-lucide="layers" class="h-4 w-4 mr-1.5"></i>
+              Explore More Services
+            </a>
+          </div>
+        </div>
+        <div class="hidden md:block md:w-1/3 p-6">
+          <img src="https://images.unsplash.com/photo-1521791136064-7986c2920216?ixlib=rb-1.2.1&auto=format&fit=crop&w=750&q=80" alt="Business consultation" class="w-full h-48 object-cover rounded shadow-lg">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Record service inquiry
+  function recordServiceInquiry(serviceId) {
+    fetch(`/api/services/${serviceId}/inquiry`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).catch(error => {
+      console.error('Error recording service inquiry:', error);
+    });
+  }
+  
+  // Initialize Lucide icons
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+    
+    // FAQ accordions
+    const faqToggles = document.querySelectorAll('[data-faq-toggle]');
+    
+    faqToggles.forEach(toggle => {
+      toggle.addEventListener('click', () => {
+        const faqItem = toggle.closest('[data-faq-item]');
+        const content = faqItem.querySelector('[data-faq-content]');
+        const openIcon = toggle.querySelector('.faq-open-icon');
+        const closeIcon = toggle.querySelector('.faq-close-icon');
+        
+        // Toggle content visibility
+        content.classList.toggle('hidden');
+        
+        // Toggle icons
+        openIcon.classList.toggle('hidden');
+        closeIcon.classList.toggle('hidden');
+      });
+    });
+  });
+</script>

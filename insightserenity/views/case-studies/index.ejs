@@ -1,0 +1,323 @@
+<!-- views/case-studies/index.ejs -->
+<% layout('layouts/case-study') %>
+
+<div class="bg-white shadow-sm rounded-lg overflow-hidden">
+  <!-- Page Header -->
+  <div class="bg-gray-50 border-b border-gray-200 px-6 py-4">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+      <div>
+        <h1 class="text-xl font-bold text-gray-800">Case Studies</h1>
+        <p class="text-sm text-gray-600 mt-1">Explore our success stories across various industries</p>
+      </div>
+      
+      <div class="mt-3 md:mt-0">
+        <% if(locals.user && ['admin', 'consultant'].includes(locals.user.role)) { %>
+          <a href="/api/case-studies/" class="inline-flex items-center px-4 py-2 bg-primary text-dark text-sm font-medium rounded-md shadow-sm hover:bg-primary-dark focus:outline-none">
+            <i data-lucide="plus-circle" class="h-4 w-4 mr-2"></i>
+            New Case Study
+          </a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Filters Section -->
+  <div class="px-6 py-4 border-b border-gray-200 bg-white">
+    <div class="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-4">
+      <!-- Industry Filter -->
+      <div class="w-full md:w-auto">
+        <label for="industry" class="block text-xs font-medium text-gray-700 mb-1">Industry</label>
+        <select id="industry" name="industry" class="block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md focus:ring-primary focus:border-primary">
+          <option value="">All Industries</option>
+          <option value="technology">Technology</option>
+          <option value="healthcare">Healthcare</option>
+          <option value="finance">Finance</option>
+          <option value="education">Education</option>
+          <option value="retail">Retail</option>
+          <option value="manufacturing">Manufacturing</option>
+          <option value="media">Media</option>
+          <option value="legal">Legal</option>
+          <option value="real_estate">Real Estate</option>
+          <option value="energy">Energy</option>
+          <option value="hospitality">Hospitality</option>
+          <option value="nonprofit">Nonprofit</option>
+          <option value="government">Government</option>
+          <option value="transportation">Transportation</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      
+      <!-- Service Filter -->
+      <div class="w-full md:w-auto">
+        <label for="service" class="block text-xs font-medium text-gray-700 mb-1">Service</label>
+        <select id="service" name="service" class="block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md focus:ring-primary focus:border-primary">
+          <option value="">All Services</option>
+          <% if (locals.services) { %>
+            <% services.forEach(service => { %>
+              <option value="<%= service._id %>"><%= service.name %></option>
+            <% }) %>
+          <% } %>
+        </select>
+      </div>
+      
+      <!-- Tags Filter -->
+      <div class="w-full md:w-auto">
+        <label for="tags" class="block text-xs font-medium text-gray-700 mb-1">Tags</label>
+        <div class="relative">
+          <input type="text" id="tags" name="tags" placeholder="Enter tags..." class="block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md focus:ring-primary focus:border-primary">
+          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <i data-lucide="tag" class="h-4 w-4 text-gray-400"></i>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Search Box -->
+      <div class="w-full md:w-auto md:flex-grow">
+        <label for="search" class="block text-xs font-medium text-gray-700 mb-1">Search</label>
+        <div class="relative">
+          <input type="text" id="search" name="search" placeholder="Search case studies..." class="block w-full pl-3 pr-10 py-2 text-sm border-gray-300 rounded-md focus:ring-primary focus:border-primary">
+          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <i data-lucide="search" class="h-4 w-4 text-gray-400"></i>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Apply Filters Button -->
+      <div class="w-full md:w-auto self-end">
+        <button type="button" id="apply-filters" class="w-full md:w-auto mt-5 inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none">
+          <i data-lucide="filter" class="h-4 w-4 mr-2"></i>
+          Apply Filters
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Case Studies Grid -->
+  <div class="px-6 py-5">
+    <div id="case-studies-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Case Study Cards -->
+      <% if(locals.caseStudies && caseStudies.length > 0) { %>
+        <% caseStudies.forEach(caseStudy => { %>
+          <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-300">
+            <!-- Featured Image -->
+            <div class="h-48 bg-gray-200 overflow-hidden">
+              <% if(caseStudy.media && caseStudy.media.featuredImage) { %>
+                <img src="<%= caseStudy.media.featuredImage %>" alt="<%= caseStudy.title %>" class="w-full h-full object-cover">
+              <% } else { %>
+                <div class="w-full h-full flex items-center justify-center bg-gray-100">
+                  <i data-lucide="image" class="h-16 w-16 text-gray-400"></i>
+                </div>
+              <% } %>
+            </div>
+            
+            <!-- Card Content -->
+            <div class="p-5">
+              <!-- Industry Badge -->
+              <div class="flex items-center mb-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                  <i data-lucide="briefcase" class="h-3 w-3 mr-1"></i>
+                  <%= caseStudy.client.industry.replace('_', ' ').charAt(0).toUpperCase() + caseStudy.client.industry.replace('_', ' ').slice(1) %>
+                </span>
+                
+                <% if(caseStudy.featured) { %>
+                  <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                    <i data-lucide="star" class="h-3 w-3 mr-1"></i>
+                    Featured
+                  </span>
+                <% } %>
+              </div>
+              
+              <!-- Title -->
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                <%= caseStudy.title %>
+              </h3>
+              
+              <!-- Client -->
+              <p class="text-sm text-gray-600 mb-3">
+                <% if(!caseStudy.client.isAnonymous) { %>
+                  <span class="font-medium">Client:</span> <%= caseStudy.client.name %>
+                <% } else { %>
+                  <span class="font-medium">Client:</span> <em>Confidential</em>
+                <% } %>
+              </p>
+              
+              <!-- Summary -->
+              <p class="text-sm text-gray-700 mb-4 line-clamp-3">
+                <%= caseStudy.summary %>
+              </p>
+              
+              <!-- Tags -->
+              <% if(caseStudy.tags && caseStudy.tags.length > 0) { %>
+                <div class="flex flex-wrap gap-2 mb-4">
+                  <% caseStudy.tags.slice(0, 3).forEach(tag => { %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                      #<%= tag %>
+                    </span>
+                  <% }) %>
+                  
+                  <% if(caseStudy.tags.length > 3) { %>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500">
+                      +<%= caseStudy.tags.length - 3 %> more
+                    </span>
+                  <% } %>
+                </div>
+              <% } %>
+              
+              <!-- View Button -->
+              <a href="/api/case-studies/<%= caseStudy.slug %>" class="inline-flex items-center justify-center w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none">
+                View Case Study
+              </a>
+            </div>
+          </div>
+        <% }) %>
+      <% } else { %>
+        <div class="col-span-full flex flex-col items-center justify-center py-12 text-center">
+          <i data-lucide="file-search" class="h-16 w-16 text-gray-400 mb-4"></i>
+          <h3 class="text-lg font-medium text-gray-900">No case studies found</h3>
+          <p class="mt-1 text-sm text-gray-500">Try adjusting your filters or search criteria</p>
+        </div>
+      <% } %>
+    </div>
+    
+    <!-- Pagination -->
+    <% if(locals.pagination && pagination.total > pagination.limit) { %>
+      <div class="mt-8 flex items-center justify-between border-t border-gray-200 pt-4">
+        <div class="flex flex-1 justify-between sm:hidden">
+          <% if(pagination.page > 1) { %>
+            <a href="#" data-page="<%= pagination.page - 1 %>" class="pagination-link relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Previous</a>
+          <% } else { %>
+            <span class="relative inline-flex items-center rounded-md border border-gray-300 bg-gray-100 px-4 py-2 text-sm font-medium text-gray-500 cursor-not-allowed">Previous</span>
+          <% } %>
+          
+          <% if(pagination.page < pagination.pages) { %>
+            <a href="#" data-page="<%= pagination.page + 1 %>" class="pagination-link relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Next</a>
+          <% } else { %>
+            <span class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-gray-100 px-4 py-2 text-sm font-medium text-gray-500 cursor-not-allowed">Next</span>
+          <% } %>
+        </div>
+        
+        <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+          <div>
+            <p class="text-sm text-gray-700">
+              Showing <span class="font-medium"><%= ((pagination.page - 1) * pagination.limit) + 1 %></span> to <span class="font-medium"><%= Math.min(pagination.page * pagination.limit, pagination.total) %></span> of <span class="font-medium"><%= pagination.total %></span> results
+            </p>
+          </div>
+          
+          <div>
+            <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+              <!-- Previous Page -->
+              <% if(pagination.page > 1) { %>
+                <a href="#" data-page="<%= pagination.page - 1 %>" class="pagination-link relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+                  <span class="sr-only">Previous</span>
+                  <i data-lucide="chevron-left" class="h-5 w-5"></i>
+                </a>
+              <% } else { %>
+                <span class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 cursor-not-allowed">
+                  <span class="sr-only">Previous</span>
+                  <i data-lucide="chevron-left" class="h-5 w-5"></i>
+                </span>
+              <% } %>
+              
+              <!-- Page Numbers -->
+              <% 
+                let startPage = Math.max(1, pagination.page - 2);
+                let endPage = Math.min(pagination.pages, startPage + 4);
+                if (endPage - startPage < 4) {
+                  startPage = Math.max(1, endPage - 4);
+                }
+              %>
+              
+              <% for(let i = startPage; i <= endPage; i++) { %>
+                <% if(i === pagination.page) { %>
+                  <span aria-current="page" class="relative z-10 inline-flex items-center bg-primary px-4 py-2 text-sm font-semibold text-dark focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+                    <%= i %>
+                  </span>
+                <% } else { %>
+                  <a href="#" data-page="<%= i %>" class="pagination-link relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+                    <%= i %>
+                  </a>
+                <% } %>
+              <% } %>
+              
+              <!-- Next Page -->
+              <% if(pagination.page < pagination.pages) { %>
+                <a href="#" data-page="<%= pagination.page + 1 %>" class="pagination-link relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">
+                  <span class="sr-only">Next</span>
+                  <i data-lucide="chevron-right" class="h-5 w-5"></i>
+                </a>
+              <% } else { %>
+                <span class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 cursor-not-allowed">
+                  <span class="sr-only">Next</span>
+                  <i data-lucide="chevron-right" class="h-5 w-5"></i>
+                </span>
+              <% } %>
+            </nav>
+          </div>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize filter functionality
+    const industrySelect = document.getElementById('industry');
+    const serviceSelect = document.getElementById('service');
+    const tagsInput = document.getElementById('tags');
+    const searchInput = document.getElementById('search');
+    const applyFiltersBtn = document.getElementById('apply-filters');
+    const paginationLinks = document.querySelectorAll('.pagination-link');
+    
+    // Apply filters when button is clicked
+    applyFiltersBtn.addEventListener('click', function() {
+      loadCaseStudies(1);
+    });
+    
+    // Handle pagination clicks
+    paginationLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const page = this.getAttribute('data-page');
+        loadCaseStudies(page);
+      });
+    });
+    
+    // Function to load case studies with filters
+    function loadCaseStudies(page = 1) {
+      const container = document.getElementById('case-studies-container');
+      const loadingOverlay = document.getElementById('loading-overlay');
+      
+      // Show loading overlay
+      if (loadingOverlay) loadingOverlay.classList.remove('hidden');
+      
+      // Build query parameters
+      const params = new URLSearchParams();
+      params.append('page', page);
+      
+      if (industrySelect.value) params.append('industry', industrySelect.value);
+      if (serviceSelect.value) params.append('serviceId', serviceSelect.value);
+      if (tagsInput.value) params.append('tags', tagsInput.value);
+      if (searchInput.value) params.append('search', searchInput.value);
+      
+      // Fetch case studies
+      fetch(`/api/case-studies?${params.toString()}`)  // Include parameters here
+        .then(response => {
+            if (response.headers.get('content-type').includes('application/json')) {
+            return response.json();
+            } else {
+            window.location.href = `/api/case-studies?${params.toString()}`;
+            return null;
+            }
+        })
+        .then(data => {
+            if (data) {
+            // Only execute this if we got JSON data
+            const url = new URL(window.location);
+            url.search = params.toString();
+            window.location.href = url.toString();
+            }
+        })
+    }
+  });
+</script>

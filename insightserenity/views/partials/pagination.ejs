@@ -1,0 +1,127 @@
+<!-- views/partials/pagination.ejs -->
+<%
+/**
+ * Pagination Partial
+ * 
+ * Required params:
+ * - pagination: Object containing pagination info
+ *   - total: Total number of items
+ *   - page: Current page number
+ *   - limit: Items per page
+ *   - pages: Total number of pages
+ * - baseUrl: The base URL for pagination links (e.g., '/clients/projects')
+ * 
+ * Optional:
+ * - query: Object containing query string parameters to preserve
+ * 
+ * Usage example:
+ * <%- include('../partials/pagination', { 
+ *      pagination: projects.pagination,
+ *      baseUrl: '/clients/projects',
+ *      query: { status: 'active', sort: 'newest' }
+ * }) %>
+ */
+%>
+
+<% if (pagination && pagination.pages > 1) { %>
+    <nav class="flex justify-between items-center mt-8" aria-label="Pagination">
+        <div class="text-sm text-gray-700">
+            Showing <span class="font-medium"><%= ((pagination.page - 1) * pagination.limit) + 1 %></span> to 
+            <span class="font-medium"><%= Math.min(pagination.page * pagination.limit, pagination.total) %></span> of 
+            <span class="font-medium"><%= pagination.total %></span> results
+        </div>
+        
+        <ul class="inline-flex items-center -space-x-px">
+            <!-- Previous page link -->
+            <li>
+                <a href="<%= pagination.page > 1 ? buildUrl(baseUrl, pagination.page - 1, query) : '#' %>" 
+                   class="<%= pagination.page > 1 ? 'text-gray-500 hover:bg-gray-100' : 'text-gray-300 cursor-not-allowed' %> block px-3 py-2 ml-0 leading-tight bg-white border border-gray-300 rounded-l-lg">
+                    <span class="sr-only">Previous</span>
+                    <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                </a>
+            </li>
+            
+            <% 
+            // Calculate range of pages to display
+            let startPage = Math.max(1, pagination.page - 2);
+            let endPage = Math.min(pagination.pages, pagination.page + 2);
+            
+            // Always show at least 5 pages if available
+            if (endPage - startPage < 4 && pagination.pages > 4) {
+                if (startPage === 1) {
+                    endPage = Math.min(startPage + 4, pagination.pages);
+                } else if (endPage === pagination.pages) {
+                    startPage = Math.max(endPage - 4, 1);
+                }
+            }
+            
+            // Show first page if not in range
+            if (startPage > 1) { %>
+                <li>
+                    <a href="<%= buildUrl(baseUrl, 1, query) %>" 
+                       class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100">1</a>
+                </li>
+                
+                <% if (startPage > 2) { %>
+                    <li>
+                        <span class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300">...</span>
+                    </li>
+                <% } %>
+            <% } %>
+            
+            <!-- Page links -->
+            <% for (let i = startPage; i <= endPage; i++) { %>
+                <li>
+                    <a href="<%= i === pagination.page ? '#' : buildUrl(baseUrl, i, query) %>" 
+                       class="<%= i === pagination.page 
+                            ? 'z-10 px-3 py-2 leading-tight text-primary bg-primary-light border border-primary' 
+                            : 'px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100' %>">
+                        <%= i %>
+                    </a>
+                </li>
+            <% } %>
+            
+            <!-- Show last page if not in range -->
+            <% if (endPage < pagination.pages) { %>
+                <% if (endPage < pagination.pages - 1) { %>
+                    <li>
+                        <span class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300">...</span>
+                    </li>
+                <% } %>
+                
+                <li>
+                    <a href="<%= buildUrl(baseUrl, pagination.pages, query) %>" 
+                       class="px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100">
+                        <%= pagination.pages %>
+                    </a>
+                </li>
+            <% } %>
+            
+            <!-- Next page link -->
+            <li>
+                <a href="<%= pagination.page < pagination.pages ? buildUrl(baseUrl, pagination.page + 1, query) : '#' %>" 
+                   class="<%= pagination.page < pagination.pages ? 'text-gray-500 hover:bg-gray-100' : 'text-gray-300 cursor-not-allowed' %> block px-3 py-2 leading-tight bg-white border border-gray-300 rounded-r-lg">
+                    <span class="sr-only">Next</span>
+                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                </a>
+            </li>
+        </ul>
+    </nav>
+<% } %>
+
+<%
+// Helper function to build the URL with query parameters
+function buildUrl(baseUrl, page, query = {}) {
+    let url = `${baseUrl}?page=${page}`;
+    
+    if (query) {
+        Object.keys(query).forEach(key => {
+            if (query[key] && key !== 'page') {
+                url += `&${key}=${encodeURIComponent(query[key])}`;
+            }
+        });
+    }
+    
+    return url;
+}
+%>

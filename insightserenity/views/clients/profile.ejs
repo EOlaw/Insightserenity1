@@ -1,0 +1,360 @@
+<!-- views/clients/profile.ejs -->
+<% layout('layouts/dashboard') -%>
+<% block('title', 'Client Profile - InsightSerenity') -%>
+
+<div class="mb-6 flex justify-between items-center">
+  <div>
+    <h1 class="text-2xl font-bold mb-2">Your Profile</h1>
+    <p class="text-gray-600">Manage your personal and company information</p>
+  </div>
+  <div class="text-right">
+    <div class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium inline-flex items-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+      </svg>
+      Profile Completion: <%= profileCompletionPercentage %>%
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Left column: Personal Information -->
+  <div class="lg:col-span-1">
+    <div class="card bg-white p-6 mb-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">Personal Information</h2>
+      
+      <div class="flex items-center justify-center mb-6">
+        <div class="relative">
+          <div class="w-32 h-32 rounded-full overflow-hidden bg-gray-200">
+            <% if (user.profile.avatarUrl) { %>
+              <img src="<%= user.profile.avatarUrl %>" alt="Profile Picture" class="w-full h-full object-cover">
+            <% } else { %>
+              <div class="w-full h-full flex items-center justify-center bg-primary text-dark text-4xl font-bold">
+                <%= user.profile.firstName.charAt(0) %><%= user.profile.lastName.charAt(0) %>
+              </div>
+            <% } %>
+          </div>
+          <form id="avatar-form" action="/api/users/profile/picture" method="POST" enctype="multipart/form-data">
+            <input type="file" name="profilePicture" id="profile-picture-input" class="hidden" accept="image/*" onchange="this.form.submit()">
+            <button type="button" id="avatar-upload-btn" class="absolute bottom-0 right-0 bg-primary text-dark rounded-full p-2 shadow-lg hover:bg-primary-dark">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+              </svg>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <form action="/api/users/profile" method="POST" id="personal-info-form">
+        <input type="hidden" name="_method" value="PUT">
+        
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+            <input type="text" id="firstName" name="firstName" value="<%= user.profile.firstName %>" required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+          </div>
+          <div>
+            <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+            <input type="text" id="lastName" name="lastName" value="<%= user.profile.lastName %>" required
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+          <div class="flex">
+            <input type="email" id="email" value="<%= user.email %>" disabled
+              class="w-full px-3 py-2 border border-gray-300 rounded-l-md bg-gray-50 text-gray-500">
+            <button type="button" data-modal-target="email-change-modal"
+              class="px-3 py-2 border border-l-0 border-gray-300 rounded-r-md bg-gray-50 text-blue-600 hover:text-blue-800">
+              Change
+            </button>
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label for="phoneNumber" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+          <input type="tel" id="phoneNumber" name="phoneNumber" value="<%= user.profile.phoneNumber || '' %>"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+        </div>
+        
+        <div class="mb-4">
+          <label for="bio" class="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+          <textarea id="bio" name="bio" rows="3"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary"><%= user.profile.bio || '' %></textarea>
+        </div>
+        
+        <div class="mt-6">
+          <button type="submit" class="w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            Save Personal Information
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card bg-white p-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">Social Profiles</h2>
+      
+      <form action="/api/users/profile" method="POST" id="social-form">
+        <input type="hidden" name="_method" value="PUT">
+        
+        <div class="mb-4">
+          <label for="linkedin" class="block text-sm font-medium text-gray-700 mb-1">LinkedIn</label>
+          <div class="flex rounded-md shadow-sm">
+            <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+              linkedin.com/in/
+            </span>
+            <input type="text" id="linkedin" name="socialMedia.linkedin" value="<%= user.profile.socialMedia?.linkedin || '' %>"
+              class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-primary focus:border-primary">
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label for="twitter" class="block text-sm font-medium text-gray-700 mb-1">Twitter</label>
+          <div class="flex rounded-md shadow-sm">
+            <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+              twitter.com/
+            </span>
+            <input type="text" id="twitter" name="socialMedia.twitter" value="<%= user.profile.socialMedia?.twitter || '' %>"
+              class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-primary focus:border-primary">
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label for="github" class="block text-sm font-medium text-gray-700 mb-1">GitHub</label>
+          <div class="flex rounded-md shadow-sm">
+            <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+              github.com/
+            </span>
+            <input type="text" id="github" name="socialMedia.github" value="<%= user.profile.socialMedia?.github || '' %>"
+              class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border border-gray-300 focus:ring-primary focus:border-primary">
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label for="website" class="block text-sm font-medium text-gray-700 mb-1">Website</label>
+          <input type="url" id="website" name="socialMedia.website" value="<%= user.profile.socialMedia?.website || '' %>"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+        </div>
+        
+        <div class="mt-6">
+          <button type="submit" class="w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            Save Social Profiles
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Right column: Company Information and Address -->
+  <div class="lg:col-span-2">
+    <div class="card bg-white p-6 mb-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">Company Information</h2>
+      
+      <form action="/api/users/client" method="POST" id="company-form">
+        <input type="hidden" name="_method" value="PUT">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="md:col-span-2 mb-4">
+            <label for="company-name" class="block text-sm font-medium text-gray-700 mb-1">Company Name</label>
+            <input type="text" id="company-name" name="company.name" value="<%= profile.company?.name || '' %>"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+          </div>
+          
+          <div class="mb-4">
+            <label for="company-position" class="block text-sm font-medium text-gray-700 mb-1">Your Position</label>
+            <input type="text" id="company-position" name="company.position" value="<%= profile.company?.position || '' %>"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+          </div>
+          
+          <div class="mb-4">
+            <label for="company-website" class="block text-sm font-medium text-gray-700 mb-1">Company Website</label>
+            <input type="url" id="company-website" name="company.website" value="<%= profile.company?.website || '' %>"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+          </div>
+          
+          <div class="mb-4">
+            <label for="company-industry" class="block text-sm font-medium text-gray-700 mb-1">Industry</label>
+            <select id="company-industry" name="company.industry"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+              <option value="" <%= !profile.company?.industry ? 'selected' : '' %>>Select Industry</option>
+              <option value="technology" <%= profile.company?.industry === 'technology' ? 'selected' : '' %>>Technology</option>
+              <option value="healthcare" <%= profile.company?.industry === 'healthcare' ? 'selected' : '' %>>Healthcare</option>
+              <option value="finance" <%= profile.company?.industry === 'finance' ? 'selected' : '' %>>Finance</option>
+              <option value="education" <%= profile.company?.industry === 'education' ? 'selected' : '' %>>Education</option>
+              <option value="retail" <%= profile.company?.industry === 'retail' ? 'selected' : '' %>>Retail</option>
+              <option value="manufacturing" <%= profile.company?.industry === 'manufacturing' ? 'selected' : '' %>>Manufacturing</option>
+              <option value="media" <%= profile.company?.industry === 'media' ? 'selected' : '' %>>Media</option>
+              <option value="legal" <%= profile.company?.industry === 'legal' ? 'selected' : '' %>>Legal</option>
+              <option value="real_estate" <%= profile.company?.industry === 'real_estate' ? 'selected' : '' %>>Real Estate</option>
+              <option value="energy" <%= profile.company?.industry === 'energy' ? 'selected' : '' %>>Energy</option>
+              <option value="hospitality" <%= profile.company?.industry === 'hospitality' ? 'selected' : '' %>>Hospitality</option>
+              <option value="nonprofit" <%= profile.company?.industry === 'nonprofit' ? 'selected' : '' %>>Nonprofit</option>
+              <option value="other" <%= profile.company?.industry === 'other' ? 'selected' : '' %>>Other</option>
+            </select>
+          </div>
+          
+          <div class="mb-4">
+            <label for="company-size" class="block text-sm font-medium text-gray-700 mb-1">Company Size</label>
+            <select id="company-size" name="company.size"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+              <option value="" <%= !profile.company?.size ? 'selected' : '' %>>Select Size</option>
+              <option value="1-10" <%= profile.company?.size === '1-10' ? 'selected' : '' %>>1-10 employees</option>
+              <option value="11-50" <%= profile.company?.size === '11-50' ? 'selected' : '' %>>11-50 employees</option>
+              <option value="51-200" <%= profile.company?.size === '51-200' ? 'selected' : '' %>>51-200 employees</option>
+              <option value="201-500" <%= profile.company?.size === '201-500' ? 'selected' : '' %>>201-500 employees</option>
+              <option value="501-1000" <%= profile.company?.size === '501-1000' ? 'selected' : '' %>>501-1000 employees</option>
+              <option value="1000+" <%= profile.company?.size === '1000+' ? 'selected' : '' %>>1000+ employees</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="mt-6">
+          <button type="submit" class="w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            Save Company Information
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card bg-white p-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">Billing Address</h2>
+      
+      <form action="/api/users/client" method="POST" id="billing-form">
+        <input type="hidden" name="_method" value="PUT">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="md:col-span-2 mb-4">
+            <label for="billing-street" class="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+            <input type="text" id="billing-street" name="billing.address.street" value="<%= profile.billing?.address?.street || '' %>"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+          </div>
+          
+          <div class="mb-4">
+            <label for="billing-city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
+            <input type="text" id="billing-city" name="billing.address.city" value="<%= profile.billing?.address?.city || '' %>"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+          </div>
+          
+          <div class="mb-4">
+            <label for="billing-state" class="block text-sm font-medium text-gray-700 mb-1">State/Province</label>
+            <input type="text" id="billing-state" name="billing.address.state" value="<%= profile.billing?.address?.state || '' %>"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+          </div>
+          
+          <div class="mb-4">
+            <label for="billing-zip" class="block text-sm font-medium text-gray-700 mb-1">ZIP/Postal Code</label>
+            <input type="text" id="billing-zip" name="billing.address.zipCode" value="<%= profile.billing?.address?.zipCode || '' %>"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+          </div>
+          
+          <div class="mb-4">
+            <label for="billing-country" class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+            <input type="text" id="billing-country" name="billing.address.country" value="<%= profile.billing?.address?.country || '' %>"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+          </div>
+          
+          <div class="mb-4">
+            <label for="billing-taxid" class="block text-sm font-medium text-gray-700 mb-1">Tax ID (Optional)</label>
+            <input type="text" id="billing-taxid" name="billing.taxId" value="<%= profile.billing?.taxId || '' %>"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+          </div>
+        </div>
+        
+        <div class="mt-6">
+          <button type="submit" class="w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-dark bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+            Save Billing Address
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Email Change Modal -->
+<div id="email-change-modal" class="fixed inset-0 hidden overflow-y-auto z-50">
+  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    </div>
+
+    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+      <form action="/api/users/email/change" method="POST">
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+              <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                Change Email Address
+              </h3>
+              <div class="mt-4">
+                <div class="mb-4">
+                  <label for="current-email" class="block text-sm font-medium text-gray-700 mb-1">Current Email</label>
+                  <input type="email" id="current-email" value="<%= user.email %>" disabled
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500">
+                </div>
+                <div class="mb-4">
+                  <label for="new-email" class="block text-sm font-medium text-gray-700 mb-1">New Email</label>
+                  <input type="email" id="new-email" name="newEmail" required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+                </div>
+                <div>
+                  <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                  <input type="password" id="password" name="password" required
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary">
+                    <p class="mt-1 text-xs text-gray-500">For security, please enter your current password</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary text-dark text-base font-medium hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:ml-3 sm:w-auto sm:text-sm">
+            Change Email
+          </button>
+          <button type="button" data-modal-close class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Profile picture upload button click
+    const avatarUploadBtn = document.getElementById('avatar-upload-btn');
+    const profilePictureInput = document.getElementById('profile-picture-input');
+    
+    avatarUploadBtn.addEventListener('click', function() {
+      profilePictureInput.click();
+    });
+    
+    // Modal handling
+    const modalTriggers = document.querySelectorAll('[data-modal-target]');
+    const modalCloses = document.querySelectorAll('[data-modal-close]');
+    
+    modalTriggers.forEach(trigger => {
+      trigger.addEventListener('click', function() {
+        const modalId = this.getAttribute('data-modal-target');
+        const modal = document.getElementById(modalId);
+        modal.classList.remove('hidden');
+      });
+    });
+    
+    modalCloses.forEach(close => {
+      close.addEventListener('click', function() {
+        const modal = this.closest('[id$="-modal"]');
+        modal.classList.add('hidden');
+      });
+    });
+    
+    // Close modals when clicking outside
+    document.addEventListener('click', function(event) {
+      if (event.target.classList.contains('fixed') && event.target.classList.contains('inset-0')) {
+        event.target.classList.add('hidden');
+      }
+    });
+  });
+</script>

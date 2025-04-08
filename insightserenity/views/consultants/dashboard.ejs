@@ -1,0 +1,287 @@
+<% layout('layouts/dashboard') -%>
+<% block('title', 'Consultant Dashboard - InsightSerenity') -%>
+
+<div class="mb-6">
+    <h1 class="text-2xl font-bold mb-2">Welcome, <%= user.profile.firstName %>!</h1>
+    <p class="text-gray-600">Here's an overview of your account and projects</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <!-- Stats Card - Projects -->
+    <div class="card bg-white p-5">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold">Projects</h2>
+            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                <%= dashboardData.projectStats.total %>
+            </span>
+        </div>
+        <div class="flex items-center justify-between text-sm">
+            <div>
+                <span class="text-gray-500">Active</span>
+                <p class="text-xl font-bold"><%= dashboardData.projectStats.active %></p>
+            </div>
+            <div>
+                <span class="text-gray-500">Completed</span>
+                <p class="text-xl font-bold"><%= dashboardData.projectStats.completed %></p>
+            </div>
+            <div>
+                <span class="text-gray-500">Total Earned</span>
+                <p class="text-xl font-bold">$<%= dashboardData.projectStats.totalEarned.toLocaleString() %></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats Card - Profile Completion -->
+    <div class="card bg-white p-5">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold">Profile Completion</h2>
+            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                <%= dashboardData.profileCompletionPercentage %>%
+            </span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+            <div class="bg-primary h-2.5 rounded-full" style="width: <%= dashboardData.profileCompletionPercentage %>%"></div>
+        </div>
+        <a href="/consultants/profile" class="text-primary-dark hover:text-primary flex items-center text-sm font-medium">
+            Complete your profile <i data-lucide="arrow-right" class="h-4 w-4 ml-1"></i>
+        </a>
+    </div>
+    
+    <!-- Stats Card - Availability -->
+    <div class="card bg-white p-5">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold">Availability</h2>
+            <span class="bg-<%= dashboardData.availability.status === 'available' ? 'green' : (dashboardData.availability.status === 'limited' ? 'yellow' : 'red') %>-100 text-<%= dashboardData.availability.status === 'available' ? 'green' : (dashboardData.availability.status === 'limited' ? 'yellow' : 'red') %>-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                <%= dashboardData.availability.status.charAt(0).toUpperCase() + dashboardData.availability.status.slice(1) %>
+            </span>
+        </div>
+        <p class="text-sm text-gray-600 mb-4">
+            <% if (dashboardData.availability.status === 'available') { %>
+                You're currently available for new projects
+            <% } else if (dashboardData.availability.status === 'limited') { %>
+                You have limited availability for new projects
+            <% } else { %>
+                You're currently unavailable for new projects
+            <% } %>
+        </p>
+        <a href="/consultants/settings" class="text-primary-dark hover:text-primary flex items-center text-sm font-medium">
+            Update availability <i data-lucide="arrow-right" class="h-4 w-4 ml-1"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Metrics Overview -->
+<div class="card bg-white p-6 mb-8">
+    <h2 class="text-xl font-semibold mb-6">Performance Metrics</h2>
+    
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="text-center">
+            <div class="text-gray-500 text-sm mb-1">Completion Rate</div>
+            <div class="text-2xl font-bold text-gray-800"><%= dashboardData.metrics.completionRate %>%</div>
+        </div>
+        <div class="text-center">
+            <div class="text-gray-500 text-sm mb-1">Response Time</div>
+            <div class="text-2xl font-bold text-gray-800"><%= dashboardData.metrics.responseTime %> hrs</div>
+        </div>
+        <div class="text-center">
+            <div class="text-gray-500 text-sm mb-1">Average Rating</div>
+            <div class="text-2xl font-bold text-gray-800 flex items-center justify-center">
+                <%= dashboardData.metrics.average || '0.0' %> <i data-lucide="star" class="h-5 w-5 ml-1 text-yellow-400"></i>
+            </div>
+        </div>
+        <div class="text-center">
+            <div class="text-gray-500 text-sm mb-1">Proposals</div>
+            <div class="text-2xl font-bold text-gray-800"><%= dashboardData.proposalCount %></div>
+        </div>
+    </div>
+</div>
+
+<!-- Active Projects -->
+<div class="card bg-white p-6 mb-8">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-semibold">Active Projects</h2>
+        <a href="/consultants/projects" class="text-primary-dark hover:text-primary text-sm font-medium">
+            View all <i data-lucide="arrow-right" class="h-4 w-4 ml-1 inline"></i>
+        </a>
+    </div>
+    
+    <% if (dashboardData.activeProjects && dashboardData.activeProjects.length > 0) { %>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Project
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Client
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Updated
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <% dashboardData.activeProjects.forEach(project => { %>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900"><%= project.title %></div>
+                                <div class="text-sm text-gray-500"><%= project.category %></div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <% if (project.client && project.client.user) { %>
+                                        <% const client = project.client.user; %>
+                                        <% if (client.profile && client.profile.avatarUrl) { %>
+                                            <img class="h-8 w-8 rounded-full" src="<%= client.profile.avatarUrl %>" alt="<%= client.profile.firstName %>">
+                                        <% } else { %>
+                                            <div class="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-dark font-bold">
+                                                <%= client.profile.firstName.charAt(0) %><%= client.profile.lastName.charAt(0) %>
+                                            </div>
+                                        <% } %>
+                                        <div class="ml-3">
+                                            <div class="text-sm font-medium text-gray-900">
+                                                <%= client.profile.firstName %> <%= client.profile.lastName %>
+                                            </div>
+                                            <% if (project.client.company && project.client.company.name) { %>
+                                                <div class="text-xs text-gray-500"><%= project.client.company.name %></div>
+                                            <% } %>
+                                        </div>
+                                    <% } else { %>
+                                        <div class="text-sm text-gray-500">Unknown client</div>
+                                    <% } %>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    <% if(project.status === 'active') { %>
+                                        bg-green-100 text-green-800
+                                    <% } else if(project.status === 'in_progress') { %>
+                                        bg-blue-100 text-blue-800
+                                    <% } else { %>
+                                        bg-yellow-100 text-yellow-800
+                                    <% } %>">
+                                    <%= project.status.replace('_', ' ').charAt(0).toUpperCase() + project.status.replace('_', ' ').slice(1) %>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <%= new Date(project.updatedAt).toLocaleDateString() %>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="/consultants/projects/<%= project._id %>" class="text-primary-dark hover:text-primary">View</a>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    <% } else { %>
+        <div class="text-center py-8">
+            <div class="mb-4">
+                <i data-lucide="folder" class="h-12 w-12 mx-auto text-gray-400"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-1">No active projects</h3>
+            <p class="text-gray-500 mb-4">Browse available projects or wait for client inquiries</p>
+            <a href="/consultants/available-projects" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                <i data-lucide="search" class="h-4 w-4 mr-2"></i>
+                Find Projects
+            </a>
+        </div>
+    <% } %>
+</div>
+
+<!-- Project Matches -->
+<div class="card bg-white p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-semibold">Project Matches</h2>
+        <a href="/consultants/available-projects" class="text-primary-dark hover:text-primary text-sm font-medium">
+            View all <i data-lucide="arrow-right" class="h-4 w-4 ml-1 inline"></i>
+        </a>
+    </div>
+    
+    <% if (dashboardData.projectMatches && dashboardData.projectMatches.length > 0) { %>
+        <div class="space-y-6">
+            <% dashboardData.projectMatches.forEach(project => { %>
+                <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-lg font-medium mb-1"><%= project.title %></h3>
+                            <div class="flex items-center mb-2">
+                                <span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded mr-2">
+                                    <%= project.category.replace('_', ' ').charAt(0).toUpperCase() + project.category.replace('_', ' ').slice(1) %>
+                                </span>
+                                <span class="text-gray-500 text-sm">
+                                    Posted <%= new Date(project.createdAt).toLocaleDateString() %>
+                                </span>
+                            </div>
+                            <p class="text-gray-600 text-sm line-clamp-2 mb-3">
+                                <%= project.description.substring(0, 150) %><%= project.description.length > 150 ? '...' : '' %>
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <% if (project.budget && project.budget.min && project.budget.max) { %>
+                                <div class="text-sm font-medium mb-1">
+                                    $<%= project.budget.min %> - $<%= project.budget.max %>
+                                </div>
+                            <% } else if (project.budget && project.budget.min) { %>
+                                <div class="text-sm font-medium mb-1">
+                                    From $<%= project.budget.min %>
+                                </div>
+                            <% } else if (project.budget && project.budget.max) { %>
+                                <div class="text-sm font-medium mb-1">
+                                    Up to $<%= project.budget.max %>
+                                </div>
+                            <% } %>
+                            <div class="text-xs text-gray-500 mb-2">
+                                <%= project.budget && project.budget.type ? project.budget.type.charAt(0).toUpperCase() + project.budget.type.slice(1) : 'Fixed' %> price
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between mt-2">
+                        <div class="flex items-center">
+                            <% if (project.client && project.client.user && project.client.user.profile) { %>
+                                <% if (project.client.user.profile.avatarUrl) { %>
+                                    <img src="<%= project.client.user.profile.avatarUrl %>" alt="<%= project.client.user.profile.firstName %>" class="h-6 w-6 rounded-full mr-2">
+                                <% } else { %>
+                                    <div class="h-6 w-6 rounded-full bg-primary flex items-center justify-center text-dark font-bold text-xs mr-2">
+                                        <%= project.client.user.profile.firstName.charAt(0) %><%= project.client.user.profile.lastName.charAt(0) %>
+                                    </div>
+                                <% } %>
+                                <span class="text-sm text-gray-600">
+                                    <%= project.client.user.profile.firstName %> <%= project.client.user.profile.lastName %>
+                                </span>
+                            <% } %>
+                        </div>
+                        <div>
+                            <a href="/projects/<%= project._id %>" class="inline-flex items-center text-sm font-medium text-primary-dark hover:text-primary mr-4">
+                                View Details
+                            </a>
+                            <a href="/consultants/proposals/<%= project._id %>/new" class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                                Submit Proposal
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    <% } else { %>
+        <div class="text-center py-8">
+            <div class="mb-4">
+                <i data-lucide="briefcase" class="h-12 w-12 mx-auto text-gray-400"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-1">No matching projects</h3>
+            <p class="text-gray-500 mb-4">We'll notify you when projects matching your skills become available</p>
+            <a href="/consultants/available-projects" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-dark bg-primary hover:bg-primary-dark">
+                <i data-lucide="search" class="h-4 w-4 mr-2"></i>
+                Browse All Projects
+            </a>
+        </div>
+    <% } %>
+</div>

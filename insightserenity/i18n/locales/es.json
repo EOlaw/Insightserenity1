@@ -1,0 +1,646 @@
+{
+  "common": {
+    "appName": "InsightSerenity",
+    "tagline": "Soluciones de consultoría diseñadas para transformar su negocio",
+    "navigation": {
+      "home": "Inicio",
+      "services": "Servicios",
+      "caseStudies": "Casos de Éxito",
+      "blog": "Blog",
+      "about": "Nosotros",
+      "contact": "Contacto",
+      "login": "Iniciar Sesión",
+      "signup": "Registrarse",
+      "dashboard": "Panel",
+      "profile": "Perfil",
+      "settings": "Configuración",
+      "logout": "Cerrar Sesión"
+    },
+    "actions": {
+      "submit": "Enviar",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "edit": "Editar",
+      "view": "Ver",
+      "search": "Buscar",
+      "filter": "Filtrar",
+      "sort": "Ordenar",
+      "apply": "Aplicar",
+      "clear": "Limpiar",
+      "back": "Atrás",
+      "next": "Siguiente",
+      "previous": "Anterior",
+      "continue": "Continuar",
+      "finish": "Finalizar",
+      "confirm": "Confirmar",
+      "download": "Descargar",
+      "upload": "Subir"
+    },
+    "status": {
+      "loading": "Cargando...",
+      "success": "Éxito",
+      "error": "Error",
+      "warning": "Advertencia",
+      "info": "Información",
+      "pending": "Pendiente",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "completed": "Completado",
+      "processing": "Procesando",
+      "draft": "Borrador",
+      "published": "Publicado",
+      "archived": "Archivado"
+    },
+    "time": {
+      "now": "Justo ahora",
+      "minutesAgo": "Hace {{count}} minuto",
+      "minutesAgo_plural": "Hace {{count}} minutos",
+      "hoursAgo": "Hace {{count}} hora",
+      "hoursAgo_plural": "Hace {{count}} horas",
+      "daysAgo": "Hace {{count}} día",
+      "daysAgo_plural": "Hace {{count}} días",
+      "weeksAgo": "Hace {{count}} semana",
+      "weeksAgo_plural": "Hace {{count}} semanas",
+      "monthsAgo": "Hace {{count}} mes",
+      "monthsAgo_plural": "Hace {{count}} meses",
+      "yearsAgo": "Hace {{count}} año",
+      "yearsAgo_plural": "Hace {{count}} años",
+      "today": "Hoy",
+      "yesterday": "Ayer",
+      "tomorrow": "Mañana"
+    },
+    "meta": {
+      "pageTitle": "{{title}} | InsightSerenity",
+      "description": "InsightSerenity ofrece soluciones de consultoría diseñadas para transformar su negocio y generar resultados significativos.",
+      "keywords": "consultoría, consultoría empresarial, consultores expertos, transformación empresarial"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Iniciar sesión en su cuenta",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "rememberMe": "Recordarme",
+      "forgotPassword": "¿Olvidó su contraseña?",
+      "noAccount": "¿No tiene una cuenta?",
+      "signUp": "Regístrese",
+      "loginButton": "Iniciar Sesión",
+      "continueWithGoogle": "Continuar con Google",
+      "continueWithLinkedIn": "Continuar con LinkedIn",
+      "errors": {
+        "invalidCredentials": "Correo electrónico o contraseña inválidos",
+        "accountLocked": "Su cuenta ha sido bloqueada. Por favor contacte a soporte.",
+        "accountNotVerified": "Por favor verifique su correo electrónico antes de iniciar sesión"
+      }
+    },
+    "register": {
+      "title": "Crear cuenta",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña",
+      "accountType": "Tipo de cuenta",
+      "client": "Cliente",
+      "consultant": "Consultor",
+      "agreeTerms": "Acepto los {{termsLink}} y la {{privacyLink}}",
+      "termsLink": "Términos de Servicio",
+      "privacyLink": "Política de Privacidad",
+      "alreadyHaveAccount": "¿Ya tiene una cuenta?",
+      "login": "Iniciar Sesión",
+      "createAccountButton": "Crear Cuenta",
+      "errors": {
+        "passwordMismatch": "Las contraseñas no coinciden",
+        "emailTaken": "El correo electrónico ya está en uso",
+        "weakPassword": "La contraseña es demasiado débil",
+        "termsRequired": "Debe aceptar los términos y la política de privacidad"
+      }
+    },
+    "forgotPassword": {
+      "title": "Restablecer su contraseña",
+      "email": "Correo electrónico",
+      "instructions": "Ingrese su correo electrónico y le enviaremos instrucciones para restablecer su contraseña",
+      "sendButton": "Enviar Enlace",
+      "backToLogin": "Volver al inicio de sesión",
+      "success": "Revise su correo electrónico para obtener instrucciones sobre cómo restablecer su contraseña",
+      "errors": {
+        "emailNotFound": "No se encontró ninguna cuenta con este correo electrónico"
+      }
+    },
+    "resetPassword": {
+      "title": "Crear nueva contraseña",
+      "newPassword": "Nueva contraseña",
+      "confirmPassword": "Confirmar nueva contraseña",
+      "resetButton": "Restablecer Contraseña",
+      "success": "Su contraseña ha sido restablecida con éxito",
+      "loginPrompt": "Ahora puede iniciar sesión con su nueva contraseña",
+      "errors": {
+        "passwordMismatch": "Las contraseñas no coinciden",
+        "weakPassword": "La contraseña es demasiado débil",
+        "invalidToken": "Token de restablecimiento inválido o caducado"
+      }
+    },
+    "verification": {
+      "title": "Verificar su correo electrónico",
+      "success": "Su correo electrónico ha sido verificado con éxito",
+      "alreadyVerified": "Su correo electrónico ya ha sido verificado",
+      "loginPrompt": "Ahora puede iniciar sesión en su cuenta",
+      "errors": {
+        "invalidToken": "Token de verificación inválido o caducado"
+      }
+    },
+    "twoFactor": {
+      "title": "Autenticación de dos factores",
+      "subtitle": "Ingrese el código de verificación de su aplicación de autenticación",
+      "code": "Código de verificación",
+      "verifyButton": "Verificar",
+      "backupCode": "Usar código de respaldo",
+      "errors": {
+        "invalidCode": "Código de verificación inválido",
+        "expired": "El código de verificación ha caducado"
+      }
+    }
+  },
+  "dashboard": {
+    "welcome": "Bienvenido de nuevo, {{name}}",
+    "summary": {
+      "title": "Resumen del Panel",
+      "activeProjects": "Proyectos Activos",
+      "pendingProposals": "Propuestas Pendientes",
+      "upcomingMeetings": "Próximas Reuniones",
+      "recentMessages": "Mensajes Recientes",
+      "tasks": "Tareas",
+      "invoices": "Facturas"
+    },
+    "client": {
+      "findConsultants": "Encontrar Consultores",
+      "myProjects": "Mis Proyectos",
+      "projectRequests": "Solicitudes de Proyectos",
+      "savedConsultants": "Consultores Guardados"
+    },
+    "consultant": {
+      "availableProjects": "Proyectos Disponibles",
+      "myClients": "Mis Clientes",
+      "projectProposals": "Propuestas de Proyectos",
+      "earnings": "Ganancias",
+      "portfolio": "Portafolio"
+    },
+    "admin": {
+      "userManagement": "Gestión de Usuarios",
+      "contentManagement": "Gestión de Contenido",
+      "systemSettings": "Configuración del Sistema",
+      "analytics": "Analíticas",
+      "reports": "Informes"
+    }
+  },
+  "profile": {
+    "title": "Mi Perfil",
+    "personalInfo": {
+      "title": "Información Personal",
+      "firstName": "Nombre",
+      "lastName": "Apellido",
+      "email": "Correo Electrónico",
+      "phone": "Teléfono",
+      "location": "Ubicación",
+      "about": "Acerca de Mí",
+      "profilePicture": "Foto de Perfil",
+      "updateButton": "Actualizar Información"
+    },
+    "professionalInfo": {
+      "title": "Información Profesional",
+      "company": "Empresa",
+      "position": "Cargo",
+      "industry": "Industria",
+      "experience": "Años de Experiencia",
+      "skills": "Habilidades",
+      "specialties": "Especialidades",
+      "education": "Educación",
+      "certifications": "Certificaciones",
+      "languages": "Idiomas"
+    },
+    "security": {
+      "title": "Configuración de Seguridad",
+      "changePassword": "Cambiar Contraseña",
+      "twoFactorAuth": "Autenticación de Dos Factores",
+      "loginHistory": "Historial de Inicio de Sesión",
+      "sessions": "Sesiones Activas",
+      "deactivateAccount": "Desactivar Cuenta"
+    },
+    "preferences": {
+      "title": "Preferencias",
+      "language": "Idioma",
+      "timezone": "Zona Horaria",
+      "notifications": "Notificaciones",
+      "emailPreferences": "Preferencias de Correo Electrónico",
+      "privacy": "Configuración de Privacidad"
+    }
+  },
+  "services": {
+    "title": "Nuestros Servicios",
+    "subtitle": "Soluciones de consultoría diseñadas para transformar su negocio",
+    "categories": {
+      "strategy": "Estrategia Empresarial",
+      "operations": "Operaciones",
+      "technology": "Tecnología",
+      "digital": "Transformación Digital",
+      "finance": "Finanzas y Contabilidad",
+      "hr": "Recursos Humanos",
+      "marketing": "Marketing",
+      "legal": "Legal",
+      "compliance": "Cumplimiento y Riesgo",
+      "research": "Investigación y Desarrollo",
+      "education": "Formación y Educación",
+      "sustainability": "Sostenibilidad",
+      "other": "Otros Servicios"
+    },
+    "filters": {
+      "category": "Categoría",
+      "industry": "Industria",
+      "pricingModel": "Modelo de Precios",
+      "sortOptions": {
+        "nameAsc": "Nombre (A-Z)",
+        "nameDesc": "Nombre (Z-A)",
+        "newest": "Más Recientes",
+        "popular": "Más Populares"
+      }
+    },
+    "detail": {
+      "overview": "Visión General",
+      "benefits": "Beneficios Clave",
+      "features": "Características",
+      "process": "Nuestro Proceso",
+      "pricing": "Precios",
+      "deliverables": "Entregables",
+      "timeline": "Cronograma",
+      "expertise": "Experiencia Requerida",
+      "industries": "Industrias Atendidas",
+      "consultants": "Nuestros Especialistas",
+      "faqs": "Preguntas Frecuentes",
+      "contact": "Solicitar Este Servicio",
+      "related": "Servicios Relacionados"
+    },
+    "pricing": {
+      "models": {
+        "hourly": "Tarifa por Hora",
+        "fixed": "Precio Fijo",
+        "retainer": "Cuota Mensual",
+        "milestone": "Por Hitos",
+        "value_based": "Basado en Valor",
+        "mixed": "Precios Mixtos"
+      },
+      "customQuote": "Cotización Personalizada",
+      "startingFrom": "Desde",
+      "contactForPricing": "Contactar para precios"
+    }
+  },
+  "caseStudies": {
+    "title": "Casos de Éxito",
+    "subtitle": "Historias reales de éxito de nuestros clientes",
+    "filters": {
+      "industry": "Industria",
+      "service": "Tipo de Servicio",
+      "challenge": "Desafío",
+      "sortOptions": {
+        "newest": "Más Recientes",
+        "oldest": "Más Antiguos",
+        "alphabetical": "Alfabético"
+      }
+    },
+    "detail": {
+      "client": "Cliente",
+      "industry": "Industria",
+      "duration": "Duración del Proyecto",
+      "services": "Servicios Proporcionados",
+      "challenge": "El Desafío",
+      "approach": "Nuestro Enfoque",
+      "solution": "La Solución",
+      "results": "Resultados e Impacto",
+      "testimonial": "Testimonio del Cliente",
+      "consultants": "Consultores Involucrados",
+      "downloads": "Descargas Relacionadas",
+      "relatedCaseStudies": "Casos de Éxito Relacionados"
+    }
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Perspectivas y experiencia de nuestros consultores",
+    "readMore": "Leer Más",
+    "authorBy": "Por",
+    "publishedOn": "Publicado el",
+    "minuteRead": "{{count}} minuto de lectura",
+    "minuteRead_plural": "{{count}} minutos de lectura",
+    "categories": "Categorías",
+    "recentPosts": "Publicaciones Recientes",
+    "popularTags": "Etiquetas Populares",
+    "post": {
+      "share": "Compartir este artículo",
+      "comments": "Comentarios",
+      "leaveComment": "Deja un comentario",
+      "yourName": "Tu Nombre",
+      "yourEmail": "Tu Correo Electrónico",
+      "yourComment": "Tu Comentario",
+      "submitComment": "Enviar Comentario",
+      "relatedPosts": "Artículos Relacionados",
+      "authorBio": "Sobre el Autor"
+    }
+  },
+  "contact": {
+    "title": "Contáctenos",
+    "subtitle": "Póngase en contacto con nuestro equipo",
+    "form": {
+      "name": "Su Nombre",
+      "email": "Correo Electrónico",
+      "phone": "Teléfono",
+      "company": "Nombre de la Empresa",
+      "subject": "Asunto",
+      "message": "Su Mensaje",
+      "submitButton": "Enviar Mensaje"
+    },
+    "info": {
+      "address": "Dirección",
+      "phone": "Teléfono",
+      "email": "Correo Electrónico",
+      "hours": "Horario Laboral"
+    },
+    "consultation": {
+      "title": "Solicitar una Consulta",
+      "description": "Programe una consulta gratuita con uno de nuestros expertos"
+    },
+    "success": "Su mensaje ha sido enviado con éxito. Nos pondremos en contacto con usted en breve.",
+    "error": "Hubo un error al enviar su mensaje. Por favor, inténtelo de nuevo."
+  },
+  "about": {
+    "title": "Sobre Nosotros",
+    "mission": {
+      "title": "Nuestra Misión",
+      "description": "Empoderar a las organizaciones con las perspectivas y experiencia que necesitan para lograr un crecimiento y excelencia sostenibles."
+    },
+    "vision": {
+      "title": "Nuestra Visión",
+      "description": "Ser el socio de confianza al que las organizaciones recurren para soluciones de consultoría transformadoras."
+    },
+    "values": {
+      "title": "Nuestros Valores",
+      "excellence": "Excelencia",
+      "integrity": "Integridad",
+      "collaboration": "Colaboración",
+      "innovation": "Innovación",
+      "impact": "Impacto"
+    },
+    "team": {
+      "title": "Nuestro Equipo",
+      "leadership": "Equipo Directivo",
+      "consultants": "Nuestros Consultores",
+      "viewProfile": "Ver Perfil"
+    },
+    "history": {
+      "title": "Nuestra Historia",
+      "description": "La historia del viaje y crecimiento de InsightSerenity"
+    },
+    "clients": {
+      "title": "Clientes que Hemos Ayudado",
+      "testimonials": "Testimonios"
+    }
+  },
+  "projects": {
+    "title": "Proyectos",
+    "status": {
+      "draft": "Borrador",
+      "pending": "Pendiente",
+      "active": "Activo",
+      "onHold": "En Espera",
+      "completed": "Completado",
+      "cancelled": "Cancelado"
+    },
+    "client": {
+      "myProjects": "Mis Proyectos",
+      "createNew": "Crear Nuevo Proyecto",
+      "projectDetails": "Detalles del Proyecto",
+      "consultants": "Consultores Asignados",
+      "timeline": "Cronograma del Proyecto",
+      "documents": "Documentos del Proyecto",
+      "invoices": "Facturas",
+      "communication": "Comunicación"
+    },
+    "consultant": {
+      "myProjects": "Mis Proyectos",
+      "availableProjects": "Proyectos Disponibles",
+      "projectDetails": "Detalles del Proyecto",
+      "client": "Información del Cliente",
+      "timeline": "Cronograma del Proyecto",
+      "tasks": "Tareas",
+      "deliverables": "Entregables",
+      "timeTracking": "Seguimiento de Tiempo",
+      "documents": "Documentos del Proyecto"
+    },
+    "form": {
+      "title": "Título del Proyecto",
+      "description": "Descripción del Proyecto",
+      "objectives": "Objetivos del Proyecto",
+      "scope": "Alcance del Proyecto",
+      "budget": "Presupuesto",
+      "timeline": "Cronograma",
+      "startDate": "Fecha de Inicio",
+      "endDate": "Fecha de Finalización",
+      "industry": "Industria",
+      "service": "Tipo de Servicio",
+      "requirements": "Requisitos",
+      "attachments": "Archivos Adjuntos"
+    }
+  },
+  "payments": {
+    "title": "Pagos",
+    "client": {
+      "invoices": "Facturas",
+      "paymentMethods": "Métodos de Pago",
+      "transactions": "Historial de Transacciones",
+      "subscriptions": "Suscripciones"
+    },
+    "consultant": {
+      "earnings": "Ganancias",
+      "pending": "Pagos Pendientes",
+      "paid": "Facturas Pagadas",
+      "bankInfo": "Información Bancaria",
+      "taxDocuments": "Documentos Fiscales"
+    },
+    "invoice": {
+      "number": "Número de Factura",
+      "date": "Fecha de Emisión",
+      "dueDate": "Fecha de Vencimiento",
+      "client": "Cliente",
+      "consultant": "Consultor",
+      "project": "Proyecto",
+      "description": "Descripción",
+      "amount": "Importe",
+      "status": "Estado",
+      "payNow": "Pagar Ahora",
+      "download": "Descargar Factura"
+    },
+    "status": {
+      "pending": "Pendiente",
+      "paid": "Pagada",
+      "overdue": "Vencida",
+      "cancelled": "Cancelada",
+      "refunded": "Reembolsada"
+    }
+  },
+  "messages": {
+    "title": "Mensajes",
+    "inbox": "Bandeja de Entrada",
+    "sent": "Enviados",
+    "archived": "Archivados",
+    "newMessage": "Nuevo Mensaje",
+    "noMessages": "No hay mensajes para mostrar",
+    "to": "Para",
+    "subject": "Asunto",
+    "message": "Mensaje",
+    "attachments": "Archivos Adjuntos",
+    "send": "Enviar Mensaje",
+    "reply": "Responder",
+    "forward": "Reenviar",
+    "delete": "Eliminar",
+    "archive": "Archivar"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "markAllRead": "Marcar Todo como Leído",
+    "noNotifications": "No hay notificaciones para mostrar",
+    "types": {
+      "message": "Nuevo Mensaje",
+      "project": "Actualización de Proyecto",
+      "proposal": "Nueva Propuesta",
+      "payment": "Pago",
+      "system": "Notificación del Sistema"
+    }
+  },
+  "admin": {
+    "users": {
+      "title": "Gestión de Usuarios",
+      "allUsers": "Todos los Usuarios",
+      "clients": "Clientes",
+      "consultants": "Consultores",
+      "admins": "Administradores",
+      "userDetails": "Detalles del Usuario",
+      "createUser": "Crear Usuario",
+      "editUser": "Editar Usuario",
+      "deactivateUser": "Desactivar Usuario",
+      "activateUser": "Activar Usuario",
+      "resetPassword": "Restablecer Contraseña",
+      "roles": {
+        "client": "Cliente",
+        "consultant": "Consultor",
+        "admin": "Administrador"
+      }
+    },
+    "content": {
+      "title": "Gestión de Contenido",
+      "services": "Servicios",
+      "caseStudies": "Casos de Éxito",
+      "blog": "Artículos del Blog",
+      "pages": "Páginas",
+      "categories": "Categorías",
+      "media": "Biblioteca de Medios"
+    },
+    "settings": {
+      "title": "Configuración del Sistema",
+      "general": "Configuración General",
+      "appearance": "Apariencia",
+      "email": "Configuración de Correo",
+      "security": "Configuración de Seguridad",
+      "integrations": "Integraciones",
+      "apiKeys": "Claves API",
+      "billing": "Configuración de Facturación"
+    },
+    "analytics": {
+      "title": "Analíticas",
+      "overview": "Resumen",
+      "users": "Analíticas de Usuarios",
+      "projects": "Analíticas de Proyectos",
+      "revenue": "Analíticas de Ingresos",
+      "content": "Analíticas de Contenido",
+      "export": "Exportar Datos"
+    }
+  },
+  "errors": {
+    "general": {
+      "title": "Se produjo un error",
+      "message": "Algo salió mal. Por favor, inténtelo de nuevo.",
+      "retry": "Reintentar",
+      "contact": "Contactar a Soporte"
+    },
+    "notFound": {
+      "title": "Página No Encontrada",
+      "message": "La página que está buscando no existe o ha sido movida.",
+      "goHome": "Ir a la Página Principal"
+    },
+    "unauthorized": {
+      "title": "No Autorizado",
+      "message": "No tiene permiso para acceder a este recurso.",
+      "login": "Iniciar Sesión"
+    },
+    "forbidden": {
+      "title": "Acceso Denegado",
+      "message": "No tiene permiso para acceder a esta página.",
+      "contact": "Contactar a Soporte"
+    },
+    "serverError": {
+      "title": "Error del Servidor",
+      "message": "Se produjo un error interno del servidor. Por favor, inténtelo más tarde.",
+      "refresh": "Actualizar Página"
+    },
+    "validation": {
+      "required": "Este campo es obligatorio",
+      "email": "Por favor ingrese una dirección de correo válida",
+      "minLength": "Este campo debe tener al menos {{count}} carácter",
+      "minLength_plural": "Este campo debe tener al menos {{count}} caracteres",
+      "maxLength": "Este campo no debe exceder {{count}} carácter",
+      "maxLength_plural": "Este campo no debe exceder {{count}} caracteres",
+      "passwordMatch": "Las contraseñas deben coincidir",
+      "invalidFormat": "Formato inválido"
+    }
+  },
+  "footer": {
+    "company": {
+      "about": "Sobre Nosotros",
+      "team": "Nuestro Equipo",
+      "careers": "Carreras",
+      "contact": "Contáctenos"
+    },
+    "services": {
+      "title": "Servicios",
+      "consulting": "Consultoría",
+      "strategy": "Estrategia",
+      "operations": "Operaciones",
+      "technology": "Tecnología",
+      "viewAll": "Ver Todos los Servicios"
+    },
+    "resources": {
+      "title": "Recursos",
+      "blog": "Blog",
+      "caseStudies": "Casos de Éxito",
+      "events": "Eventos",
+      "tools": "Herramientas Gratuitas"
+    },
+    "legal": {
+      "terms": "Términos de Servicio",
+      "privacy": "Política de Privacidad",
+      "cookies": "Política de Cookies",
+      "security": "Seguridad"
+    },
+    "social": {
+      "followUs": "Síguenos",
+      "linkedin": "LinkedIn",
+      "twitter": "Twitter",
+      "facebook": "Facebook",
+      "instagram": "Instagram"
+    },
+    "newsletter": {
+      "title": "Suscríbete a nuestro boletín",
+      "placeholder": "Tu correo electrónico",
+      "button": "Suscribir",
+      "privacy": "Respetamos tu privacidad y nunca compartiremos tu información."
+    },
+    "copyright": "© {{year}} InsightSerenity. Todos los derechos reservados."
+  }
+}
